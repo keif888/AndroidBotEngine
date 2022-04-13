@@ -38,6 +38,9 @@ namespace ScriptEditor
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tvBotData = new System.Windows.Forms.TreeView();
+            this.gbAppName = new System.Windows.Forms.GroupBox();
+            this.label24 = new System.Windows.Forms.Label();
+            this.tbAppNameAppId = new System.Windows.Forms.TextBox();
             this.gbPickAction = new System.Windows.Forms.GroupBox();
             this.cbPickActionAction = new System.Windows.Forms.ComboBox();
             this.label23 = new System.Windows.Forms.Label();
@@ -114,11 +117,14 @@ namespace ScriptEditor
             this.tbPointY = new System.Windows.Forms.MaskedTextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.label25 = new System.Windows.Forms.Label();
+            this.tbAppNameTimeout = new System.Windows.Forms.MaskedTextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.gbAppName.SuspendLayout();
             this.gbPickAction.SuspendLayout();
             this.gbAppControl.SuspendLayout();
             this.gbWFNC.SuspendLayout();
@@ -167,7 +173,7 @@ namespace ScriptEditor
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.openToolStripMenuItem.Text = "&Open";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
@@ -175,6 +181,7 @@ namespace ScriptEditor
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.saveToolStripMenuItem.Text = "&Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
@@ -186,6 +193,7 @@ namespace ScriptEditor
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
             // splitContainer1
             // 
@@ -200,6 +208,7 @@ namespace ScriptEditor
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.gbAppName);
             this.splitContainer1.Panel2.Controls.Add(this.gbPickAction);
             this.splitContainer1.Panel2.Controls.Add(this.gbAppControl);
             this.splitContainer1.Panel2.Controls.Add(this.gbWFNC);
@@ -214,7 +223,7 @@ namespace ScriptEditor
             this.splitContainer1.Panel2.Controls.Add(this.gbDrag);
             this.splitContainer1.Panel2.Controls.Add(this.gbClick);
             this.splitContainer1.Panel2.Cursor = System.Windows.Forms.Cursors.Default;
-            this.splitContainer1.Size = new System.Drawing.Size(1184, 537);
+            this.splitContainer1.Size = new System.Drawing.Size(1184, 595);
             this.splitContainer1.SplitterDistance = 277;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -224,20 +233,53 @@ namespace ScriptEditor
             this.tvBotData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvBotData.Location = new System.Drawing.Point(0, 0);
             this.tvBotData.Name = "tvBotData";
-            this.tvBotData.Size = new System.Drawing.Size(277, 537);
+            this.tvBotData.Size = new System.Drawing.Size(277, 595);
             this.tvBotData.TabIndex = 0;
-            this.tvBotData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvBotData_AfterSelect);
+            this.tvBotData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TvBotData_AfterSelect);
+            // 
+            // gbAppName
+            // 
+            this.gbAppName.Controls.Add(this.label25);
+            this.gbAppName.Controls.Add(this.tbAppNameTimeout);
+            this.gbAppName.Controls.Add(this.label24);
+            this.gbAppName.Controls.Add(this.tbAppNameAppId);
+            this.gbAppName.Enabled = false;
+            this.gbAppName.Location = new System.Drawing.Point(9, 476);
+            this.gbAppName.Name = "gbAppName";
+            this.gbAppName.Size = new System.Drawing.Size(438, 84);
+            this.gbAppName.TabIndex = 23;
+            this.gbAppName.TabStop = false;
+            this.gbAppName.Text = "App Name";
+            this.gbAppName.Visible = false;
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(7, 27);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(42, 15);
+            this.label24.TabIndex = 1;
+            this.label24.Text = "App Id";
+            // 
+            // tbAppNameAppId
+            // 
+            this.tbAppNameAppId.Location = new System.Drawing.Point(77, 20);
+            this.tbAppNameAppId.Name = "tbAppNameAppId";
+            this.tbAppNameAppId.Size = new System.Drawing.Size(355, 23);
+            this.tbAppNameAppId.TabIndex = 0;
             // 
             // gbPickAction
             // 
             this.gbPickAction.Controls.Add(this.cbPickActionAction);
             this.gbPickAction.Controls.Add(this.label23);
+            this.gbPickAction.Enabled = false;
             this.gbPickAction.Location = new System.Drawing.Point(497, 404);
             this.gbPickAction.Name = "gbPickAction";
             this.gbPickAction.Size = new System.Drawing.Size(293, 58);
             this.gbPickAction.TabIndex = 22;
             this.gbPickAction.TabStop = false;
             this.gbPickAction.Text = "Action";
+            this.gbPickAction.Visible = false;
             // 
             // cbPickActionAction
             // 
@@ -660,6 +702,7 @@ namespace ScriptEditor
             this.btnUpdate.TabIndex = 16;
             this.btnUpdate.Text = "Update";
             this.btnUpdate.UseVisualStyleBackColor = true;
+            this.btnUpdate.Click += new System.EventHandler(this.BtnUpdate_Click);
             // 
             // gbSleep
             // 
@@ -976,11 +1019,29 @@ namespace ScriptEditor
             this.openFileDialog1.Filter = "json files|*.json|All files|*.*";
             this.openFileDialog1.Title = "Bot Config";
             // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(7, 56);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(79, 15);
+            this.label25.TabIndex = 12;
+            this.label25.Text = "Wait Time ms";
+            // 
+            // tbAppNameTimeout
+            // 
+            this.tbAppNameTimeout.Location = new System.Drawing.Point(92, 53);
+            this.tbAppNameTimeout.Mask = "#00000";
+            this.tbAppNameTimeout.Name = "tbAppNameTimeout";
+            this.tbAppNameTimeout.Size = new System.Drawing.Size(71, 23);
+            this.tbAppNameTimeout.TabIndex = 11;
+            this.tbAppNameTimeout.ValidatingType = typeof(int);
+            // 
             // ScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1184, 561);
+            this.ClientSize = new System.Drawing.Size(1184, 619);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -992,6 +1053,8 @@ namespace ScriptEditor
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.gbAppName.ResumeLayout(false);
+            this.gbAppName.PerformLayout();
             this.gbPickAction.ResumeLayout(false);
             this.gbPickAction.PerformLayout();
             this.gbAppControl.ResumeLayout(false);
@@ -1108,6 +1171,11 @@ namespace ScriptEditor
         private System.Windows.Forms.GroupBox gbPickAction;
         private System.Windows.Forms.ComboBox cbPickActionAction;
         private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.GroupBox gbAppName;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.TextBox tbAppNameAppId;
+        private System.Windows.Forms.Label label25;
+        private System.Windows.Forms.MaskedTextBox tbAppNameTimeout;
     }
 }
 

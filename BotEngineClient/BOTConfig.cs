@@ -37,7 +37,7 @@ namespace BotEngineClient
         /// <summary>
         /// Used to store what time of day a "ActionType = Daily" runs once after.
         /// </summary>
-        public DateTime DailyScheduledTime { get; set; }
+        public DateTime? DailyScheduledTime { get; set; }
         /// <summary>
         /// Used to determine what type of Action this is.
         /// Scheduled = Runs every Frequency Minutes

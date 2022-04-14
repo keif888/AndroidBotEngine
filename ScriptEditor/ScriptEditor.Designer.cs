@@ -36,9 +36,20 @@ namespace ScriptEditor
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.belowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.textToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.validateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tvBotData = new System.Windows.Forms.TreeView();
             this.gbAppName = new System.Windows.Forms.GroupBox();
+            this.label25 = new System.Windows.Forms.Label();
+            this.tbAppNameTimeout = new System.Windows.Forms.MaskedTextBox();
             this.label24 = new System.Windows.Forms.Label();
             this.tbAppNameAppId = new System.Windows.Forms.TextBox();
             this.gbPickAction = new System.Windows.Forms.GroupBox();
@@ -117,8 +128,6 @@ namespace ScriptEditor
             this.tbPointY = new System.Windows.Forms.MaskedTextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.label25 = new System.Windows.Forms.Label();
-            this.tbAppNameTimeout = new System.Windows.Forms.MaskedTextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -143,7 +152,11 @@ namespace ScriptEditor
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.addToolStripMenuItem,
+            this.textToolStripMenuItem,
+            this.testToolStripMenuItem,
+            this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1184, 24);
@@ -194,6 +207,70 @@ namespace ScriptEditor
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
+            // 
+            // addToolStripMenuItem
+            // 
+            this.addToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboveToolStripMenuItem,
+            this.belowToolStripMenuItem});
+            this.addToolStripMenuItem.Name = "addToolStripMenuItem";
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(41, 20);
+            this.addToolStripMenuItem.Text = "&Add";
+            // 
+            // aboveToolStripMenuItem
+            // 
+            this.aboveToolStripMenuItem.Name = "aboveToolStripMenuItem";
+            this.aboveToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
+            this.aboveToolStripMenuItem.Text = "&Above";
+            // 
+            // belowToolStripMenuItem
+            // 
+            this.belowToolStripMenuItem.Name = "belowToolStripMenuItem";
+            this.belowToolStripMenuItem.Size = new System.Drawing.Size(108, 22);
+            this.belowToolStripMenuItem.Text = "&Below";
+            // 
+            // textToolStripMenuItem
+            // 
+            this.textToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setupToolStripMenuItem,
+            this.validateToolStripMenuItem});
+            this.textToolStripMenuItem.Name = "textToolStripMenuItem";
+            this.textToolStripMenuItem.Size = new System.Drawing.Size(40, 20);
+            this.textToolStripMenuItem.Text = "&Text";
+            // 
+            // setupToolStripMenuItem
+            // 
+            this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
+            this.setupToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.setupToolStripMenuItem.Text = "&Setup";
+            this.setupToolStripMenuItem.Click += new System.EventHandler(this.setupToolStripMenuItem_Click);
+            // 
+            // validateToolStripMenuItem
+            // 
+            this.validateToolStripMenuItem.Name = "validateToolStripMenuItem";
+            this.validateToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.validateToolStripMenuItem.Text = "&Validate";
+            // 
+            // testToolStripMenuItem
+            // 
+            this.testToolStripMenuItem.Name = "testToolStripMenuItem";
+            this.testToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            this.testToolStripMenuItem.Text = "T&est";
+            this.testToolStripMenuItem.Click += new System.EventHandler(this.testToolStripMenuItem_Click);
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "&Help";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Text = "&About";
             // 
             // splitContainer1
             // 
@@ -251,6 +328,24 @@ namespace ScriptEditor
             this.gbAppName.TabStop = false;
             this.gbAppName.Text = "App Name";
             this.gbAppName.Visible = false;
+            // 
+            // label25
+            // 
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(7, 56);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(79, 15);
+            this.label25.TabIndex = 12;
+            this.label25.Text = "Wait Time ms";
+            // 
+            // tbAppNameTimeout
+            // 
+            this.tbAppNameTimeout.Location = new System.Drawing.Point(92, 53);
+            this.tbAppNameTimeout.Mask = "#00000";
+            this.tbAppNameTimeout.Name = "tbAppNameTimeout";
+            this.tbAppNameTimeout.Size = new System.Drawing.Size(71, 23);
+            this.tbAppNameTimeout.TabIndex = 11;
+            this.tbAppNameTimeout.ValidatingType = typeof(int);
             // 
             // label24
             // 
@@ -1019,24 +1114,6 @@ namespace ScriptEditor
             this.openFileDialog1.Filter = "json files|*.json|All files|*.*";
             this.openFileDialog1.Title = "Bot Config";
             // 
-            // label25
-            // 
-            this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(7, 56);
-            this.label25.Name = "label25";
-            this.label25.Size = new System.Drawing.Size(79, 15);
-            this.label25.TabIndex = 12;
-            this.label25.Text = "Wait Time ms";
-            // 
-            // tbAppNameTimeout
-            // 
-            this.tbAppNameTimeout.Location = new System.Drawing.Point(92, 53);
-            this.tbAppNameTimeout.Mask = "#00000";
-            this.tbAppNameTimeout.Name = "tbAppNameTimeout";
-            this.tbAppNameTimeout.Size = new System.Drawing.Size(71, 23);
-            this.tbAppNameTimeout.TabIndex = 11;
-            this.tbAppNameTimeout.ValidatingType = typeof(int);
-            // 
             // ScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1176,6 +1253,15 @@ namespace ScriptEditor
         private System.Windows.Forms.TextBox tbAppNameAppId;
         private System.Windows.Forms.Label label25;
         private System.Windows.Forms.MaskedTextBox tbAppNameTimeout;
+        private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem belowToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem textToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem setupToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem validateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
     }
 }
 

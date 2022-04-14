@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.Json;
 using BotEngineClient;
+using SharpAdbClient;
 
 namespace ScriptEditor
 {
@@ -17,6 +18,7 @@ namespace ScriptEditor
     {
         private BOTConfig moeConfig;
         private bool ChangePending;
+        private AdbServer? server;
 
         public ScriptEditor()
         {
@@ -597,6 +599,21 @@ namespace ScriptEditor
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void testToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void setupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FindTextEdit fte = new FindTextEdit();
+            if (fte.ShowDialog() == DialogResult.OK)
+            {
+                string searchText = fte.SearchText;
+                Rectangle searchArea = fte.SearchRectangle;
+            }
         }
     }
 }

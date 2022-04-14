@@ -15,4 +15,16 @@
     <ProjectReference Include="..\BotEngineClient\BotEngineClient.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ADB\adb.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ADB\AdbWinApi.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ADB\AdbWinUsbApi.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

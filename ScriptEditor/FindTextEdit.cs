@@ -18,9 +18,11 @@ namespace ScriptEditor
         private AdbServer? server;
         private string colourString;
         private FindText.FindMode findMode;
+        private bool UsePos;
         private readonly List<CellItems> savedRows;
         private int removedTop, removedBottom, removedLeft, removedRight;
         private Point lastSelected;
+        private bool MultiColour;
 
         public string SearchText { get; private set; }
         public Rectangle SearchRectangle { get; private set; }
@@ -53,6 +55,9 @@ namespace ScriptEditor
                 if (pi != null)
                     pi.SetValue(dgvImage, true, null);
             }
+            MultiColour = false;
+            UsePos = false;
+            tcColourTabs.SelectedTab = tpGray;
         }
 
         private void btnLoadPic_Click(object sender, EventArgs e)
@@ -271,8 +276,6 @@ namespace ScriptEditor
             }
         }
 
-
-
         private void btnColour2Two_Click(object sender, EventArgs e)
         {
             //GuiControlGet, c,, SelColor
@@ -313,6 +316,60 @@ namespace ScriptEditor
 
 
             findMode = FindText.FindMode.colourMode;
+            UsePos = false;
+            dgvImage.SuspendLayout();
+            for (int i = 0; i < dgvImage.Columns.Count; i++)
+                for (int j = 0; j < dgvImage.Rows.Count; j++)
+                {
+                    ColourGridTag? tag = (ColourGridTag)dgvImage.Rows[j].Cells[i].Tag;
+                    if (tag != null)
+                    {
+                        colour = Convert.ToUInt32(tag.ColourString.Substring(2), 16);
+                        int r = (int)tag.Red - rr;
+                        int g = (int)tag.Green - gg;
+                        int b = (int)tag.Blue - bb;
+                        int jx = (int)r + (int)rr + (int)rr;
+
+                        if ((1024 + jx) * r * r + 2048 * g * g + (1534 - jx) * b * b <= colourSimilarity)
+                        {
+                            tag.Black = true;
+                            dgvImage.Rows[j].Cells[i].Value = blackBitmap;
+                        }
+                        else
+                        {
+                            tag.Black = false;
+                            dgvImage.Rows[j].Cells[i].Value = whiteBitmap;
+                        }
+                    }
+                }
+
+
+            dgvImage.ResumeLayout();
+            if (!HasBeenGrayed)
+            {
+                HasBeenGrayed = true;
+            }
+        }
+
+        private void btnColourPos2Two_Click(object sender, EventArgs e)
+        {
+            if (tbColour.Text == "")
+            {
+                MessageBox.Show("Select a colour square on the grid to select the colour to be similar to.", "Select Colour", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            string colourSelected = tbColour.Text;
+            decimal colourSimilarity = Math.Round(tbColourPosSimilarity.Value / 100.0m, 2);
+            colourString = string.Format("{0}@{1}", colourSelected, colourSimilarity);
+            colourSimilarity = Math.Floor(512m * 9m * 255m * 255m * (1m - colourSimilarity) * (1m - colourSimilarity));
+            uint colour = Convert.ToUInt32(tbColour.Text.Substring(2), 16);
+            int rr = (int)((colour >> 16) & 0xFF);
+            int gg = (int)((colour >> 8) & 0xFF);
+            int bb = (int)(colour & 0xFF);
+
+            findMode = FindText.FindMode.colourMode;
+            UsePos = true;
             dgvImage.SuspendLayout();
             for (int i = 0; i < dgvImage.Columns.Count; i++)
                 for (int j = 0; j < dgvImage.Rows.Count; j++)
@@ -819,6 +876,18 @@ namespace ScriptEditor
             this.Close();
         }
 
+        private void tcColourTabs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (tcColourTabs.SelectedTab != tpMultiColour)
+            {
+                cbFindMultiColour.Checked = false;
+            }
+        }
+
+        private void cbFindMultiColour_CheckedChanged(object sender, EventArgs e)
+        {
+            MultiColour = cbFindMultiColour.Checked;
+        }
 
         private void clearUI()
         {
@@ -908,7 +977,7 @@ namespace ScriptEditor
                     else
                         txt += "0";
                 }
-            if (findMode == FindText.FindMode.colourPositionMode)
+            if (findMode == FindText.FindMode.colourMode && UsePos && !MultiColour)
             {
                 //if InStr(color,"@") and (UsePos) and (!MultiColor)
                 //{
@@ -918,15 +987,15 @@ namespace ScriptEditor
                 //  Loop, % nW*nH
                 //  {
                 int k = 0, l = 0;
-                for (int i = 0; i < dgvImage.Columns.Count; i++)
-                    for (int j = 0; j < dgvImage.Rows.Count; j++)
+                for (int j = 0; j < dgvImage.Rows.Count; j++)
+                    for (int i = 0; i < dgvImage.Columns.Count; i++)
                     {
                         //    if (!show[++k])
                         //      Continue
-                        if ((dgvImage.Rows[j].Cells[i].Tag as ColourGridTag).Black == true)
+                        k++;
+                        if ((dgvImage.Rows[j].Cells[i].Tag as ColourGridTag).Black == false)
                             continue;  // Because the outer FOR doesn't have any code, can live with this.
                         //    i++
-                        k++;
                         if (lastSelected == new Point(i,j))
                         {
                             //    if (k=cors.SelPos)

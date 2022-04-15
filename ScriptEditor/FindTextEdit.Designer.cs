@@ -65,23 +65,23 @@ namespace ScriptEditor
             this.btnCropTop = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.btnCropTopNegative = new System.Windows.Forms.Button();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tcColourTabs = new System.Windows.Forms.TabControl();
+            this.tpGray = new System.Windows.Forms.TabPage();
             this.btnGray2Two = new System.Windows.Forms.Button();
             this.tbGrayThreshold = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tpGrayDiff = new System.Windows.Forms.TabPage();
             this.tbGrayDifference = new System.Windows.Forms.NumericUpDown();
             this.btnGrayDiff2Two = new System.Windows.Forms.Button();
             this.label10 = new System.Windows.Forms.Label();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.tpColour = new System.Windows.Forms.TabPage();
+            this.tbColourSimilarity = new System.Windows.Forms.NumericUpDown();
             this.btnColour2Two = new System.Windows.Forms.Button();
             this.label11 = new System.Windows.Forms.Label();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.tpColourPos = new System.Windows.Forms.TabPage();
             this.btnColourPos2Two = new System.Windows.Forms.Button();
-            this.tbColourPosSlider = new System.Windows.Forms.TrackBar();
             this.label12 = new System.Windows.Forms.Label();
-            this.tabPage5 = new System.Windows.Forms.TabPage();
+            this.tpColourDiff = new System.Windows.Forms.TabPage();
             this.btnColourDiff2Two = new System.Windows.Forms.Button();
             this.label15 = new System.Windows.Forms.Label();
             this.nudBlue = new System.Windows.Forms.NumericUpDown();
@@ -89,7 +89,7 @@ namespace ScriptEditor
             this.nudGreen = new System.Windows.Forms.NumericUpDown();
             this.label13 = new System.Windows.Forms.Label();
             this.nudRed = new System.Windows.Forms.NumericUpDown();
-            this.tabPage6 = new System.Windows.Forms.TabPage();
+            this.tpMultiColour = new System.Windows.Forms.TabPage();
             this.btnUndo = new System.Windows.Forms.Button();
             this.cbFindMultiColour = new System.Windows.Forms.CheckBox();
             this.label16 = new System.Windows.Forms.Label();
@@ -101,24 +101,24 @@ namespace ScriptEditor
             this.btnCancel = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.tbColourSimilarity = new System.Windows.Forms.NumericUpDown();
+            this.tbColourPosSimilarity = new System.Windows.Forms.NumericUpDown();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvImage)).BeginInit();
             this.panel2.SuspendLayout();
-            this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
+            this.tcColourTabs.SuspendLayout();
+            this.tpGray.SuspendLayout();
+            this.tpGrayDiff.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbGrayDifference)).BeginInit();
-            this.tabPage3.SuspendLayout();
-            this.tabPage4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tbColourPosSlider)).BeginInit();
-            this.tabPage5.SuspendLayout();
+            this.tpColour.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbColourSimilarity)).BeginInit();
+            this.tpColourPos.SuspendLayout();
+            this.tpColourDiff.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudBlue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGreen)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRed)).BeginInit();
-            this.tabPage6.SuspendLayout();
+            this.tpMultiColour.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRGB)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbColourSimilarity)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tbColourPosSimilarity)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -190,7 +190,7 @@ namespace ScriptEditor
             this.panel2.Controls.Add(this.btnCropTop);
             this.panel2.Controls.Add(this.label1);
             this.panel2.Controls.Add(this.btnCropTopNegative);
-            this.panel2.Controls.Add(this.tabControl1);
+            this.panel2.Controls.Add(this.tcColourTabs);
             this.panel2.Controls.Add(this.btnReset);
             this.panel2.Controls.Add(this.tbOutputText);
             this.panel2.Controls.Add(this.btnGenText);
@@ -502,32 +502,33 @@ namespace ScriptEditor
             this.btnCropTopNegative.UseVisualStyleBackColor = true;
             this.btnCropTopNegative.Click += new System.EventHandler(this.btnCropTopNegative_Click);
             // 
-            // tabControl1
+            // tcColourTabs
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
-            this.tabControl1.Controls.Add(this.tabPage4);
-            this.tabControl1.Controls.Add(this.tabPage5);
-            this.tabControl1.Controls.Add(this.tabPage6);
-            this.tabControl1.Location = new System.Drawing.Point(312, 42);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(419, 100);
-            this.tabControl1.TabIndex = 5;
+            this.tcColourTabs.Controls.Add(this.tpGray);
+            this.tcColourTabs.Controls.Add(this.tpGrayDiff);
+            this.tcColourTabs.Controls.Add(this.tpColour);
+            this.tcColourTabs.Controls.Add(this.tpColourPos);
+            this.tcColourTabs.Controls.Add(this.tpColourDiff);
+            this.tcColourTabs.Controls.Add(this.tpMultiColour);
+            this.tcColourTabs.Location = new System.Drawing.Point(312, 42);
+            this.tcColourTabs.Name = "tcColourTabs";
+            this.tcColourTabs.SelectedIndex = 0;
+            this.tcColourTabs.Size = new System.Drawing.Size(419, 100);
+            this.tcColourTabs.TabIndex = 5;
+            this.tcColourTabs.SelectedIndexChanged += new System.EventHandler(this.tcColourTabs_SelectedIndexChanged);
             // 
-            // tabPage1
+            // tpGray
             // 
-            this.tabPage1.Controls.Add(this.btnGray2Two);
-            this.tabPage1.Controls.Add(this.tbGrayThreshold);
-            this.tabPage1.Controls.Add(this.label3);
-            this.tabPage1.Location = new System.Drawing.Point(4, 24);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(411, 72);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Gray";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tpGray.Controls.Add(this.btnGray2Two);
+            this.tpGray.Controls.Add(this.tbGrayThreshold);
+            this.tpGray.Controls.Add(this.label3);
+            this.tpGray.Location = new System.Drawing.Point(4, 24);
+            this.tpGray.Name = "tpGray";
+            this.tpGray.Padding = new System.Windows.Forms.Padding(3);
+            this.tpGray.Size = new System.Drawing.Size(411, 72);
+            this.tpGray.TabIndex = 0;
+            this.tpGray.Text = "Gray";
+            this.tpGray.UseVisualStyleBackColor = true;
             // 
             // btnGray2Two
             // 
@@ -555,18 +556,18 @@ namespace ScriptEditor
             this.label3.TabIndex = 0;
             this.label3.Text = "Gray Threshold";
             // 
-            // tabPage2
+            // tpGrayDiff
             // 
-            this.tabPage2.Controls.Add(this.tbGrayDifference);
-            this.tabPage2.Controls.Add(this.btnGrayDiff2Two);
-            this.tabPage2.Controls.Add(this.label10);
-            this.tabPage2.Location = new System.Drawing.Point(4, 24);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(411, 72);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "GrayDiff";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.tpGrayDiff.Controls.Add(this.tbGrayDifference);
+            this.tpGrayDiff.Controls.Add(this.btnGrayDiff2Two);
+            this.tpGrayDiff.Controls.Add(this.label10);
+            this.tpGrayDiff.Location = new System.Drawing.Point(4, 24);
+            this.tpGrayDiff.Name = "tpGrayDiff";
+            this.tpGrayDiff.Padding = new System.Windows.Forms.Padding(3);
+            this.tpGrayDiff.Size = new System.Drawing.Size(411, 72);
+            this.tpGrayDiff.TabIndex = 1;
+            this.tpGrayDiff.Text = "GrayDiff";
+            this.tpGrayDiff.UseVisualStyleBackColor = true;
             // 
             // tbGrayDifference
             // 
@@ -604,18 +605,30 @@ namespace ScriptEditor
             this.label10.TabIndex = 3;
             this.label10.Text = "Gray Difference";
             // 
-            // tabPage3
+            // tpColour
             // 
-            this.tabPage3.Controls.Add(this.tbColourSimilarity);
-            this.tabPage3.Controls.Add(this.btnColour2Two);
-            this.tabPage3.Controls.Add(this.label11);
-            this.tabPage3.Location = new System.Drawing.Point(4, 24);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage3.Size = new System.Drawing.Size(411, 72);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Colour";
-            this.tabPage3.UseVisualStyleBackColor = true;
+            this.tpColour.Controls.Add(this.tbColourSimilarity);
+            this.tpColour.Controls.Add(this.btnColour2Two);
+            this.tpColour.Controls.Add(this.label11);
+            this.tpColour.Location = new System.Drawing.Point(4, 24);
+            this.tpColour.Name = "tpColour";
+            this.tpColour.Padding = new System.Windows.Forms.Padding(3);
+            this.tpColour.Size = new System.Drawing.Size(411, 72);
+            this.tpColour.TabIndex = 2;
+            this.tpColour.Text = "Colour";
+            this.tpColour.UseVisualStyleBackColor = true;
+            // 
+            // tbColourSimilarity
+            // 
+            this.tbColourSimilarity.Location = new System.Drawing.Point(69, 7);
+            this.tbColourSimilarity.Name = "tbColourSimilarity";
+            this.tbColourSimilarity.Size = new System.Drawing.Size(57, 23);
+            this.tbColourSimilarity.TabIndex = 7;
+            this.tbColourSimilarity.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
             // 
             // btnColour2Two
             // 
@@ -636,37 +649,28 @@ namespace ScriptEditor
             this.label11.TabIndex = 1;
             this.label11.Text = "Similarity";
             // 
-            // tabPage4
+            // tpColourPos
             // 
-            this.tabPage4.Controls.Add(this.btnColourPos2Two);
-            this.tabPage4.Controls.Add(this.tbColourPosSlider);
-            this.tabPage4.Controls.Add(this.label12);
-            this.tabPage4.Location = new System.Drawing.Point(4, 24);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage4.Size = new System.Drawing.Size(411, 72);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "ColourPos";
-            this.tabPage4.UseVisualStyleBackColor = true;
+            this.tpColourPos.Controls.Add(this.tbColourPosSimilarity);
+            this.tpColourPos.Controls.Add(this.btnColourPos2Two);
+            this.tpColourPos.Controls.Add(this.label12);
+            this.tpColourPos.Location = new System.Drawing.Point(4, 24);
+            this.tpColourPos.Name = "tpColourPos";
+            this.tpColourPos.Padding = new System.Windows.Forms.Padding(3);
+            this.tpColourPos.Size = new System.Drawing.Size(411, 72);
+            this.tpColourPos.TabIndex = 3;
+            this.tpColourPos.Text = "ColourPos";
+            this.tpColourPos.UseVisualStyleBackColor = true;
             // 
             // btnColourPos2Two
             // 
-            this.btnColourPos2Two.Location = new System.Drawing.Point(295, 7);
+            this.btnColourPos2Two.Location = new System.Drawing.Point(144, 5);
             this.btnColourPos2Two.Name = "btnColourPos2Two";
             this.btnColourPos2Two.Size = new System.Drawing.Size(108, 23);
             this.btnColourPos2Two.TabIndex = 9;
             this.btnColourPos2Two.Text = "Colour Pos 2 Two";
             this.btnColourPos2Two.UseVisualStyleBackColor = true;
-            // 
-            // tbColourPosSlider
-            // 
-            this.tbColourPosSlider.Location = new System.Drawing.Point(70, 5);
-            this.tbColourPosSlider.Maximum = 100;
-            this.tbColourPosSlider.Name = "tbColourPosSlider";
-            this.tbColourPosSlider.Size = new System.Drawing.Size(219, 45);
-            this.tbColourPosSlider.TabIndex = 8;
-            this.tbColourPosSlider.TickStyle = System.Windows.Forms.TickStyle.None;
-            this.tbColourPosSlider.Value = 100;
+            this.btnColourPos2Two.Click += new System.EventHandler(this.btnColourPos2Two_Click);
             // 
             // label12
             // 
@@ -677,22 +681,22 @@ namespace ScriptEditor
             this.label12.TabIndex = 7;
             this.label12.Text = "Similarity";
             // 
-            // tabPage5
+            // tpColourDiff
             // 
-            this.tabPage5.Controls.Add(this.btnColourDiff2Two);
-            this.tabPage5.Controls.Add(this.label15);
-            this.tabPage5.Controls.Add(this.nudBlue);
-            this.tabPage5.Controls.Add(this.label14);
-            this.tabPage5.Controls.Add(this.nudGreen);
-            this.tabPage5.Controls.Add(this.label13);
-            this.tabPage5.Controls.Add(this.nudRed);
-            this.tabPage5.Location = new System.Drawing.Point(4, 24);
-            this.tabPage5.Name = "tabPage5";
-            this.tabPage5.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage5.Size = new System.Drawing.Size(411, 72);
-            this.tabPage5.TabIndex = 4;
-            this.tabPage5.Text = "ColourDiff";
-            this.tabPage5.UseVisualStyleBackColor = true;
+            this.tpColourDiff.Controls.Add(this.btnColourDiff2Two);
+            this.tpColourDiff.Controls.Add(this.label15);
+            this.tpColourDiff.Controls.Add(this.nudBlue);
+            this.tpColourDiff.Controls.Add(this.label14);
+            this.tpColourDiff.Controls.Add(this.nudGreen);
+            this.tpColourDiff.Controls.Add(this.label13);
+            this.tpColourDiff.Controls.Add(this.nudRed);
+            this.tpColourDiff.Location = new System.Drawing.Point(4, 24);
+            this.tpColourDiff.Name = "tpColourDiff";
+            this.tpColourDiff.Padding = new System.Windows.Forms.Padding(3);
+            this.tpColourDiff.Size = new System.Drawing.Size(411, 72);
+            this.tpColourDiff.TabIndex = 4;
+            this.tpColourDiff.Text = "ColourDiff";
+            this.tpColourDiff.UseVisualStyleBackColor = true;
             // 
             // btnColourDiff2Two
             // 
@@ -781,19 +785,19 @@ namespace ScriptEditor
             0,
             0});
             // 
-            // tabPage6
+            // tpMultiColour
             // 
-            this.tabPage6.Controls.Add(this.btnUndo);
-            this.tabPage6.Controls.Add(this.cbFindMultiColour);
-            this.tabPage6.Controls.Add(this.label16);
-            this.tabPage6.Controls.Add(this.nudRGB);
-            this.tabPage6.Location = new System.Drawing.Point(4, 24);
-            this.tabPage6.Name = "tabPage6";
-            this.tabPage6.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage6.Size = new System.Drawing.Size(411, 72);
-            this.tabPage6.TabIndex = 5;
-            this.tabPage6.Text = "MultiColour";
-            this.tabPage6.UseVisualStyleBackColor = true;
+            this.tpMultiColour.Controls.Add(this.btnUndo);
+            this.tpMultiColour.Controls.Add(this.cbFindMultiColour);
+            this.tpMultiColour.Controls.Add(this.label16);
+            this.tpMultiColour.Controls.Add(this.nudRGB);
+            this.tpMultiColour.Location = new System.Drawing.Point(4, 24);
+            this.tpMultiColour.Name = "tpMultiColour";
+            this.tpMultiColour.Padding = new System.Windows.Forms.Padding(3);
+            this.tpMultiColour.Size = new System.Drawing.Size(411, 72);
+            this.tpMultiColour.TabIndex = 5;
+            this.tpMultiColour.Text = "MultiColour";
+            this.tpMultiColour.UseVisualStyleBackColor = true;
             // 
             // btnUndo
             // 
@@ -813,6 +817,7 @@ namespace ScriptEditor
             this.cbFindMultiColour.TabIndex = 4;
             this.cbFindMultiColour.Text = "Find Multi Colour";
             this.cbFindMultiColour.UseVisualStyleBackColor = true;
+            this.cbFindMultiColour.CheckedChanged += new System.EventHandler(this.cbFindMultiColour_CheckedChanged);
             // 
             // label16
             // 
@@ -897,13 +902,13 @@ namespace ScriptEditor
             this.openFileDialog1.Filter = "BMP files|*.bmp|PNG files|*.png|All files|*.*";
             this.openFileDialog1.Title = "Image File";
             // 
-            // tbColourSimilarity
+            // tbColourPosSimilarity
             // 
-            this.tbColourSimilarity.Location = new System.Drawing.Point(69, 7);
-            this.tbColourSimilarity.Name = "tbColourSimilarity";
-            this.tbColourSimilarity.Size = new System.Drawing.Size(57, 23);
-            this.tbColourSimilarity.TabIndex = 7;
-            this.tbColourSimilarity.Value = new decimal(new int[] {
+            this.tbColourPosSimilarity.Location = new System.Drawing.Point(69, 5);
+            this.tbColourPosSimilarity.Name = "tbColourPosSimilarity";
+            this.tbColourPosSimilarity.Size = new System.Drawing.Size(56, 23);
+            this.tbColourPosSimilarity.TabIndex = 10;
+            this.tbColourPosSimilarity.Value = new decimal(new int[] {
             100,
             0,
             0,
@@ -923,26 +928,26 @@ namespace ScriptEditor
             ((System.ComponentModel.ISupportInitialize)(this.dgvImage)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            this.tabPage2.PerformLayout();
+            this.tcColourTabs.ResumeLayout(false);
+            this.tpGray.ResumeLayout(false);
+            this.tpGray.PerformLayout();
+            this.tpGrayDiff.ResumeLayout(false);
+            this.tpGrayDiff.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbGrayDifference)).EndInit();
-            this.tabPage3.ResumeLayout(false);
-            this.tabPage3.PerformLayout();
-            this.tabPage4.ResumeLayout(false);
-            this.tabPage4.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.tbColourPosSlider)).EndInit();
-            this.tabPage5.ResumeLayout(false);
-            this.tabPage5.PerformLayout();
+            this.tpColour.ResumeLayout(false);
+            this.tpColour.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbColourSimilarity)).EndInit();
+            this.tpColourPos.ResumeLayout(false);
+            this.tpColourPos.PerformLayout();
+            this.tpColourDiff.ResumeLayout(false);
+            this.tpColourDiff.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudBlue)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGreen)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRed)).EndInit();
-            this.tabPage6.ResumeLayout(false);
-            this.tabPage6.PerformLayout();
+            this.tpMultiColour.ResumeLayout(false);
+            this.tpMultiColour.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRGB)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbColourSimilarity)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tbColourPosSimilarity)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -983,16 +988,16 @@ namespace ScriptEditor
         private System.Windows.Forms.Button btnCropTop;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnCropTopNegative;
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabControl tcColourTabs;
+        private System.Windows.Forms.TabPage tpGray;
         private System.Windows.Forms.Button btnGray2Two;
         private System.Windows.Forms.TextBox tbGrayThreshold;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.TabPage tabPage4;
-        private System.Windows.Forms.TabPage tabPage5;
-        private System.Windows.Forms.TabPage tabPage6;
+        private System.Windows.Forms.TabPage tpGrayDiff;
+        private System.Windows.Forms.TabPage tpColour;
+        private System.Windows.Forms.TabPage tpColourPos;
+        private System.Windows.Forms.TabPage tpColourDiff;
+        private System.Windows.Forms.TabPage tpMultiColour;
         private System.Windows.Forms.Button btnReset;
         private System.Windows.Forms.TextBox tbOutputText;
         private System.Windows.Forms.Button btnGenText;
@@ -1003,7 +1008,6 @@ namespace ScriptEditor
         private System.Windows.Forms.Button btnColour2Two;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Button btnColourPos2Two;
-        private System.Windows.Forms.TrackBar tbColourPosSlider;
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.NumericUpDown nudGreen;
@@ -1021,5 +1025,6 @@ namespace ScriptEditor
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.NumericUpDown tbGrayDifference;
         private System.Windows.Forms.NumericUpDown tbColourSimilarity;
+        private System.Windows.Forms.NumericUpDown tbColourPosSimilarity;
     }
 }

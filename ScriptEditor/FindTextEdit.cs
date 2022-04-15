@@ -237,6 +237,40 @@ namespace ScriptEditor
             dgvImage.ResumeLayout();
         }
 
+        private void btnGrayDiff2Two_Click(object sender, EventArgs e)
+        {
+            int GrayDiff = (int)tbGrayDifference.Value;
+            colourString = string.Format("**{0}", GrayDiff);
+
+            findMode = FindText.FindMode.greyDifferenceMode;
+            dgvImage.SuspendLayout();
+            for (int i = 0; i < dgvImage.Columns.Count; i++)
+                for (int j = 0; j < dgvImage.Rows.Count; j++)
+                {
+                    ColourGridTag? tag = (ColourGridTag)dgvImage.Rows[j].Cells[i].Tag;
+                    if (tag != null)
+                    {
+                        if (tag.Gray <= GrayDiff)
+                        {
+                            tag.Black = true;
+                            dgvImage.Rows[j].Cells[i].Value = blackBitmap;
+                        }
+                        else
+                        {
+                            tag.Black = false;
+                            dgvImage.Rows[j].Cells[i].Value = whiteBitmap;
+                        }
+                    }
+                }
+
+
+            dgvImage.ResumeLayout();
+            if (!HasBeenGrayed)
+            {
+                HasBeenGrayed = true;
+            }
+        }
+
         private void btnReset_Click(object sender, EventArgs e)
         {
             if (savedRows.Count > 0)
@@ -709,11 +743,12 @@ namespace ScriptEditor
             this.Close();
         }
 
+
         private void clearUI()
         {
             lastSelected = Point.Empty;
             tbGrayThreshold.Text = string.Empty;
-            tbGrayDifference.Text = string.Empty;
+            tbGrayDifference.Value = 50;
             nudRed.Value = 255;
             nudGreen.Value = 255;
             nudBlue.Value = 255;

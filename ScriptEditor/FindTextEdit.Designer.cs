@@ -72,7 +72,6 @@ namespace ScriptEditor
             this.label3 = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.btnGrayDiff2Two = new System.Windows.Forms.Button();
-            this.tbGrayDifference = new System.Windows.Forms.TextBox();
             this.label10 = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.btnColour2Two = new System.Windows.Forms.Button();
@@ -102,6 +101,7 @@ namespace ScriptEditor
             this.btnCancel = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.tbGrayDifference = new System.Windows.Forms.NumericUpDown();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvImage)).BeginInit();
             this.panel2.SuspendLayout();
@@ -118,6 +118,7 @@ namespace ScriptEditor
             ((System.ComponentModel.ISupportInitialize)(this.nudRed)).BeginInit();
             this.tabPage6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRGB)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tbGrayDifference)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -556,8 +557,8 @@ namespace ScriptEditor
             // 
             // tabPage2
             // 
-            this.tabPage2.Controls.Add(this.btnGrayDiff2Two);
             this.tabPage2.Controls.Add(this.tbGrayDifference);
+            this.tabPage2.Controls.Add(this.btnGrayDiff2Two);
             this.tabPage2.Controls.Add(this.label10);
             this.tabPage2.Location = new System.Drawing.Point(4, 24);
             this.tabPage2.Name = "tabPage2";
@@ -575,13 +576,7 @@ namespace ScriptEditor
             this.btnGrayDiff2Two.TabIndex = 5;
             this.btnGrayDiff2Two.Text = "Gray Diff 2 Two";
             this.btnGrayDiff2Two.UseVisualStyleBackColor = true;
-            // 
-            // tbGrayDifference
-            // 
-            this.tbGrayDifference.Location = new System.Drawing.Point(100, 7);
-            this.tbGrayDifference.Name = "tbGrayDifference";
-            this.tbGrayDifference.Size = new System.Drawing.Size(100, 23);
-            this.tbGrayDifference.TabIndex = 4;
+            this.btnGrayDiff2Two.Click += new System.EventHandler(this.btnGrayDiff2Two_Click);
             // 
             // label10
             // 
@@ -894,6 +889,23 @@ namespace ScriptEditor
             this.openFileDialog1.Filter = "BMP files|*.bmp|PNG files|*.png|All files|*.*";
             this.openFileDialog1.Title = "Image File";
             // 
+            // tbGrayDifference
+            // 
+            this.tbGrayDifference.Location = new System.Drawing.Point(102, 7);
+            this.tbGrayDifference.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.tbGrayDifference.Name = "tbGrayDifference";
+            this.tbGrayDifference.Size = new System.Drawing.Size(99, 23);
+            this.tbGrayDifference.TabIndex = 6;
+            this.tbGrayDifference.Value = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            // 
             // FindTextEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -927,6 +939,7 @@ namespace ScriptEditor
             this.tabPage6.ResumeLayout(false);
             this.tabPage6.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRGB)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.tbGrayDifference)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -983,7 +996,6 @@ namespace ScriptEditor
         private System.Windows.Forms.Button btnOK;
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Button btnGrayDiff2Two;
-        private System.Windows.Forms.TextBox tbGrayDifference;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Button btnColour2Two;
         private System.Windows.Forms.TrackBar tbColourSlider;
@@ -1005,5 +1017,6 @@ namespace ScriptEditor
         private System.Windows.Forms.NumericUpDown nudRGB;
         private System.Windows.Forms.DataGridView dgvImage;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.NumericUpDown tbGrayDifference;
     }
 }

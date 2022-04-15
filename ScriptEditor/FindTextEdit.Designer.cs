@@ -79,6 +79,7 @@ namespace ScriptEditor
             this.btnColour2Two = new System.Windows.Forms.Button();
             this.label11 = new System.Windows.Forms.Label();
             this.tpColourPos = new System.Windows.Forms.TabPage();
+            this.tbColourPosSimilarity = new System.Windows.Forms.NumericUpDown();
             this.btnColourPos2Two = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
             this.tpColourDiff = new System.Windows.Forms.TabPage();
@@ -101,7 +102,6 @@ namespace ScriptEditor
             this.btnCancel = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.tbColourPosSimilarity = new System.Windows.Forms.NumericUpDown();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvImage)).BeginInit();
             this.panel2.SuspendLayout();
@@ -112,13 +112,13 @@ namespace ScriptEditor
             this.tpColour.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbColourSimilarity)).BeginInit();
             this.tpColourPos.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbColourPosSimilarity)).BeginInit();
             this.tpColourDiff.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudBlue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudGreen)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRed)).BeginInit();
             this.tpMultiColour.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRGB)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbColourPosSimilarity)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -662,6 +662,18 @@ namespace ScriptEditor
             this.tpColourPos.Text = "ColourPos";
             this.tpColourPos.UseVisualStyleBackColor = true;
             // 
+            // tbColourPosSimilarity
+            // 
+            this.tbColourPosSimilarity.Location = new System.Drawing.Point(69, 5);
+            this.tbColourPosSimilarity.Name = "tbColourPosSimilarity";
+            this.tbColourPosSimilarity.Size = new System.Drawing.Size(56, 23);
+            this.tbColourPosSimilarity.TabIndex = 10;
+            this.tbColourPosSimilarity.Value = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            // 
             // btnColourPos2Two
             // 
             this.btnColourPos2Two.Location = new System.Drawing.Point(144, 5);
@@ -706,6 +718,7 @@ namespace ScriptEditor
             this.btnColourDiff2Two.TabIndex = 10;
             this.btnColourDiff2Two.Text = "Colour Diff 2 Two";
             this.btnColourDiff2Two.UseVisualStyleBackColor = true;
+            this.btnColourDiff2Two.Click += new System.EventHandler(this.btnColourDiff2Two_Click);
             // 
             // label15
             // 
@@ -902,18 +915,6 @@ namespace ScriptEditor
             this.openFileDialog1.Filter = "BMP files|*.bmp|PNG files|*.png|All files|*.*";
             this.openFileDialog1.Title = "Image File";
             // 
-            // tbColourPosSimilarity
-            // 
-            this.tbColourPosSimilarity.Location = new System.Drawing.Point(69, 5);
-            this.tbColourPosSimilarity.Name = "tbColourPosSimilarity";
-            this.tbColourPosSimilarity.Size = new System.Drawing.Size(56, 23);
-            this.tbColourPosSimilarity.TabIndex = 10;
-            this.tbColourPosSimilarity.Value = new decimal(new int[] {
-            100,
-            0,
-            0,
-            0});
-            // 
             // FindTextEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -939,6 +940,7 @@ namespace ScriptEditor
             ((System.ComponentModel.ISupportInitialize)(this.tbColourSimilarity)).EndInit();
             this.tpColourPos.ResumeLayout(false);
             this.tpColourPos.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.tbColourPosSimilarity)).EndInit();
             this.tpColourDiff.ResumeLayout(false);
             this.tpColourDiff.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudBlue)).EndInit();
@@ -947,7 +949,6 @@ namespace ScriptEditor
             this.tpMultiColour.ResumeLayout(false);
             this.tpMultiColour.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRGB)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.tbColourPosSimilarity)).EndInit();
             this.ResumeLayout(false);
 
         }

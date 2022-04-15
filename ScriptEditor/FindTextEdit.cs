@@ -404,6 +404,56 @@ namespace ScriptEditor
             }
         }
 
+        private void btnColourDiff2Two_Click(object sender, EventArgs e)
+        {
+            if (tbColour.Text == "")
+            {
+                MessageBox.Show("Select a core colour square on the grid to select the colour to be similar to.", "Select Colour", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            uint colour = Convert.ToUInt32(tbColour.Text.Substring(2), 16);
+            int rr = (int)((colour >> 16) & 0xFF);
+            int gg = (int)((colour >> 8) & 0xFF);
+            int bb = (int)(colour & 0xFF);
+            uint newColour = (uint)nudRed.Value << 16 | (uint)nudGreen.Value << 8 | (uint)nudBlue.Value;
+            colourString = string.Format("{0}-{1:X6}", tbColour.Text.Substring(2), newColour);
+
+            findMode = FindText.FindMode.greyDifferenceMode;
+            dgvImage.SuspendLayout();
+            for (int i = 0; i < dgvImage.Columns.Count; i++)
+                for (int j = 0; j < dgvImage.Rows.Count; j++)
+                {
+                    ColourGridTag? tag = (ColourGridTag)dgvImage.Rows[j].Cells[i].Tag;
+                    if (tag != null)
+                    {
+                        colour = Convert.ToUInt32(tag.ColourString.Substring(2), 16);
+                        int r = (int)tag.Red;
+                        int g = (int)tag.Green;
+                        int b = (int)tag.Blue;
+
+                        if (Math.Abs(r - rr) < nudRed.Value && Math.Abs(g - gg) < nudGreen.Value && Math.Abs(b - bb) < nudBlue.Value)
+                        {
+                            tag.Black = true;
+                            dgvImage.Rows[j].Cells[i].Value = blackBitmap;
+                        }
+                        else
+                        {
+                            tag.Black = false;
+                            dgvImage.Rows[j].Cells[i].Value = whiteBitmap;
+                        }
+                    }
+                }
+
+
+            dgvImage.ResumeLayout();
+            if (!HasBeenGrayed)
+            {
+                HasBeenGrayed = true;
+            }
+
+        }
+
+
         private void btnReset_Click(object sender, EventArgs e)
         {
             if (savedRows.Count > 0)

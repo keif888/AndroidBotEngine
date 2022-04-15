@@ -271,6 +271,82 @@ namespace ScriptEditor
             }
         }
 
+
+
+        private void btnColour2Two_Click(object sender, EventArgs e)
+        {
+            //GuiControlGet, c,, SelColor
+            //if (c="")
+            //{
+            //  Gui, +OwnDialogs
+            //  MsgBox, 4096, Tip, % Lang["12"] " !", 1
+            //  return
+            //}
+            if (tbColour.Text == "")
+            {
+                MessageBox.Show("Select a colour square on the grid to select the colour to be similar to.", "Select Colour", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            //UsePos:=(cmd="ColorPos2Two") ? 1:0
+            //GuiControlGet, n,, Similar1
+            //n:=Round(n/100,2), color:=c "@" n
+            string colourSelected = tbColour.Text;
+            decimal colourSimilarity = Math.Round(tbColourSimilarity.Value / 100.0m, 2);
+            colourString = string.Format("{0}@{1}", colourSelected, colourSimilarity);
+            //, n:=Floor(512*9*255*255*(1-n)*(1-n)), k:=i:=0
+            colourSimilarity = Math.Floor(512m * 9m * 255m * 255m * (1m - colourSimilarity) * (1m - colourSimilarity));
+            uint colour = Convert.ToUInt32(tbColour.Text.Substring(2), 16);
+            //, rr:=(c>>16)&0xFF, gg:=(c>>8)&0xFF, bb:=c&0xFF
+            int rr = (int)((colour >> 16) & 0xFF);
+            int gg = (int)((colour >> 8) & 0xFF);
+            int bb = (int)(colour & 0xFF);
+            //Loop, % nW*nH
+            //{
+            //  c:=cors[++k], r:=((c>>16)&0xFF)-rr
+            //  , g:=((c>>8)&0xFF)-gg, b:=(c&0xFF)-bb, j:=r+rr+rr
+            //  , ascii[k]:=v:=((1024+j)*r*r+2048*g*g+(1534-j)*b*b<=n)
+            //  if (show[k])
+            //    i:=(v?i+1:i-1), c:=(v?"Black":"White"), %Gui_%("SetColor")
+            //}
+            //bg:=i>0 ? "1":"0"
+
+
+            findMode = FindText.FindMode.colourMode;
+            dgvImage.SuspendLayout();
+            for (int i = 0; i < dgvImage.Columns.Count; i++)
+                for (int j = 0; j < dgvImage.Rows.Count; j++)
+                {
+                    ColourGridTag? tag = (ColourGridTag)dgvImage.Rows[j].Cells[i].Tag;
+                    if (tag != null)
+                    {
+                        colour = Convert.ToUInt32(tag.ColourString.Substring(2), 16);
+                        int r = (int)tag.Red - rr;
+                        int g = (int)tag.Green - gg;
+                        int b = (int)tag.Blue - bb;
+                        int jx = (int)r + (int)rr + (int)rr;
+
+                        if ((1024 + jx) * r * r + 2048 * g * g + (1534 - jx) * b * b <= colourSimilarity)
+                        {
+                            tag.Black = true;
+                            dgvImage.Rows[j].Cells[i].Value = blackBitmap;
+                        }
+                        else
+                        {
+                            tag.Black = false;
+                            dgvImage.Rows[j].Cells[i].Value = whiteBitmap;
+                        }
+                    }
+                }
+
+
+            dgvImage.ResumeLayout();
+            if (!HasBeenGrayed)
+            {
+                HasBeenGrayed = true;
+            }
+        }
+
         private void btnReset_Click(object sender, EventArgs e)
         {
             if (savedRows.Count > 0)

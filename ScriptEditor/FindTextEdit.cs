@@ -82,7 +82,6 @@ namespace ScriptEditor
 
         private void dgvImage_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            //ToDo: Detect that a cell has been clicked and if in BW mode, change colour value.
             ColourGridTag? tag;
             if (dgvImage.Rows[e.RowIndex].Cells[e.ColumnIndex] != null)
             {
@@ -109,6 +108,18 @@ namespace ScriptEditor
                                 else
                                     cell.Value = blackBitmap;
                                 tag.Black = !tag.Black;
+                            }
+                        }
+                        if (MultiColour)
+                        {
+                            string cellColour = string.Format("{0}/{1}/{2}", e.ColumnIndex, e.RowIndex, tag.ColourString.Substring(2));
+                            if (tbOutputText.Text.Length > 0)
+                            {
+                                tbOutputText.Text = string.Format("{0},{1}", tbOutputText.Text, cellColour);
+                            }
+                            else
+                            {
+                                tbOutputText.Text = string.Format("|<{0}>##{1}${2}", tbComment.Text, nudRGB.Value,cellColour);
                             }
                         }
                     }
@@ -937,6 +948,50 @@ namespace ScriptEditor
         private void cbFindMultiColour_CheckedChanged(object sender, EventArgs e)
         {
             MultiColour = cbFindMultiColour.Checked;
+            if (MultiColour)
+            {
+                tbOutputText.Text = String.Empty;
+            }
+        }
+
+        private void btnUndo_Click(object sender, EventArgs e)
+        {
+            if (MultiColour)
+            {
+                if (tbOutputText.TextLength > 0)
+                {
+                    string[] results = tbOutputText.Text.Split(",");
+                    tbOutputText.Text = string.Empty;
+                    for (int i = 0; i < results.Length - 1; i++)
+                    {
+                        if (tbOutputText.TextLength == 0)
+                            tbOutputText.Text = results[i];
+                        else
+                            tbOutputText.Text = string.Format("{0},{1}", tbOutputText.Text, results[i]);
+                    }
+                }
+            }
+        }
+
+        private void nudRGB_ValueChanged(object sender, EventArgs e)
+        {
+            if (MultiColour)
+            {
+                if (tbOutputText.TextLength > 0)
+                {
+                    string[] results = tbOutputText.Text.Split("$");
+                    tbOutputText.Text = string.Format("|<{0}>##{1}${2}", tbComment.Text, nudRGB.Value, results[1]);
+                }
+            }
+        }
+
+        private void tbComment_TextChanged(object sender, EventArgs e)
+        {
+            if (tbOutputText.TextLength > 0)
+            {
+                string[] results = tbOutputText.Text.Split(">");
+                tbOutputText.Text = string.Format("|<{0}>{1}", tbComment.Text, results[1]);
+            }
         }
 
         private void clearUI()
@@ -1011,140 +1066,50 @@ namespace ScriptEditor
 
             if (!HasBeenGrayed)
                 return;
-            //for (int i = 0; i < dgvImage.Columns.Count; i++)
-            //    for (int j = 0; j < dgvImage.Rows.Count; j++)
-            //    {
-            //        if ((dgvImage.Rows[j].Cells[i].Tag as ColourGridTag).Black == true)
-            //            txt += "1";
-            //        else
-            //            txt += "0";
-            //    }
-            for (int i = 0; i < dgvImage.Rows.Count; i++)
-                for (int j = 0; j < dgvImage.Columns.Count; j++)
-                {
-                    if ((dgvImage.Rows[i].Cells[j].Tag as ColourGridTag).Black == true)
-                        txt += "1";
-                    else
-                        txt += "0";
-                }
-            if (findMode == FindText.FindMode.colourMode && UsePos && !MultiColour)
-            {
-                //if InStr(color,"@") and (UsePos) and (!MultiColor)
-                //{
-                //  r:=StrSplit(color,"@")
-                string[] r = colour.Split("@");
-                //  k:=i:=j:=0
-                //  Loop, % nW*nH
-                //  {
-                int k = 0, l = 0;
-                for (int j = 0; j < dgvImage.Rows.Count; j++)
-                    for (int i = 0; i < dgvImage.Columns.Count; i++)
-                    {
-                        //    if (!show[++k])
-                        //      Continue
-                        k++;
-                        if ((dgvImage.Rows[j].Cells[i].Tag as ColourGridTag).Black == false)
-                            continue;  // Because the outer FOR doesn't have any code, can live with this.
-                        //    i++
-                        if (lastSelected == new Point(i,j))
-                        {
-                            //    if (k=cors.SelPos)
-                            //    {
-                            //      j:=i
-                            //      Break
-                            //    }
-                            l = k;
-                            // break;
-                            goto breakDoubleFor;
-                        }
-                    }
-                breakDoubleFor:
-                //  }
-                //  if (j=0)
-                //  {
-                //    MsgBox, 4096, Tip, % Lang["12"] " !", 1
-                //    return
-                //  }
-                if (l == 0)
-                {
-                    MessageBox.Show("Please Set Gray Difference First");
-                    return;
-                }
-                colour = "#" + (l - 1).ToString() + "@" + r[1];
-                //  color:="#" (j-1) "@" r.2
-                //}
-            }
-            /*
-             * 
-             * 
-    //if (cmd="SplitAdd") and (!MultiColor)
-    //{
-    //  if InStr(color,"#")
-    //  {
-    //    MsgBox, 4096, Tip, % Lang["14"], 3
-    //    return
-    //  }
-    //  bg:=StrLen(StrReplace(txt,"0"))
-    //    > StrLen(StrReplace(txt,"1")) ? "1":"0"
-    //  s:="", i:=0, k:=nW*nH+1+CutLeft
-    //  Loop, % w:=nW-CutLeft-CutRight
-    //  {
-    //    i++
-    //    if (!show[k++] and A_Index<w)
-    //      Continue
-    //    i:=Format("{:d}",i)
-    //    v:=RegExReplace(txt,"m`n)^(.{" i "}).*","$1")
-    //    txt:=RegExReplace(txt,"m`n)^.{" i "}"), i:=0
-    //    While InStr(v,bg)
-    //    {
-    //      if (v~="^" bg "+\n")
-    //        v:=RegExReplace(v,"^" bg "+\n")
-    //      else if !(v~="m`n)[^\n" bg "]$")
-    //        v:=RegExReplace(v,"m`n)" bg "$")
-    //      else if (v~="\n" bg "+\n$")
-    //        v:=RegExReplace(v,"\n\K" bg "+\n$")
-    //      else if !(v~="m`n)^[^\n" bg "]")
-    //        v:=RegExReplace(v,"m`n)^" bg)
-    //      else Break
-    //    }
-    //    if (v!="")
-    //    {
-    //      v:=Format("{:d}",InStr(v,"`n")-1) "." FindText.bit2base64(v)
-    //      s.="`nText.=""|<" SubStr(Comment,1,1) ">" color "$" v """`n"
-    //      Comment:=SubStr(Comment, 2)
-    //    }
-    //  }
-    //  Event:=cmd, Result:=s
-    //  Gui, Hide
-    //  return
-    //}
 
-             * 
-             * */
-
-            //if (!MultiColor)
-            //  txt:=Format("{:d}",InStr(txt,"`n")-1) "." FindText.bit2base64(txt)
-            if (findMode != FindText.FindMode.multiColourMode)
+            if (findMode == FindText.FindMode.multiColourMode)
             {
-                txt = string.Format("{0:d}", dgvImage.Columns.Count) + "." + FindText.Bit2base64(txt);
+                SearchText = tbOutputText.Text;
             }
-            //else
-            //{
             else
             {
-                throw new NotImplementedException();
-                //  GuiControlGet, dRGB  // nudRGB
-                //  r:=StrSplit(Trim(StrReplace(Result,",","/"),"/"),"/")
-                //  , x:=r.1, y:=r.2, s:="", i:=1
-                //  Loop, % r.MaxIndex()//3
-                //    s.="," (r[i++]-x) "/" (r[i++]-y) "/" r[i++]
-                //  txt:=SubStr(s,2), color:="##" dRGB
-                //}
+                for (int i = 0; i < dgvImage.Rows.Count; i++)
+                    for (int j = 0; j < dgvImage.Columns.Count; j++)
+                    {
+                        if ((dgvImage.Rows[i].Cells[j].Tag as ColourGridTag).Black == true)
+                            txt += "1";
+                        else
+                            txt += "0";
+                    }
+                if (findMode == FindText.FindMode.colourMode && UsePos && !MultiColour)
+                {
+                    string[] r = colour.Split("@");
+                    int k = 0, l = 0;
+                    for (int j = 0; j < dgvImage.Rows.Count; j++)
+                        for (int i = 0; i < dgvImage.Columns.Count; i++)
+                        {
+                            k++;
+                            if ((dgvImage.Rows[j].Cells[i].Tag as ColourGridTag).Black == false)
+                                continue;
+                            if (lastSelected == new Point(i, j))
+                            {
+                                l = k;
+                                goto breakDoubleFor;
+                            }
+                        }
+                    breakDoubleFor:
+                    if (l == 0)
+                    {
+                        MessageBox.Show("Please Set Gray Difference First");
+                        return;
+                    }
+                    colour = "#" + (l - 1).ToString() + "@" + r[1];
+                }
+                txt = string.Format("{0:d}", dgvImage.Columns.Count) + "." + FindText.Bit2base64(txt);
+                textString = string.Format(@"|<{0}>{1}${2}", tbComment.Text, colour, txt);
+                tbOutputText.Text = textString;
+                SearchText = textString;
             }
-
-            textString = string.Format(@"|<{0}>{1}${2}", tbComment.Text, colour, txt);
-            tbOutputText.Text = textString;
-            SearchText = textString;
         }
     }
 

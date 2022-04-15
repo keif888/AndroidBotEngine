@@ -335,6 +335,7 @@ namespace ScriptEditor
             this.tbComment.Name = "tbComment";
             this.tbComment.Size = new System.Drawing.Size(109, 23);
             this.tbComment.TabIndex = 28;
+            this.tbComment.TextChanged += new System.EventHandler(this.tbComment_TextChanged);
             // 
             // label2
             // 
@@ -818,8 +819,9 @@ namespace ScriptEditor
             this.btnUndo.Name = "btnUndo";
             this.btnUndo.Size = new System.Drawing.Size(75, 23);
             this.btnUndo.TabIndex = 5;
-            this.btnUndo.Text = "Unfo";
+            this.btnUndo.Text = "Undo";
             this.btnUndo.UseVisualStyleBackColor = true;
+            this.btnUndo.Click += new System.EventHandler(this.btnUndo_Click);
             // 
             // cbFindMultiColour
             // 
@@ -857,6 +859,7 @@ namespace ScriptEditor
             0,
             0,
             0});
+            this.nudRGB.ValueChanged += new System.EventHandler(this.nudRGB_ValueChanged);
             // 
             // btnReset
             // 

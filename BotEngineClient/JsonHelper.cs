@@ -16,10 +16,8 @@ namespace BotEngineClient
             Errors = new List<string>();
         }
 
-        public bool ValidateGameConfig(string jsonGameFileName, string jsonListFileName)
+        public bool ValidateGameConfigStructure(string jsonGameFileName)
         {
-            if (!ValidateListConfig(jsonListFileName))
-                return false;
             return true;
         }
 
@@ -49,7 +47,6 @@ namespace BotEngineClient
                     JsonNode fileIdValue = jsonObject["FileId"];
                     if (fileIdValue is JsonValue)
                     {
-                        JsonValue jsonValue = fileIdValue.AsValue();
                         JsonElement value = fileIdValue.GetValue<JsonElement>();
                         if (value.ValueKind == JsonValueKind.String)
                         {
@@ -76,7 +73,59 @@ namespace BotEngineClient
                 }
                 else
                 {
-                    JsonNode coordinatesValue = jsonObject["Coordinates"];
+                    JsonNode coordinatesNode = jsonObject["Coordinates"];
+                    if (coordinatesNode is JsonObject)
+                    {
+                        JsonObject coordinatesObject = (JsonObject)coordinatesNode;
+                        foreach (KeyValuePair<string,JsonNode?>  coordItem in coordinatesObject)
+                        {
+                            if (coordItem.Value is JsonArray)
+                            {
+                                JsonArray coordArray = coordItem.Value.AsArray();
+                                foreach (JsonNode arrayItem in coordArray)
+                                {
+                                    if (arrayItem is JsonObject)
+                                    {
+                                        JsonObject arrayObject = (JsonObject)arrayItem;
+                                        if (arrayObject.ContainsKey("X"))
+                                        {
+                                            JsonElement value = arrayObject["X"].GetValue<JsonElement>();
+                                            if (value.ValueKind != JsonValueKind.Number)
+                                                Errors.Add(string.Format("Coordinates list item \"X\" at path {0} is is of the wrong type.  Was expecting Number but found String", arrayObject.GetPath(), value.ValueKind));
+                                        }
+                                        else
+                                        {
+                                            Errors.Add(string.Format("Coordinates list item at path {0} is missing required element \"X\"", arrayObject.GetPath()));
+                                        }
+                                        if (arrayObject.ContainsKey("Y"))
+                                        {
+                                            JsonElement value = arrayObject["Y"].GetValue<JsonElement>();
+                                            if (value.ValueKind != JsonValueKind.Number)
+                                                Errors.Add(string.Format("Coordinates list item \"Y\" at path {0} is is of the wrong type.  Was expecting Number but found String", arrayObject.GetPath(), value.ValueKind));
+                                        }
+                                        else
+                                        {
+                                            Errors.Add(string.Format("Coordinates list item at path {0} is missing required element \"Y\"", arrayObject.GetPath()));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        JsonElement jsonElement = arrayItem.GetValue<JsonElement>();
+                                        Errors.Add(string.Format("Coordinates list item {0} at path {1} is of the wrong type.  Was expecting Object, but found {2}", arrayItem.ToJsonString(), arrayItem.GetPath(), jsonElement.ValueKind));
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                JsonElement jsonElement = coordItem.Value.GetValue<JsonElement>();
+                                Errors.Add(string.Format("Coordinates item {0} at path {1} is of the wrong type.  Was expecting Array, but found {2}", coordItem.Key, coordItem.Value.GetPath(), jsonElement.ValueKind));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Errors.Add("Required field \"Coordinates\" is of the wrong type.  Expecting an Object with one or more named arrays of X/Y value pairs");
+                    }
                 }
             }
             else
@@ -90,10 +139,8 @@ namespace BotEngineClient
                 return false;
         }
 
-        public bool ValidateDeviceConfig(string jsonDeviceFileName, string jsonGameFileName, string jsonListFileName)
+        public bool ValidateDeviceConfigStructure(string jsonDeviceFileName)
         {
-            if (!ValidateGameConfig(jsonGameFileName, jsonListFileName))
-                return false;
             return true;
         }
     }

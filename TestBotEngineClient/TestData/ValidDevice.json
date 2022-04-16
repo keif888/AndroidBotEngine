@@ -1,0 +1,14 @@
+{
+  "FileId": "DeviceConfig",
+  "LastActionTaken": {
+    "Daily10PMEvent": {
+      "LastRun": "2022-04-15T22:01:03.5593639+10:00",
+      "ActionEnabled": true
+    },
+    "GameDownDetect": {
+      "LastRun": "2022-04-15T22:53:32.6077396+10:00",
+      "ActionEnabled": true,
+      "Frequency": 1
+    }
+  }
+}

@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBotEngineClient", "TestBotEngineClient\TestBotEngineClient.csproj", "{A655DBE3-D7BE-4372-B4CF-26E190699053}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,18 @@ Global
 		{19CB2F6C-10BF-4EFB-8B84-728BA1AA1514}.Release|x64.Build.0 = Release|Any CPU
 		{19CB2F6C-10BF-4EFB-8B84-728BA1AA1514}.Release|x86.ActiveCfg = Release|Any CPU
 		{19CB2F6C-10BF-4EFB-8B84-728BA1AA1514}.Release|x86.Build.0 = Release|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Debug|x64.Build.0 = Debug|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Debug|x86.Build.0 = Debug|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Release|x64.ActiveCfg = Release|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Release|x64.Build.0 = Release|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Release|x86.ActiveCfg = Release|Any CPU
+		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

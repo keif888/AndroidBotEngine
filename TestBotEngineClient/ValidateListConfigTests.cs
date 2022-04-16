@@ -115,7 +115,7 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 1);
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item \"X\" at path $.Coordinates.BouncingBalls[0] is is of the wrong type.  Was expecting Number but found String"));
+            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item \"X\" at path $.Coordinates.BouncingBalls[0] is of the wrong type.  Was expecting Number but found String"));
         }
 
         [TestMethod]
@@ -139,7 +139,7 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 1);
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item \"Y\" at path $.Coordinates.StaticBalls[1] is is of the wrong type.  Was expecting Number but found String"));
+            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item \"Y\" at path $.Coordinates.StaticBalls[1] is of the wrong type.  Was expecting Number but found String"));
         }
 
         [TestMethod]

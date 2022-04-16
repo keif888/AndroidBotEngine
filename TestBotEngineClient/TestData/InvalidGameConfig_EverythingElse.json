@@ -1,0 +1,84 @@
+{
+  "FileId": "GameConfig",
+  "findStrings": {
+    "BadFindString": {
+      "findString": [],
+      "searchArea": {
+        "X": 350,
+        "Y": 50,
+        "width": 200,
+        "height": 350
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
+    },
+    "BadSearchArea": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": "IAmBad",
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
+    },
+    "BadTextTolerance": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "X": 350,
+        "Y": 50,
+        "width": 200,
+        "height": 350
+      },
+      "textTolerance": "IAMBad",
+      "backgroundTolerance": 0.2
+    },
+    "BadBackgroundTolerance": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "X": 350,
+        "Y": 50,
+        "width": 200,
+        "height": 350
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": "IAMBad"
+    }
+  },
+  "systemActions": {
+    "ClosePopups": {
+      "ActionType": "System",
+      "Commands": [
+        {
+          "CommandNumber": 25,
+          "CommandId": "IfExists",
+          "ImageName": "CloseGeneric",
+          "Commands": [
+            {
+              "CommandNumber": 2510,
+              "CommandId": "FindClick",
+              "ImageName": "CloseGeneric"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "actions": {
+    "GameDownDetect": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "IfExists",
+          "ImageName": "Phone",
+          "Commands": [
+            {
+              "CommandNumber": 1010,
+              "CommandId": "StartGame",
+              "TimeOut": 120000,
+              "Value": "com.android.chrome/com.android.chrome/com.google.android.apps.chrome.Main"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -259,7 +259,7 @@ namespace BotEngineClient
         public int Y2 { get; set; }
     }
 
-    public class BOTAllianceConfig
+    public class BOTListConfig
     {
         public Dictionary<string, List<XYCoords>>? Coordinates { get; set; }
     }

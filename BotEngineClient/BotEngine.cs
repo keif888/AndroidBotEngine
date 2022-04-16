@@ -24,7 +24,7 @@ namespace BotEngineClient
         private Dictionary<string, FindString> FindStrings;
         private Dictionary<string, Action> NormalActions;
         private Dictionary<string, Action> SystemActions;
-        private BOTAllianceConfig AllianceConfig;
+        private BOTListConfig ListConfig;
         private string EmulatorName;
 
         public enum CommandResults
@@ -53,12 +53,12 @@ namespace BotEngineClient
             SystemActions = systemActions;
         }
 
-        public void ReloadAllianceConfig(BOTAllianceConfig allianceConfig)
+        public void ReloadListConfig(BOTListConfig listConfig)
         {
-            AllianceConfig = allianceConfig;
+            ListConfig = listConfig;
         }
 
-        public BotEngine(IServiceProvider ServiceProvider, string ADBPath, string ADBDeviceData, Dictionary<string, FindString> findStrings, Dictionary<string, Action> systemActions, Dictionary<string, Action> normalActions, BOTAllianceConfig allianceConfig)
+        public BotEngine(IServiceProvider ServiceProvider, string ADBPath, string ADBDeviceData, Dictionary<string, FindString> findStrings, Dictionary<string, Action> systemActions, Dictionary<string, Action> normalActions, BOTListConfig listConfig)
         {
             _logger = (ILogger)ServiceProvider.GetService(typeof(ILogger));
             using (_logger.BeginScope("BotEngine"))
@@ -91,7 +91,7 @@ namespace BotEngineClient
                 FindStrings = findStrings;
                 SystemActions = systemActions;
                 NormalActions = normalActions;
-                AllianceConfig = allianceConfig;
+                ListConfig = listConfig;
                 EmulatorName = adbDevice.Model;
             }
         }
@@ -533,11 +533,11 @@ namespace BotEngineClient
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), CoordinateName)))
             {
                 CommandResults result;
-                if (AllianceConfig.Coordinates == null)
+                if (ListConfig.Coordinates == null)
                     return CommandResults.InputError;
-                if (!AllianceConfig.Coordinates.ContainsKey(CoordinateName))
+                if (!ListConfig.Coordinates.ContainsKey(CoordinateName))
                     return CommandResults.InputError;
-                List<XYCoords> coords = AllianceConfig.Coordinates[CoordinateName];
+                List<XYCoords> coords = ListConfig.Coordinates[CoordinateName];
 
                 foreach (XYCoords point in coords)
                 {

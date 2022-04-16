@@ -19,8 +19,8 @@ namespace BotEngine
         private static ILogger _logger;
         private static BOTConfig botGameConfig;
         private static bool reloadBOTGameConfig;
-        private static BOTAllianceConfig botAllianceConfig;
-        private static bool reloadBOTAllianceConfig;
+        private static BOTListConfig botListConfig;
+        private static bool reloadBOTListConfig;
         private static BOTDeviceConfig botDeviceConfig;
         private static BOTDeviceConfig botDeviceConfigNew;
         private static bool reloadBOTDeviceConfig;
@@ -28,8 +28,8 @@ namespace BotEngine
         private static bool cancelRequested;
         private static FileSystemWatcher gameConfigWatcher;
         private static string gameConfigFileName;
-        private static FileSystemWatcher allianceWatcher;
-        private static string allianceConfigFileName;
+        private static FileSystemWatcher listWatcher;
+        private static string listConfigFileName;
         private static FileSystemWatcher deviceWatcher;
         private static string deviceConfigFileName;
         private static ServiceCollection services;
@@ -50,8 +50,8 @@ namespace BotEngine
             [Option('g', "GameConfig", Required = true, HelpText = "The name of the json file that contains the Search Strings and Actions.")]
             public string ConfigFileName { get; set; }
 
-            [Option('a', "Alliance", Required = true, HelpText = "The name of the json file that contains the Alliance Settings.")]
-            public string AllianceFileName { get; set; }
+            [Option('i', "ListConfig", Required = true, HelpText = "The name of the json file that contains the List Settings.")]
+            public string ListConfigFileName { get; set; }
 
             [Option('c', "DeviceConfig", Required = true, HelpText = "The name of the json file that contains the last time actions were taken for a device.  If the file doesn't exist it will be created.")]
             public string DeviceFileName { get; set; }
@@ -71,11 +71,11 @@ namespace BotEngine
         {
             int result = 0;
             cancelRequested = false;
-            reloadBOTAllianceConfig = false;
+            reloadBOTListConfig = false;
             reloadBOTDeviceConfig = false;
             reloadBOTGameConfig = false;
             botGameConfig = new BOTConfig();
-            botAllianceConfig = new BOTAllianceConfig();
+            botListConfig = new BOTListConfig();
             botDeviceConfig = new BOTDeviceConfig();
             botDeviceConfigNew = new BOTDeviceConfig();
 
@@ -173,9 +173,9 @@ namespace BotEngine
                     _logger.LogError("Game Config file {0} does not exist.  Exiting.", o.ConfigFileName);
                     return -2;
                 }
-                if (!File.Exists(o.AllianceFileName))
+                if (!File.Exists(o.ListConfigFileName))
                 {
-                    _logger.LogError("Alliance Config file {0} does not exist.  Exiting.", o.AllianceFileName);
+                    _logger.LogError("List Config file {0} does not exist.  Exiting.", o.ListConfigFileName);
                     return -2;
                 }
 
@@ -236,12 +236,12 @@ namespace BotEngine
 
                     try
                     {
-                        jsonString = File.ReadAllText(o.AllianceFileName);
-                        botAllianceConfig = JsonSerializer.Deserialize<BOTAllianceConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+                        jsonString = File.ReadAllText(o.ListConfigFileName);
+                        botListConfig = JsonSerializer.Deserialize<BOTListConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
                     }
                     catch (JsonException jse)
                     {
-                        _logger.LogError(jse, "JSON file format error reading {0}", o.AllianceFileName);
+                        _logger.LogError(jse, "JSON file format error reading {0}", o.ListConfigFileName);
                         return -2;
                     }
 
@@ -286,13 +286,13 @@ namespace BotEngine
                     gameConfigWatcher.Renamed += ReloadJSONConfig;
                     gameConfigWatcher.EnableRaisingEvents = true;
 
-                    allianceWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.AllianceFileName));
-                    allianceWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes;
-                    allianceWatcher.Filter = Path.GetFileName(o.AllianceFileName);
-                    allianceConfigFileName = o.AllianceFileName;
-                    allianceWatcher.Changed += ReloadJSONConfig;
-                    allianceWatcher.Renamed += ReloadJSONConfig;
-                    allianceWatcher.EnableRaisingEvents = true;
+                    listWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ListConfigFileName));
+                    listWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes;
+                    listWatcher.Filter = Path.GetFileName(o.ListConfigFileName);
+                    listConfigFileName = o.ListConfigFileName;
+                    listWatcher.Changed += ReloadJSONConfig;
+                    listWatcher.Renamed += ReloadJSONConfig;
+                    listWatcher.EnableRaisingEvents = true;
 
                     deviceWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.DeviceFileName));
                     deviceWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes;
@@ -323,16 +323,16 @@ namespace BotEngine
                     if (configErrors)
                         return -2;
 
-                    BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, o.ADBPath, deviceId, botGameConfig.findStrings, botGameConfig.systemActions, botGameConfig.actions, botAllianceConfig);
+                    BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, o.ADBPath, deviceId, botGameConfig.findStrings, botGameConfig.systemActions, botGameConfig.actions, botListConfig);
                     BotEngineClient.BotEngine.CommandResults cr = BotEngineClient.BotEngine.CommandResults.Ok;
                     DateTime tenMinuteDateTime = DateTime.MinValue;
                     bool paused = false;
                     do
                     {
-                        if (reloadBOTAllianceConfig)
+                        if (reloadBOTListConfig)
                         {
-                            bot.ReloadAllianceConfig(botAllianceConfig);
-                            reloadBOTAllianceConfig = false;
+                            bot.ReloadListConfig(botListConfig);
+                            reloadBOTListConfig = false;
                         }
 
                         if (reloadBOTGameConfig)
@@ -436,9 +436,9 @@ namespace BotEngine
             {
                 ReloadGameConfig(sender, e);
             }
-            else if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(allianceConfigFileName).ToLower())
+            else if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(listConfigFileName).ToLower())
             {
-                ReloadAlliance(sender, e);
+                ReloadListConfig(sender, e);
             }
             else if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(deviceConfigFileName).ToLower())
             {
@@ -596,15 +596,15 @@ namespace BotEngine
             }
         }
 
-        private static void ReloadAlliance(object sender, FileSystemEventArgs e)
+        private static void ReloadListConfig(object sender, FileSystemEventArgs e)
         {
             _logger.LogInformation("Changes detected in {0}, reloading", e.FullPath);
             try
             {
                 if (ReloadJsonString(e, out string jsonString))
                 {
-                    botAllianceConfig = JsonSerializer.Deserialize<BOTAllianceConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
-                    reloadBOTAllianceConfig = true;
+                    botListConfig = JsonSerializer.Deserialize<BOTListConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+                    reloadBOTListConfig = true;
                 }
             }
             catch (JsonException jse)

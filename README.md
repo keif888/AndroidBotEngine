@@ -10,8 +10,8 @@ The console app will receive a set of 3 json files that contain the configuratio
 The json files are:  
 1. GameConfig
 	- This file has all the Image Recognition strings, and the Actions that have been configured
-1. Alliance (ToDo: Rename from Alliance to ListConfig)
-	- This file has the lists of lists
+1. ListConfig
+	- This file has the lists of lists of locations to do things at
 1. DeviceConfig
 	- This file has the list of Actions that the device has done, when it last did them, and can be used to enable/disable Actions
 
@@ -31,7 +31,7 @@ The list of commands to date are:
 1. Exit
 	- Exits from a configurable Action
 1. LoopCoordinates
-	- Takes the name of a list of coordinates (from the Alliance json file), and passes them into the EnterLoopCoordinate command
+	- Takes the name of a list of coordinates (from the ListConfig json file), and passes them into the EnterLoopCoordinate command
 	- Supports nested Commands
 1. EnterLoopCoordinate
 	- Takes the specified X/Y coordinate from a configured list (via Command LoopCoordinates) and sends them to the Android Device as keyboard data entry

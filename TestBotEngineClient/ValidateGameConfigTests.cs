@@ -85,7 +85,7 @@ namespace TestBotEngineClient
 
             Assert.IsFalse(jsonHelper.ValidateGameConfigStructure(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
-            Assert.AreEqual<int>(21, jsonHelper.Errors.Count);
+            Assert.AreEqual<int>(22, jsonHelper.Errors.Count);
             
             CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"BadFindString\" at path $.findStrings.BadFindString.findString is of the wrong type.  Was expecting String but found System.Text.Json.Nodes.JsonArray");
             CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"MissingFindString\" at path $.findStrings.MissingFindString is missing required field \"findString\"");
@@ -109,6 +109,8 @@ namespace TestBotEngineClient
             CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"BadActiontype\" at path $.systemActions.BadActiontype.ActionType is of the wrong type.  Was expecting String but found System.Text.Json.Nodes.JsonArray");
             CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"BadCommands\" at path $.systemActions.BadCommands.Commands is of the wrong type.  Was expecting Array but found System.Text.Json.Nodes.JsonObject");
             CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"InvalidActiontype\" at path $.systemActions.InvalidActiontype.ActionType with value \"Invalid\" is not valid.  Was expecting one of the following \"System\", \"Scheduled\", \"Daily\", \"Always\"");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"BadCommandInCommands\" at path $.systemActions.BadCommandInCommands.Commands[0] is of the wrong type.  Was expecting Array but found String");
 
         }
 

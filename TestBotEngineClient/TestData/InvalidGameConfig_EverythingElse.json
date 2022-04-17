@@ -217,10 +217,15 @@
     "BadCommands": {
       "ActionType": "System",
       "Commands": { "IAmBad": "DealWithIt" }
+    },
+    "BadCommandInCommands": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [ "Junk" ]
     }
   },
   "actions": {
-    "GameDownDetect": {
+    "Valid": {
       "Frequency": 1,
       "ActionType": "Scheduled",
       "Commands": [

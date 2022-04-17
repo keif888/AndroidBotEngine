@@ -281,13 +281,13 @@ namespace BotEngineClient
                                 }
                                 else
                                 {
-                                    if (!(systemActionJsonObject["Commands"] is JsonArray))
+                                    if (!(systemActionJsonObject["Commands"] is JsonArray commandsJsonArray))
                                     {
                                         Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Array but found {2}", systemActionsItem.Key, systemActionJsonObject["Commands"].GetPath(), systemActionJsonObject["Commands"].GetType()));
                                     }
                                     else
                                     {
-                                        //ToDo: Validate Command Array.
+                                        ValidateCommands(systemActionsItem.Key, commandsJsonArray);
                                     }
                                 }
                             }
@@ -345,6 +345,25 @@ namespace BotEngineClient
                 return true;
             else
                 return false;
+        }
+
+        private void ValidateCommands(string listItemName, JsonArray commandsJsonArray)
+        {
+            foreach (JsonNode commandsItem in commandsJsonArray)
+            {
+                if (!(commandsItem is JsonObject commandsObject))
+                {
+                    if (!(commandsItem is JsonValue))
+                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Array but found {2}", listItemName, commandsItem.GetPath(), commandsItem.GetType()));
+                    else
+                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Array but found {2}", listItemName, commandsItem.GetPath(), commandsItem.GetValue<JsonElement>().ValueKind));
+                }
+                else
+                {
+                    // ToDo: Parse the rest of a command, and ensure it's valid.
+                    // Need to handle each of the varying Commands, and ensure they are valid as well.
+                }
+            }
         }
 
         public bool ValidateListConfig(string jsonListFileName)

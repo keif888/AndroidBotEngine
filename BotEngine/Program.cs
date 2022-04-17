@@ -454,6 +454,9 @@ namespace BotEngine
                 if (consoleStatus == ConsoleKeyPressEnum.Pause)
                 {
                     paused = !paused;
+                    // Save the device status when Pausing, so that it's clean for an external to update it.
+                    if (paused)
+                        SaveDeviceConfigJson();
                 }
                 else if (consoleStatus == ConsoleKeyPressEnum.Exit)
                 {
@@ -476,7 +479,8 @@ namespace BotEngine
                     sb.AppendLine();
                 }
             }
-            _logger.LogInformation(sb.ToString());
+            // Log as Warning, so that it will show by default.
+            _logger.LogWarning(sb.ToString());
         }
 
         private static ConsoleKeyPressEnum HandleConsoleKeyBoard(Dictionary<string, BotEngineClient.Action> actions, Dictionary<string, ActionActivity> lastActionTaken)
@@ -494,7 +498,7 @@ namespace BotEngine
                         break;
                     case 'p':
                     case 'P':
-                        _logger.LogInformation("In Console Command Pause Received");
+                        _logger.LogWarning("In Console Command Pause Received");
                         result = ConsoleKeyPressEnum.Pause;
                         break;
                     case 's':
@@ -505,7 +509,7 @@ namespace BotEngine
                         break;
                     case 'x':
                     case 'X':
-                        _logger.LogInformation("In Console Command Exit Received");
+                        _logger.LogWarning("In Console Command Exit Received");
                         result = ConsoleKeyPressEnum.Exit;
                         break;
                     default:

@@ -461,6 +461,15 @@ namespace BotEngineClient
             }
         }
 
+        /// <summary>
+        /// Within a list of search areas, the 1st one that doesn't have the searchString image is clicked on.
+        /// </summary>
+        /// <param name="searchName"></param>
+        /// <param name="searchString"></param>
+        /// <param name="areas"></param>
+        /// <returns></returns>
+        // ToDo: Add optional scroll if nothing found?
+        // ToSo: Add new command, which takes a big area, and a number, which is the number of regions to search within, and the 1st click point if the image isn't found?
         private CommandResults ClickWhenNotFoundInArea(string searchName, FindString searchString, List<SearchArea> areas)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))

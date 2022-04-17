@@ -375,6 +375,7 @@ namespace BotEngine
                                     {
                                         if (item.Value.BeforeAction != null)
                                         {
+                                            // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
                                             cr = bot.ExecuteAction(item.Value.BeforeAction);
                                             if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
                                                 break;
@@ -382,6 +383,7 @@ namespace BotEngine
                                         _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
                                         if (cancelRequested || paused)
                                             break;
+                                        // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
                                         cr = bot.ExecuteAction(item.Key);
                                         _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
                                         if (cancelRequested || paused)
@@ -394,14 +396,16 @@ namespace BotEngine
                                         }
                                         if (item.Value.AfterAction != null)
                                         {
+                                            // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
                                             cr = bot.ExecuteAction(item.Value.AfterAction);
                                             if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
                                                 break;
                                         }
                                     }
                                 }
-                                else if (item.Value.ActionType.ToLower() == "anywhere")
+                                else if (item.Value.ActionType.ToLower() == "always")
                                 {
+                                    // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
                                     cr = bot.ExecuteAction(item.Key);
                                     if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
                                         break;

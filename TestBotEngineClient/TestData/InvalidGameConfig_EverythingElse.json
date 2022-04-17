@@ -12,9 +12,24 @@
       "textTolerance": 0.2,
       "backgroundTolerance": 0.2
     },
+    "MissingFindString": {
+      "searchArea": {
+        "X": 350,
+        "Y": 50,
+        "width": 200,
+        "height": 350
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
+    },
     "BadSearchArea": {
       "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
       "searchArea": "IAmBad",
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
+    },
+    "MissingSearchArea": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
       "textTolerance": 0.2,
       "backgroundTolerance": 0.2
     },
@@ -29,6 +44,16 @@
       "textTolerance": "IAMBad",
       "backgroundTolerance": 0.2
     },
+    "MissingTextTolerance": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "X": 350,
+        "Y": 50,
+        "width": 200,
+        "height": 350
+      },
+      "backgroundTolerance": 0.2
+    },
     "BadBackgroundTolerance": {
       "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
       "searchArea": {
@@ -39,11 +64,104 @@
       },
       "textTolerance": 0.2,
       "backgroundTolerance": "IAMBad"
+    },
+    "MissingBackgroundTolerance": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "X": 350,
+        "Y": 50,
+        "width": 200,
+        "height": 350
+      },
+      "textTolerance": 0.2
+    },
+    "BadSearchAreaX": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "X": "IAMBad",
+        "Y": 50,
+        "width": 200,
+        "height": 350
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
+    },
+    "BadSearchAreaY": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "X": 350,
+        "Y": [],
+        "width": 200,
+        "height": 350
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
+    },
+    "BadSearchAreaW": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "X": 350,
+        "Y": 50,
+        "width": "IAmBad",
+        "height": 350
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
+    },
+    "BadSearchAreaH": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "X": 350,
+        "Y": 50,
+        "width": 200,
+        "height": { "Junk": 10 }
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
+    },
+    "BadSearchAreaXMissing": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "Y": 50,
+        "width": 200,
+        "height": 350
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
+    },
+    "BadSearchAreaYMissing": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "X": 350,
+        "width": 200,
+        "height": 350
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
+    },
+    "BadSearchAreaWMissing": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "X": 350,
+        "Y": 50,
+        "height": 350
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
+    },
+    "BadSearchAreaHMissing": {
+      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "searchArea": {
+        "X": 350,
+        "Y": 50,
+        "width": 200
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
     }
   },
   "systemActions": {
-    "ClosePopups": {
-      "ActionType": "System",
+    "MissingActionType": {
       "Commands": [
         {
           "CommandNumber": 25,
@@ -58,6 +176,47 @@
           ]
         }
       ]
+    },
+    "BadActiontype": {
+      "ActionType": [],
+      "Commands": [
+        {
+          "CommandNumber": 25,
+          "CommandId": "IfExists",
+          "ImageName": "CloseGeneric",
+          "Commands": [
+            {
+              "CommandNumber": 2510,
+              "CommandId": "FindClick",
+              "ImageName": "CloseGeneric"
+            }
+          ]
+        }
+      ]
+    },
+    "InvalidActiontype": {
+      "ActionType": "Invalid",
+      "Commands": [
+        {
+          "CommandNumber": 25,
+          "CommandId": "IfExists",
+          "ImageName": "CloseGeneric",
+          "Commands": [
+            {
+              "CommandNumber": 2510,
+              "CommandId": "FindClick",
+              "ImageName": "CloseGeneric"
+            }
+          ]
+        }
+      ]
+    },
+    "MissingCommands": {
+      "ActionType": "System"
+    },
+    "BadCommands": {
+      "ActionType": "System",
+      "Commands": { "IAmBad": "DealWithIt" }
     }
   },
   "actions": {

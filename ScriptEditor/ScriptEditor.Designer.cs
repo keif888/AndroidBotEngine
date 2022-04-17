@@ -730,7 +730,7 @@ namespace ScriptEditor
             this.cbActionType.Items.AddRange(new object[] {
             "Scheduled",
             "Daily",
-            "Anywhere",
+            "Always",
             "System"});
             this.cbActionType.Location = new System.Drawing.Point(49, 52);
             this.cbActionType.Name = "cbActionType";

@@ -42,7 +42,7 @@ namespace BotEngineClient
         /// Used to determine what type of Action this is.
         /// Scheduled = Runs every Frequency Minutes
         /// Daily = Runs once after DailyScheduledTime
-        /// Anywhere = Poorly named, but means that it runs every loop.  ToDo: Refactor to Always
+        /// Always = Means that it runs every loop.
         /// System = Indicates that it is a System action, and is not scheduled, but called from other Actions.
         /// </summary>
         public string ActionType { get; set; }

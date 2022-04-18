@@ -27,7 +27,7 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 1);
-            Assert.IsTrue(jsonHelper.Errors.Contains(string.Format("\"FileId\" value is of incorrect type.  Expecting a String but got {0}", JsonValueKind.Number)));
+            CollectionAssert.Contains(jsonHelper.Errors, string.Format("\"FileId\" value is of incorrect type.  Expecting a String but got {0}", JsonValueKind.Number));
         }
 
         [TestMethod]
@@ -39,8 +39,8 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 2);
-            Assert.IsTrue(jsonHelper.Errors.Contains("\"FileId\" indicates that this is not \"ListConfig\" but DeviceConfig"));
-            Assert.IsTrue(jsonHelper.Errors.Contains("Required field \"Coordinates\" missing."));
+            CollectionAssert.Contains(jsonHelper.Errors, "\"FileId\" indicates that this is not \"ListConfig\" but DeviceConfig");
+            CollectionAssert.Contains(jsonHelper.Errors, "Required field \"Coordinates\" missing.");
         }
 
         [TestMethod]
@@ -52,7 +52,7 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 1);
-            Assert.IsTrue(jsonHelper.Errors.Contains("Required field \"FileId\" is of the wrong type.  Expecting a String Value"));
+            CollectionAssert.Contains(jsonHelper.Errors, "Required field \"FileId\" is of the wrong type.  Expecting a String Value");
         }
 
         [TestMethod]
@@ -64,7 +64,7 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 1);
-            Assert.IsTrue(jsonHelper.Errors.Contains("Required field \"Coordinates\" is of the wrong type.  Expecting an Object with one or more named arrays of X/Y value pairs"));
+            CollectionAssert.Contains(jsonHelper.Errors, "Required field \"Coordinates\" is of the wrong type.  Expecting an Object with one or more named arrays of X/Y value pairs");
         }
 
         [TestMethod]
@@ -76,7 +76,7 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 1);
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates item BouncingBalls at path $.Coordinates.BouncingBalls is of the wrong type.  Was expecting Array, but found String"));
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates item BouncingBalls at path $.Coordinates.BouncingBalls is of the wrong type.  Was expecting Array, but found String");
         }
 
         [TestMethod]
@@ -88,10 +88,10 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 4);
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item \"X\" at path $.Coordinates.BouncingBalls[0] is of the wrong type.  Was expecting Object, but found String"));
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item 10 at path $.Coordinates.BouncingBalls[1] is of the wrong type.  Was expecting Object, but found Number"));
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item \"Y\" at path $.Coordinates.BouncingBalls[2] is of the wrong type.  Was expecting Object, but found String"));
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item 10 at path $.Coordinates.BouncingBalls[3] is of the wrong type.  Was expecting Object, but found Number"));
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates list item \"X\" at path $.Coordinates.BouncingBalls[0] is of the wrong type.  Was expecting Object, but found String");
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates list item 10 at path $.Coordinates.BouncingBalls[1] is of the wrong type.  Was expecting Object, but found Number");
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates list item \"Y\" at path $.Coordinates.BouncingBalls[2] is of the wrong type.  Was expecting Object, but found String");
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates list item 10 at path $.Coordinates.BouncingBalls[3] is of the wrong type.  Was expecting Object, but found Number");
         }
 
         [TestMethod]
@@ -103,7 +103,7 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 1);
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item at path $.Coordinates.StaticBalls[0] is missing required element \"X\""));
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates list item \"StaticBalls\" at path $.Coordinates.StaticBalls[0] is missing required field \"X\"");
         }
 
         [TestMethod]
@@ -115,7 +115,7 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 1);
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item \"X\" at path $.Coordinates.BouncingBalls[0] is of the wrong type.  Was expecting Number but found String"));
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates list item \"BouncingBalls\" at path $.Coordinates.BouncingBalls[0].X is of the wrong type.  Was expecting Number but found String");
         }
 
         [TestMethod]
@@ -127,7 +127,7 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 1);
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item at path $.Coordinates.BouncingBalls[1] is missing required element \"Y\""));
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates list item \"BouncingBalls\" at path $.Coordinates.BouncingBalls[1] is missing required field \"Y\"");
         }
 
         [TestMethod]
@@ -139,7 +139,7 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 1);
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item \"Y\" at path $.Coordinates.StaticBalls[1] is of the wrong type.  Was expecting Number but found String"));
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates list item \"StaticBalls\" at path $.Coordinates.StaticBalls[1].Y is of the wrong type.  Was expecting Number but found String");
         }
 
         [TestMethod]
@@ -151,9 +151,9 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateListConfig(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             Assert.IsTrue(jsonHelper.Errors.Count == 3);
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item at path $.Coordinates.BouncingBalls[0] is missing required element \"Y\""));
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item at path $.Coordinates.StaticBalls[0] is missing required element \"X\""));
-            Assert.IsTrue(jsonHelper.Errors.Contains("Coordinates list item at path $.Coordinates.StaticBalls[1] is missing required element \"X\""));
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates list item \"BouncingBalls\" at path $.Coordinates.BouncingBalls[0] is missing required field \"Y\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates list item \"StaticBalls\" at path $.Coordinates.StaticBalls[0] is missing required field \"X\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "Coordinates list item \"StaticBalls\" at path $.Coordinates.StaticBalls[1] is missing required field \"X\"");
         }
     }
 }

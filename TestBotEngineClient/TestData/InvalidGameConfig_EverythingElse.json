@@ -222,25 +222,127 @@
       "Frequency": 1,
       "ActionType": "Scheduled",
       "Commands": [ "Junk" ]
-    }
-  },
-  "actions": {
+    },
+    "CommandIdMissing": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "TimeOut": 120000,
+          "Value": "com.android.chrome/com.android.chrome/com.google.android.apps.chrome.Main"
+        }
+      ]
+    },
+    "CommandIdWrongType": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": 5,
+          "TimeOut": 120000,
+          "Value": "com.android.chrome/com.android.chrome/com.google.android.apps.chrome.Main"
+        }
+      ]
+    },
+    "BadCommandId": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "IAmNotValid",
+          "TimeOut": 120000,
+          "Value": "com.android.chrome/com.android.chrome/com.google.android.apps.chrome.Main"
+        }
+      ]
+    },
     "Valid": {
       "Frequency": 1,
       "ActionType": "Scheduled",
       "Commands": [
         {
           "CommandNumber": 10,
-          "CommandId": "IfExists",
+          "CommandId": "Click",
           "ImageName": "Phone",
-          "Commands": [
+          "Location": {
+            "X": 52,
+            "Y": 900
+          }
+        },
+        {
+          "CommandNumber": 60,
+          "CommandId": "ClickWhenNotFoundInArea",
+          "ImageName": "UrnTick",
+          "Areas": [
             {
-              "CommandNumber": 1010,
-              "CommandId": "StartGame",
-              "TimeOut": 120000,
-              "Value": "com.android.chrome/com.android.chrome/com.google.android.apps.chrome.Main"
+              "X": 125,
+              "Y": 370,
+              "width": 60,
+              "height": 40
+            },
+            {
+              "X": 375,
+              "Y": 370,
+              "width": 60,
+              "height": 40
+            },
+            {
+              "X": 370,
+              "Y": 610,
+              "width": 60,
+              "height": 60
+            },
+            {
+              "X": 125,
+              "Y": 610,
+              "width": 60,
+              "height": 40
+            },
+            {
+              "X": 125,
+              "Y": 485,
+              "width": 60,
+              "height": 40
+            },
+            {
+              "X": 260,
+              "Y": 485,
+              "width": 60,
+              "height": 40
             }
           ]
+        }
+
+      ]
+    }
+  },
+  "actions": {
+    "Simple": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "StartGame",
+          "TimeOut": 120000,
+          "Value": "com.android.chrome/com.android.chrome/com.google.android.apps.chrome.Main"
+        }
+      ]
+    },
+    "Valid": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "Click",
+          "ImageName": "Phone",
+          "Location": {
+            "X": 52,
+            "Y": 900
+          }
         }
       ]
     }

@@ -289,7 +289,7 @@ namespace BotEngineClient
                                         }
                                         else
                                         {
-                                            ValidateCommands(systemActionsItem.Key, commandsJsonArray);
+                                            ValidateCommands("systemActions", systemActionsItem.Key, commandsJsonArray);
                                         }
                                     }
                                 }
@@ -353,7 +353,13 @@ namespace BotEngineClient
                 return false;
         }
 
-        private void ValidateCommands(string listItemName, JsonArray commandsJsonArray)
+        /// <summary>
+        /// Validates that the commands are of a valid name, and required parameters are provided and of the correct type
+        /// </summary>
+        /// <param name="location">This is the type of Action (systemAction, scheduledAction)</param>
+        /// <param name="listItemName">The name of the Action that this command is within</param>
+        /// <param name="commandsJsonArray">The JsonArray that holds all the commands to parse</param>
+        private void ValidateCommands(string location, string listItemName, JsonArray commandsJsonArray)
         {
             string Key;
             foreach (JsonNode commandsItem in commandsJsonArray)
@@ -361,31 +367,29 @@ namespace BotEngineClient
                 if (!(commandsItem is JsonObject commandsObject))
                 {
                     if (!(commandsItem is JsonValue))
-                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Array but found {2}", listItemName, commandsItem.GetPath(), commandsItem.GetType()));
+                        Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting Array but found {3}", location, listItemName, commandsItem.GetPath(), commandsItem.GetType()));
                     else
-                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Array but found {2}", listItemName, commandsItem.GetPath(), commandsItem.GetValue<JsonElement>().ValueKind));
+                        Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting Array but found {3}", location, listItemName, commandsItem.GetPath(), commandsItem.GetValue<JsonElement>().ValueKind));
                 }
                 else
                 {
-                    // ToDo: Parse the rest of a command, and ensure it's valid.
-                    // Need to handle each of the varying Commands, and ensure they are valid as well.
                     string CommandId = string.Empty;
                     Key = "CommandId";
                     if (!commandsObject.ContainsKey(Key))
                     {
-                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is missing required field \"{2}\"", listItemName, commandsItem.GetPath(), Key));
+                        Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is missing required field \"{3}\"", location, listItemName, commandsItem.GetPath(), Key));
                     }
                     else
                     {
                         if (!(commandsObject[Key] is JsonValue))
                         {
-                            Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", listItemName, commandsObject[Key].GetPath(), commandsObject[Key].GetType()));
+                            Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting String but found {3}", location, listItemName, commandsObject[Key].GetPath(), commandsObject[Key].GetType()));
                         }
                         else
                         {
                             JsonElement itemNode = commandsObject[Key].GetValue<JsonElement>();
                             if (itemNode.ValueKind != JsonValueKind.String)
-                                Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", listItemName, commandsObject[Key].GetPath(), itemNode.ValueKind));
+                                Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting String but found {3}", location, listItemName, commandsObject[Key].GetPath(), itemNode.ValueKind));
                             else
                             {
                                 switch (itemNode.GetString().ToLower())
@@ -414,14 +418,14 @@ namespace BotEngineClient
                                         CommandId = itemNode.GetString().ToLower();
                                         break;
                                     default:
-                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} with value \"{2}\" is not valid.  Was expecting a Command like one of the following \"WaitFor\", \"Click\", \"IfExists\", \"FindClickAndWait\"", listItemName, commandsObject[Key].GetPath(), itemNode.GetString()));
+                                        Errors.Add(string.Format("{0} list item \"{1}\" at path {2} with value \"{3}\" is not valid.  Was expecting a Command like one of the following \"WaitFor\", \"Click\", \"IfExists\", \"FindClickAndWait\"", location, listItemName, commandsObject[Key].GetPath(), itemNode.GetString()));
                                         break;
                                 }
                             }
                         }
                     }
 
-                    ValidateJsonValue("systemActions", listItemName, "CommandNumber", commandsObject, JsonValueKind.Number);
+                    ValidateJsonValue(location, listItemName, "CommandNumber", commandsObject, JsonValueKind.Number);
 
                     if (!string.IsNullOrEmpty(CommandId))
                     {
@@ -429,66 +433,113 @@ namespace BotEngineClient
                         {
                             case "click":
                                 Key = "Location";
-                                if (ValidateJsonValue("systemActions", listItemName, Key, commandsObject, "JsonObject", "with X/Y"))
+                                if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonObject", "with X/Y"))
                                 {
-                                    if (ValidateJsonValue("systemActions", listItemName, commandsObject[Key], "JsonObject", "with X/Y"))
+                                    if (ValidateJsonValue(location, listItemName, commandsObject[Key], "JsonObject", "with X/Y"))
                                     {
-                                        ValidateJsonValue("systemActions", listItemName, "X", commandsObject[Key].AsObject(), JsonValueKind.Number);
-                                        ValidateJsonValue("systemActions", listItemName, "Y", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                        ValidateJsonValue(location, listItemName, "X", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                        ValidateJsonValue(location, listItemName, "Y", commandsObject[Key].AsObject(), JsonValueKind.Number);
                                     }
                                 }
                                 break;
                             case "clickwhennotfoundinarea":
-                                ValidateJsonValue("systemActions", listItemName, "ImageName", commandsObject, JsonValueKind.String);
+                                ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
                                 Key = "Areas";
-                                if (ValidateJsonValue("systemActions", listItemName, Key, commandsObject, "JsonArray", "with X/Y/width/height objects"))
+                                if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonArray", "with X/Y/width/height objects"))
                                 {
                                     foreach (JsonNode areasItem in commandsObject[Key].AsArray())
                                     {
-                                        if (ValidateJsonValue("systemActions", listItemName, areasItem, "JsonObject", "with X/Y/width/height objects"))
+                                        if (ValidateJsonValue(location, listItemName, areasItem, "JsonObject", "with X/Y/width/height objects"))
                                         {
                                             JsonObject areasObject = (JsonObject)areasItem;
-                                            ValidateJsonValue("systemActions", listItemName, "X",  areasObject, JsonValueKind.Number);
-                                            ValidateJsonValue("systemActions", listItemName, "Y",  areasObject, JsonValueKind.Number);
-                                            ValidateJsonValue("systemActions", listItemName, "width",  areasObject, JsonValueKind.Number);
-                                            ValidateJsonValue("systemActions", listItemName, "height",  areasObject, JsonValueKind.Number);
+                                            ValidateJsonValue(location, listItemName, "X",  areasObject, JsonValueKind.Number);
+                                            ValidateJsonValue(location, listItemName, "Y",  areasObject, JsonValueKind.Number);
+                                            ValidateJsonValue(location, listItemName, "width",  areasObject, JsonValueKind.Number);
+                                            ValidateJsonValue(location, listItemName, "height",  areasObject, JsonValueKind.Number);
                                         }
                                     }
                                 }
                                 break;
                             case "drag":
-                                ValidateJsonValue("systemActions", listItemName, "Delay", commandsObject, JsonValueKind.Number);
+                                ValidateJsonValue(location, listItemName, "Delay", commandsObject, JsonValueKind.Number);
                                 Key = "Swipe";
-                                if (ValidateJsonValue("systemActions", listItemName, Key, commandsObject, "JsonObject", "with X1/Y1/X2/Y2 objects"))
+                                if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonObject", "with X1/Y1/X2/Y2 objects"))
                                 {
-                                    ValidateJsonValue("systemActions", listItemName, "X1", commandsObject[Key].AsObject(), JsonValueKind.Number);
-                                    ValidateJsonValue("systemActions", listItemName, "Y1", commandsObject[Key].AsObject(), JsonValueKind.Number);
-                                    ValidateJsonValue("systemActions", listItemName, "X2", commandsObject[Key].AsObject(), JsonValueKind.Number);
-                                    ValidateJsonValue("systemActions", listItemName, "Y2", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                    ValidateJsonValue(location, listItemName, "X1", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                    ValidateJsonValue(location, listItemName, "Y1", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                    ValidateJsonValue(location, listItemName, "X2", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                    ValidateJsonValue(location, listItemName, "Y2", commandsObject[Key].AsObject(), JsonValueKind.Number);
                                 }
                                 break;
                             case "exit":
+                                break;
                             case "enterloopcoordinate":
+                                ValidateJsonValue(location, listItemName, "Value", commandsObject, JsonValueKind.String);
+                                break;
                             case "findclick":
                                 break;
                             case "findclickandwait":
-                                ValidateJsonValue("systemActions", listItemName, "ImageName", commandsObject, JsonValueKind.String);
-                                ValidateJsonValue("systemActions", listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
+                                ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
+                                ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
                                 break;
                             case "ifexists":
                             case "ifnotexists":
+                                ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
+                                Key = "Commands";
+                                if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonArray", "with one or more Command objects"))
+                                {
+                                    ValidateCommands(location, listItemName, commandsObject[Key].AsArray());
+                                }
+                                break;
                             case "loopcoordinates":
+                                ValidateJsonValue(location, listItemName, "Coordinates", commandsObject, JsonValueKind.String);
+                                Key = "Commands";
+                                if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonArray", "with one or more Command objects"))
+                                {
+                                    ValidateCommands(location, listItemName, commandsObject[Key].AsArray());
+                                }
+                                break;
                             case "loopuntilfound":
                             case "loopuntilnotfound":
+                                ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
+                                ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
+                                Key = "Commands";
+                                if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonArray", "with one or more Command objects"))
+                                {
+                                    ValidateCommands(location, listItemName, commandsObject[Key].AsArray());
+                                }
+                                break;
                             case "restart":
+                                break;
                             case "runaction":
+                                ValidateJsonValue(location, listItemName, "ActionName", commandsObject, JsonValueKind.String);
+                                break;
                             case "sleep":
+                                ValidateJsonValue(location, listItemName, "Delay", commandsObject, JsonValueKind.Number);
+                                break;
                             case "startgame":
                             case "stopgame":
+                                ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
+                                ValidateJsonValue(location, listItemName, "Value", commandsObject, JsonValueKind.String);
+                                break;
                             case "waitfor":
                             case "waitforthenclick":
+                                ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
+                                ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
+                                break;
                             case "waitforchange":
                             case "waitfornochange":
+                                ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
+                                ValidateJsonValue(location, listItemName, "ChangeDetectDifference", commandsObject, JsonValueKind.Number);
+                                Key = "ChangeDetectArea";
+                                if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonObject", "with X/Y/width/height objects"))
+                                {
+                                    ValidateJsonValue(location, listItemName, "X", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                    ValidateJsonValue(location, listItemName, "Y", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                    ValidateJsonValue(location, listItemName, "width", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                    ValidateJsonValue(location, listItemName, "height", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                }
+                                break;
                             default:
                                 break;
                         }
@@ -498,7 +549,14 @@ namespace BotEngineClient
         }
 
 
-
+        /// <summary>
+        /// Validates a json Key entry exists in a Json Object, and is of the correct type.
+        /// </summary>
+        /// <param name="location">This is the type of Action (systemAction, scheduledAction)</param>
+        /// <param name="listItemName">The name of the Action that this JsonObject is within</param>
+        /// <param name="Key">The Key that identifies the entry within the JsonObject to check</param>
+        /// <param name="jsonObject">The JsonObject that may contain the Key</param>
+        /// <param name="jsonType">The type that is expected</param>
         private void ValidateJsonValue(string location, string listItemName, string Key, JsonObject jsonObject, JsonValueKind jsonType)
         {
             if (!jsonObject.ContainsKey(Key))
@@ -520,6 +578,16 @@ namespace BotEngineClient
             }
         }
 
+        /// <summary>
+        /// Validates a json Key entry exists in a Json Object, and is of the correct type.
+        /// </summary>
+        /// <param name="location">This is the type of Action (systemAction, scheduledAction)</param>
+        /// <param name="listItemName">The name of the Action that this JsonObject is within</param>
+        /// <param name="Key">The Key that identifies the entry within the JsonObject to check</param>
+        /// <param name="jsonObject">The JsonObject that may contain the Key</param>
+        /// <param name="jsonType">The string at the end of the type that is expected</param>
+        /// <param name="jsonTypeExtraInfo">Extra text to include in the error message</param>
+        /// <returns></returns>
         private bool ValidateJsonValue(string location, string listItemName, string Key, JsonObject jsonObject, string jsonType, string jsonTypeExtraInfo)
         {
             if (!jsonObject.ContainsKey(Key))
@@ -547,6 +615,15 @@ namespace BotEngineClient
             return true;
         }
 
+        /// <summary>
+        /// Validates that a JsonNode is of the correct type.
+        /// </summary>
+        /// <param name="location">This is the type of Action (systemAction, scheduledAction)</param>
+        /// <param name="listItemName">The name of the Action that this JsonObject is within</param>
+        /// <param name="jsonNode">The JsonNode that is being validated</param>
+        /// <param name="jsonType">The string at the end of the type that is expected</param>
+        /// <param name="jsonTypeExtraInfo">Extra text to include in the error message</param>
+        /// <returns></returns>
         private bool ValidateJsonValue(string location, string listItemName, JsonNode jsonNode, string jsonType, string jsonTypeExtraInfo)
         {
             if (!jsonNode.GetType().ToString().EndsWith(jsonType))
@@ -566,6 +643,11 @@ namespace BotEngineClient
             return true;
         }
 
+        /// <summary>
+        /// Validates that a json List File has the correct data structure.
+        /// </summary>
+        /// <param name="jsonListFileName"></param>
+        /// <returns></returns>
         public bool ValidateListConfig(string jsonListFileName)
         {
             int startErrorCount = Errors.Count;

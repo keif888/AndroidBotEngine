@@ -151,6 +151,14 @@ namespace TestBotEngineClient
             CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeValuesWrongType\" at path $.systemActions.DragSwipeValuesWrongType.Commands[0].Swipe.X2 is of the wrong type.  Was expecting Number but found True");
             CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeValuesWrongType\" at path $.systemActions.DragSwipeValuesWrongType.Commands[0].Swipe.Y2 is of the wrong type.  Was expecting Number but found System.Text.Json.Nodes.JsonObject");
 
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"EnterLoopCoordinatesMissing\" at path $.systemActions.EnterLoopCoordinatesMissing.Commands[0] is missing required field \"Value\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"EnterLoopCoordinatesBadType\" at path $.systemActions.EnterLoopCoordinatesBadType.Commands[0].Value is of the wrong type.  Was expecting String but found Number");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"IfExistsImageNameMissing\" at path $.systemActions.IfExistsImageNameMissing.Commands[0] is missing required field \"ImageName\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"IfExistsImageNameWrongType\" at path $.systemActions.IfExistsImageNameWrongType.Commands[0].ImageName is of the wrong type.  Was expecting String but found False");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"IfNotExistsCommandsMissing\" at path $.systemActions.IfNotExistsCommandsMissing.Commands[0] is missing required field \"Commands\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"IfExistsCommandsWrongType\" at path $.systemActions.IfExistsCommandsWrongType.Commands[0].Commands is of the wrong type.  Was expecting JsonArray with one or more Command objects but found String");
+
         }
 
     }

@@ -409,7 +409,7 @@
           "CommandNumber": 10,
           "CommandId": "Drag",
           "Delay": 150,
-          "Swipe": [78, 853, 79, 592]
+          "Swipe": [ 78, 853, 79, 592 ]
         }
       ]
     },
@@ -441,6 +441,87 @@
             "X2": true,
             "Y2": { "592": "True" }
           }
+        }
+      ]
+    },
+    "EnterLoopCoordinatesMissing": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 40,
+          "CommandId": "EnterLoopCoordinate"
+        }
+      ]
+    },
+    "EnterLoopCoordinatesBadType": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 40,
+          "CommandId": "EnterLoopCoordinate",
+          "Value": 12
+        }
+      ]
+    },
+    "IfExistsImageNameMissing": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "IfExists",
+          "Commands": [
+            {
+              "CommandNumber": 10,
+              "CommandId": "StartGame",
+              "TimeOut": 120000,
+              "Value": "com.android.chrome/com.android.chrome/com.google.android.apps.chrome.Main"
+            }
+          ]
+        }
+      ]
+    },
+    "IfExistsImageNameWrongType": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "IfExists",
+          "ImageName": false,
+          "Commands": [
+            {
+              "CommandNumber": 10,
+              "CommandId": "StartGame",
+              "TimeOut": 120000,
+              "Value": "com.android.chrome/com.android.chrome/com.google.android.apps.chrome.Main"
+            }
+          ]
+        }
+      ]
+    },
+    "IfExistsCommandsWrongType": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "IfExists",
+          "ImageName": "ValidFindString",
+          "Commands": "BadData"
+        }
+      ]
+    },
+    "IfNotExistsCommandsMissing": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "IfExists",
+          "ImageName": "ValidFindString"
         }
       ]
     }

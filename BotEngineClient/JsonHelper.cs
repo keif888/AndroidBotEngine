@@ -30,315 +30,321 @@ namespace BotEngineClient
             };
 
             string jsonList = File.ReadAllText(jsonGameFileName);
-            JsonNode jsonListNode = JsonNode.Parse(jsonList, nodeOptions, documentOptions);
-            if (jsonListNode is JsonObject jsonObject)
+            try
             {
-                if (!jsonObject.ContainsKey("FileId"))
+                JsonNode jsonListNode = JsonNode.Parse(jsonList, nodeOptions, documentOptions);
+                if (jsonListNode is JsonObject jsonObject)
                 {
-                    Errors.Add("Required field \"FileId\" missing.  Unable to confirm that the input file is a GameConfigFile");
-                }
-                else
-                {
-                    JsonNode fileIdValue = jsonObject["FileId"];
-                    if (fileIdValue is JsonValue)
+                    if (!jsonObject.ContainsKey("FileId"))
                     {
-                        JsonElement value = fileIdValue.GetValue<JsonElement>();
-                        if (value.ValueKind == JsonValueKind.String)
+                        Errors.Add("Required field \"FileId\" missing.  Unable to confirm that the input file is a GameConfigFile");
+                    }
+                    else
+                    {
+                        JsonNode fileIdValue = jsonObject["FileId"];
+                        if (fileIdValue is JsonValue)
                         {
-                            string fileId = value.GetString();
-                            if (fileId.ToLower() != "gameconfig")
+                            JsonElement value = fileIdValue.GetValue<JsonElement>();
+                            if (value.ValueKind == JsonValueKind.String)
                             {
-                                Errors.Add(string.Format("\"FileId\" indicates that this is not \"GameConfig\" but {0}", fileId));
+                                string fileId = value.GetString();
+                                if (fileId.ToLower() != "gameconfig")
+                                {
+                                    Errors.Add(string.Format("\"FileId\" indicates that this is not \"GameConfig\" but {0}", fileId));
+                                }
+                            }
+                            else
+                            {
+                                Errors.Add(string.Format("\"FileId\" value is of incorrect type.  Expecting a String but got {0}", value.ValueKind));
                             }
                         }
                         else
                         {
-                            Errors.Add(string.Format("\"FileId\" value is of incorrect type.  Expecting a String but got {0}", value.ValueKind));
+                            Errors.Add("Required field \"FileId\" is of the wrong type.  Expecting a String Value");
                         }
+                    }
+
+                    if (!jsonObject.ContainsKey("findStrings"))
+                    {
+                        Errors.Add("Required root field \"findStrings\" missing.");
                     }
                     else
                     {
-                        Errors.Add("Required field \"FileId\" is of the wrong type.  Expecting a String Value");
+                        JsonNode rootNode = jsonObject["findStrings"];
+                        if (!(rootNode is JsonObject findStringsObject))
+                        {
+                            Errors.Add("Required root field \"findStrings\" is of the wrong type.  Expecting an Object with one or more named objects of FindStrings data");
+                        }
+                        else
+                        {
+                            foreach (KeyValuePair<string, JsonNode?> findStringsItem in findStringsObject)
+                            {
+                                if (!(findStringsItem.Value is JsonObject findStringJsonObject))
+                                {
+                                    Errors.Add(string.Format("findStrings item {0} at path {1} is of the wrong type.  Was expecting Object with zero or more named findString data", findStringsItem.Key, findStringsItem.Value.GetPath()));
+                                }
+                                else
+                                {
+                                    // Check for required fields.
+                                    if (!findStringJsonObject.ContainsKey("findString"))
+                                    {
+                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"findString\"", findStringsItem.Key, findStringsItem.Value.GetPath()));
+                                    }
+                                    else
+                                    {
+                                        if (!(findStringJsonObject["findString"] is JsonValue))
+                                        {
+                                            Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", findStringsItem.Key, findStringJsonObject["findString"].GetPath(), findStringJsonObject["findString"].GetType()));
+                                        }
+                                        else
+                                        {
+                                            JsonElement itemNode = findStringJsonObject["findString"].GetValue<JsonElement>();
+                                            if (itemNode.ValueKind != JsonValueKind.String)
+                                                Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", findStringsItem.Key, findStringJsonObject["findString"].GetPath(), itemNode.ValueKind));
+                                        }
+                                    }
+                                    if (!findStringJsonObject.ContainsKey("searchArea"))
+                                    {
+                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"searchArea\"", findStringsItem.Key, findStringsItem.Value.GetPath()));
+                                    }
+                                    else
+                                    {
+                                        JsonNode itemNode = findStringJsonObject["searchArea"];
+                                        if (!(itemNode is JsonObject))
+                                            Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Object containing a search area", findStringsItem.Key, findStringJsonObject["searchArea"].GetPath()));
+                                        else
+                                        {
+                                            JsonObject searchAreaObject = (JsonObject)itemNode;
+                                            if (!searchAreaObject.ContainsKey("X"))
+                                            {
+                                                Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"X\"", findStringsItem.Key, searchAreaObject.GetPath()));
+                                            }
+                                            else
+                                            {
+                                                if (!(searchAreaObject["X"] is JsonValue))
+                                                {
+                                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["X"].GetPath(), searchAreaObject["X"].GetType()));
+                                                }
+                                                else
+                                                {
+                                                    JsonElement searchAreaItemNode = searchAreaObject["X"].GetValue<JsonElement>();
+                                                    if (searchAreaItemNode.ValueKind != JsonValueKind.Number)
+                                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["X"].GetPath(), searchAreaItemNode.ValueKind));
+                                                }
+                                            }
+                                            if (!searchAreaObject.ContainsKey("Y"))
+                                            {
+                                                Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"Y\"", findStringsItem.Key, searchAreaObject.GetPath()));
+                                            }
+                                            else
+                                            {
+                                                if (!(searchAreaObject["Y"] is JsonValue))
+                                                {
+                                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["Y"].GetPath(), searchAreaObject["Y"].GetType()));
+                                                }
+                                                else
+                                                {
+                                                    JsonElement searchAreaItemNode = searchAreaObject["Y"].GetValue<JsonElement>();
+                                                    if (searchAreaItemNode.ValueKind != JsonValueKind.Number)
+                                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["Y"].GetPath(), searchAreaItemNode.ValueKind));
+                                                }
+                                            }
+                                            if (!searchAreaObject.ContainsKey("width"))
+                                            {
+                                                Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"width\"", findStringsItem.Key, searchAreaObject.GetPath()));
+                                            }
+                                            else
+                                            {
+                                                if (!(searchAreaObject["width"] is JsonValue))
+                                                {
+                                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["width"].GetPath(), searchAreaObject["width"].GetType()));
+                                                }
+                                                else
+                                                {
+                                                    JsonElement searchAreaItemNode = searchAreaObject["width"].GetValue<JsonElement>();
+                                                    if (searchAreaItemNode.ValueKind != JsonValueKind.Number)
+                                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["width"].GetPath(), searchAreaItemNode.ValueKind));
+                                                }
+                                            }
+                                            if (!searchAreaObject.ContainsKey("height"))
+                                            {
+                                                Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"height\"", findStringsItem.Key, searchAreaObject.GetPath()));
+                                            }
+                                            else
+                                            {
+                                                if (!(searchAreaObject["height"] is JsonValue))
+                                                {
+                                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["height"].GetPath(), searchAreaObject["height"].GetType()));
+                                                }
+                                                else
+                                                {
+                                                    JsonElement searchAreaItemNode = searchAreaObject["height"].GetValue<JsonElement>();
+                                                    if (searchAreaItemNode.ValueKind != JsonValueKind.Number)
+                                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["height"].GetPath(), searchAreaItemNode.ValueKind));
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (!findStringJsonObject.ContainsKey("textTolerance"))
+                                    {
+                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"textTolerance\"", findStringsItem.Key, findStringsItem.Value.GetPath()));
+                                    }
+                                    else
+                                    {
+                                        if (!(findStringJsonObject["textTolerance"] is JsonValue))
+                                        {
+                                            Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, findStringJsonObject["textTolerance"].GetPath(), findStringJsonObject["textTolerance"].GetType()));
+                                        }
+                                        else
+                                        {
+                                            JsonElement itemNode = findStringJsonObject["textTolerance"].GetValue<JsonElement>();
+                                            if (itemNode.ValueKind != JsonValueKind.Number)
+                                                Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, findStringJsonObject["textTolerance"].GetPath(), itemNode.ValueKind));
+                                        }
+                                    }
+                                    if (!findStringJsonObject.ContainsKey("backgroundTolerance"))
+                                    {
+                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"backgroundTolerance\"", findStringsItem.Key, findStringsItem.Value.GetPath()));
+                                    }
+                                    else
+                                    {
+                                        if (!(findStringJsonObject["backgroundTolerance"] is JsonValue))
+                                        {
+                                            Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, findStringJsonObject["backgroundTolerance"].GetPath(), findStringJsonObject["backgroundTolerance"].GetType()));
+                                        }
+                                        else
+                                        {
+                                            JsonElement itemNode = findStringJsonObject["backgroundTolerance"].GetValue<JsonElement>();
+                                            if (itemNode.ValueKind != JsonValueKind.Number)
+                                                Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, findStringJsonObject["backgroundTolerance"].GetPath(), itemNode.ValueKind));
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
-                }
 
-                if (!jsonObject.ContainsKey("findStrings"))
-                {
-                    Errors.Add("Required root field \"findStrings\" missing.");
+                    if (!jsonObject.ContainsKey("systemActions"))
+                    {
+                        Errors.Add("Required root field \"systemActions\" missing.");
+                    }
+                    else
+                    {
+                        JsonNode rootNode = jsonObject["systemActions"];
+                        if (!(rootNode is JsonObject systemActionsObject))
+                        {
+                            Errors.Add("Required root field \"systemActions\" is of the wrong type.  Expecting an Object with one or more named objects of Action data");
+                        }
+                        else
+                        {
+                            foreach (KeyValuePair<string, JsonNode?> systemActionsItem in systemActionsObject)
+                            {
+                                if (!(systemActionsItem.Value is JsonObject systemActionJsonObject))
+                                {
+                                    Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Object with zero or more named objects contained within.", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
+                                }
+                                else
+                                {
+                                    // Check for required fields.
+                                    if (!systemActionJsonObject.ContainsKey("ActionType"))
+                                    {
+                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is missing required field \"ActionType\"", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
+                                    }
+                                    else
+                                    {
+                                        if (!(systemActionJsonObject["ActionType"] is JsonValue))
+                                        {
+                                            Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), systemActionJsonObject["ActionType"].GetType()));
+                                        }
+                                        else
+                                        {
+                                            JsonElement itemNode = systemActionJsonObject["ActionType"].GetValue<JsonElement>();
+                                            if (itemNode.ValueKind != JsonValueKind.String)
+                                                Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), itemNode.ValueKind));
+                                            else
+                                            {
+                                                switch (itemNode.GetString().ToLower())
+                                                {
+                                                    case "system":
+                                                    case "scheduled":
+                                                    case "daily":
+                                                    case "always":
+                                                        break;
+                                                    default:
+                                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} with value \"{2}\" is not valid.  Was expecting one of the following \"System\", \"Scheduled\", \"Daily\", \"Always\"", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), itemNode.GetString()));
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if (!systemActionJsonObject.ContainsKey("Commands"))
+                                    {
+                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is missing required field \"Commands\"", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
+                                    }
+                                    else
+                                    {
+                                        if (!(systemActionJsonObject["Commands"] is JsonArray commandsJsonArray))
+                                        {
+                                            Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Array but found {2}", systemActionsItem.Key, systemActionJsonObject["Commands"].GetPath(), systemActionJsonObject["Commands"].GetType()));
+                                        }
+                                        else
+                                        {
+                                            ValidateCommands(systemActionsItem.Key, commandsJsonArray);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (!jsonObject.ContainsKey("actions"))
+                    {
+                        Errors.Add("Required root field \"actions\" missing.");
+                    }
+                    else
+                    {
+                        JsonNode rootNode = jsonObject["actions"];
+                        if (!(rootNode is JsonObject actionsObject))
+                        {
+                            Errors.Add("Required root field \"actions\" is of the wrong type.  Expecting an Object with one or more named objects of Action data");
+                        }
+                        else
+                        {
+                            foreach (KeyValuePair<string, JsonNode?> actionsItem in actionsObject)
+                            {
+                                if (!(actionsItem.Value is JsonObject systemActionJsonObject))
+                                {
+                                    JsonElement jsonElement = actionsItem.Value.GetValue<JsonElement>();
+                                    Errors.Add(string.Format("findStrings item {0} at path {1} is of the wrong type.  Was expecting Object, but found {2}", actionsItem.Key, actionsItem.Value.GetPath(), jsonElement.ValueKind));
+                                }
+                                else
+                                {
+                                    // Check for required fields.
+                                    if (!systemActionJsonObject.ContainsKey("ActionType"))
+                                    {
+                                        Errors.Add(string.Format("actions item {0} at path {1} is missing required field \"ActionType\"", actionsItem.Key, actionsItem.Value.GetPath()));
+                                    }
+                                    if (!systemActionJsonObject.ContainsKey("Commands"))
+                                    {
+                                        Errors.Add(string.Format("actions item {0} at path {1} is missing required field \"Commands\"", actionsItem.Key, actionsItem.Value.GetPath()));
+                                    }
+                                    // ToDo: Validate the required fields types.
+                                }
+                            }
+                        }
+                    }
+
+
                 }
                 else
                 {
-                    JsonNode rootNode = jsonObject["findStrings"];
-                    if (!(rootNode is JsonObject findStringsObject))
-                    {
-                        Errors.Add("Required root field \"findStrings\" is of the wrong type.  Expecting an Object with one or more named objects of FindStrings data");
-                    }
-                    else
-                    {
-                        foreach (KeyValuePair<string, JsonNode?> findStringsItem in findStringsObject)
-                        {
-                            if (!(findStringsItem.Value is JsonObject findStringJsonObject))
-                            {
-                                Errors.Add(string.Format("findStrings item {0} at path {1} is of the wrong type.  Was expecting Object with zero or more named findString data", findStringsItem.Key, findStringsItem.Value.GetPath()));
-                            }
-                            else
-                            {
-                                // Check for required fields.
-                                if (!findStringJsonObject.ContainsKey("findString"))
-                                {
-                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"findString\"", findStringsItem.Key, findStringsItem.Value.GetPath()));
-                                }
-                                else
-                                {
-                                    if (!(findStringJsonObject["findString"] is JsonValue))
-                                    {
-                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", findStringsItem.Key, findStringJsonObject["findString"].GetPath(), findStringJsonObject["findString"].GetType()));
-                                    }
-                                    else
-                                    {
-                                        JsonElement itemNode = findStringJsonObject["findString"].GetValue<JsonElement>();
-                                        if (itemNode.ValueKind != JsonValueKind.String)
-                                            Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", findStringsItem.Key, findStringJsonObject["findString"].GetPath(), itemNode.ValueKind));
-                                    }
-                                }
-                                if (!findStringJsonObject.ContainsKey("searchArea"))
-                                {
-                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"searchArea\"", findStringsItem.Key, findStringsItem.Value.GetPath()));
-                                }
-                                else
-                                {
-                                    JsonNode itemNode = findStringJsonObject["searchArea"];
-                                    if (!(itemNode is JsonObject))
-                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Object containing a search area", findStringsItem.Key, findStringJsonObject["searchArea"].GetPath()));
-                                    else
-                                    {
-                                        JsonObject searchAreaObject = (JsonObject)itemNode;
-                                        if (!searchAreaObject.ContainsKey("X"))
-                                        {
-                                            Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"X\"", findStringsItem.Key, searchAreaObject.GetPath()));
-                                        }
-                                        else
-                                        {
-                                            if (!(searchAreaObject["X"] is JsonValue))
-                                            {
-                                                Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["X"].GetPath(), searchAreaObject["X"].GetType()));
-                                            }
-                                            else
-                                            {
-                                                JsonElement searchAreaItemNode = searchAreaObject["X"].GetValue<JsonElement>();
-                                                if (searchAreaItemNode.ValueKind != JsonValueKind.Number)
-                                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["X"].GetPath(), searchAreaItemNode.ValueKind));
-                                            }
-                                        }
-                                        if (!searchAreaObject.ContainsKey("Y"))
-                                        {
-                                            Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"Y\"", findStringsItem.Key, searchAreaObject.GetPath()));
-                                        }
-                                        else
-                                        {
-                                            if (!(searchAreaObject["Y"] is JsonValue))
-                                            {
-                                                Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["Y"].GetPath(), searchAreaObject["Y"].GetType()));
-                                            }
-                                            else
-                                            {
-                                                JsonElement searchAreaItemNode = searchAreaObject["Y"].GetValue<JsonElement>();
-                                                if (searchAreaItemNode.ValueKind != JsonValueKind.Number)
-                                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["Y"].GetPath(), searchAreaItemNode.ValueKind));
-                                            }
-                                        }
-                                        if (!searchAreaObject.ContainsKey("width"))
-                                        {
-                                            Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"width\"", findStringsItem.Key, searchAreaObject.GetPath()));
-                                        }
-                                        else
-                                        {
-                                            if (!(searchAreaObject["width"] is JsonValue))
-                                            {
-                                                Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["width"].GetPath(), searchAreaObject["width"].GetType()));
-                                            }
-                                            else
-                                            {
-                                                JsonElement searchAreaItemNode = searchAreaObject["width"].GetValue<JsonElement>();
-                                                if (searchAreaItemNode.ValueKind != JsonValueKind.Number)
-                                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["width"].GetPath(), searchAreaItemNode.ValueKind));
-                                            }
-                                        }
-                                        if (!searchAreaObject.ContainsKey("height"))
-                                        {
-                                            Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"height\"", findStringsItem.Key, searchAreaObject.GetPath()));
-                                        }
-                                        else
-                                        {
-                                            if (!(searchAreaObject["height"] is JsonValue))
-                                            {
-                                                Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["height"].GetPath(), searchAreaObject["height"].GetType()));
-                                            }
-                                            else
-                                            {
-                                                JsonElement searchAreaItemNode = searchAreaObject["height"].GetValue<JsonElement>();
-                                                if (searchAreaItemNode.ValueKind != JsonValueKind.Number)
-                                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, searchAreaObject["height"].GetPath(), searchAreaItemNode.ValueKind));
-                                            }
-                                        }
-                                    }
-                                }
-                                if (!findStringJsonObject.ContainsKey("textTolerance"))
-                                {
-                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"textTolerance\"", findStringsItem.Key, findStringsItem.Value.GetPath()));
-                                }
-                                else
-                                {
-                                    if (!(findStringJsonObject["textTolerance"] is JsonValue))
-                                    {
-                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, findStringJsonObject["textTolerance"].GetPath(), findStringJsonObject["textTolerance"].GetType()));
-                                    }
-                                    else
-                                    {
-                                        JsonElement itemNode = findStringJsonObject["textTolerance"].GetValue<JsonElement>();
-                                        if (itemNode.ValueKind != JsonValueKind.Number)
-                                            Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, findStringJsonObject["textTolerance"].GetPath(), itemNode.ValueKind));
-                                    }
-                                }
-                                if (!findStringJsonObject.ContainsKey("backgroundTolerance"))
-                                {
-                                    Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is missing required field \"backgroundTolerance\"", findStringsItem.Key, findStringsItem.Value.GetPath()));
-                                }
-                                else
-                                {
-                                    if (!(findStringJsonObject["backgroundTolerance"] is JsonValue))
-                                    {
-                                        Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, findStringJsonObject["backgroundTolerance"].GetPath(), findStringJsonObject["backgroundTolerance"].GetType()));
-                                    }
-                                    else
-                                    {
-                                        JsonElement itemNode = findStringJsonObject["backgroundTolerance"].GetValue<JsonElement>();
-                                        if (itemNode.ValueKind != JsonValueKind.Number)
-                                            Errors.Add(string.Format("findStrings list item \"{0}\" at path {1} is of the wrong type.  Was expecting Number but found {2}", findStringsItem.Key, findStringJsonObject["backgroundTolerance"].GetPath(), itemNode.ValueKind));
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    Errors.Add(string.Format("Root of {0} was not a json Object, was expecting {\"FileId\": \"ListConfig\",", jsonGameFileName));
                 }
-
-                if (!jsonObject.ContainsKey("systemActions"))
-                {
-                    Errors.Add("Required root field \"systemActions\" missing.");
-                }
-                else
-                {
-                    JsonNode rootNode = jsonObject["systemActions"];
-                    if (!(rootNode is JsonObject systemActionsObject))
-                    {
-                        Errors.Add("Required root field \"systemActions\" is of the wrong type.  Expecting an Object with one or more named objects of Action data");
-                    }
-                    else
-                    {
-                        foreach (KeyValuePair<string, JsonNode?> systemActionsItem in systemActionsObject)
-                        {
-                            if (!(systemActionsItem.Value is JsonObject systemActionJsonObject))
-                            {
-                                Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Object with zero or more named objects contained within.", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
-                            }
-                            else
-                            {
-                                // Check for required fields.
-                                if (!systemActionJsonObject.ContainsKey("ActionType"))
-                                {
-                                    Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is missing required field \"ActionType\"", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
-                                }
-                                else
-                                {
-                                    if (!(systemActionJsonObject["ActionType"] is JsonValue))
-                                    {
-                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), systemActionJsonObject["ActionType"].GetType()));
-                                    }
-                                    else
-                                    {
-                                        JsonElement itemNode = systemActionJsonObject["ActionType"].GetValue<JsonElement>();
-                                        if (itemNode.ValueKind != JsonValueKind.String)
-                                            Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), itemNode.ValueKind));
-                                        else
-                                        {
-                                            switch (itemNode.GetString().ToLower())
-                                            {
-                                                case "system":
-                                                case "scheduled":
-                                                case "daily":
-                                                case "always":
-                                                    break;
-                                                default:
-                                                    Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} with value \"{2}\" is not valid.  Was expecting one of the following \"System\", \"Scheduled\", \"Daily\", \"Always\"", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), itemNode.GetString()));
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                }
-                                if (!systemActionJsonObject.ContainsKey("Commands"))
-                                {
-                                    Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is missing required field \"Commands\"", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
-                                }
-                                else
-                                {
-                                    if (!(systemActionJsonObject["Commands"] is JsonArray commandsJsonArray))
-                                    {
-                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Array but found {2}", systemActionsItem.Key, systemActionJsonObject["Commands"].GetPath(), systemActionJsonObject["Commands"].GetType()));
-                                    }
-                                    else
-                                    {
-                                        ValidateCommands(systemActionsItem.Key, commandsJsonArray);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (!jsonObject.ContainsKey("actions"))
-                {
-                    Errors.Add("Required root field \"actions\" missing.");
-                }
-                else
-                {
-                    JsonNode rootNode = jsonObject["actions"];
-                    if (!(rootNode is JsonObject actionsObject))
-                    {
-                        Errors.Add("Required root field \"actions\" is of the wrong type.  Expecting an Object with one or more named objects of Action data");
-                    }
-                    else
-                    {
-                        foreach (KeyValuePair<string, JsonNode?> actionsItem in actionsObject)
-                        {
-                            if (!(actionsItem.Value is JsonObject systemActionJsonObject))
-                            {
-                                JsonElement jsonElement = actionsItem.Value.GetValue<JsonElement>();
-                                Errors.Add(string.Format("findStrings item {0} at path {1} is of the wrong type.  Was expecting Object, but found {2}", actionsItem.Key, actionsItem.Value.GetPath(), jsonElement.ValueKind));
-                            }
-                            else
-                            {
-                                // Check for required fields.
-                                if (!systemActionJsonObject.ContainsKey("ActionType"))
-                                {
-                                    Errors.Add(string.Format("actions item {0} at path {1} is missing required field \"ActionType\"", actionsItem.Key, actionsItem.Value.GetPath()));
-                                }
-                                if (!systemActionJsonObject.ContainsKey("Commands"))
-                                {
-                                    Errors.Add(string.Format("actions item {0} at path {1} is missing required field \"Commands\"", actionsItem.Key, actionsItem.Value.GetPath()));
-                                }
-                                // ToDo: Validate the required fields types.
-                            }
-                        }
-                    }
-                }
-
-
             }
-            else
+            catch (JsonException ex)
             {
-                Errors.Add(string.Format("Root of {0} was not a json Object, was expecting {\"FileId\": \"ListConfig\",", jsonGameFileName));
+                Errors.Add(string.Format("File {0} is not well formed JSON.  Error {1} captured.", jsonGameFileName, ex.Message));
             }
-
 
 
             if (Errors.Count == startErrorCount)
@@ -415,7 +421,7 @@ namespace BotEngineClient
                         }
                     }
 
-                    ValidateJsonValue("systemActions", listItemName, "CommandNumber", commandsItem, commandsObject, JsonValueKind.Number);
+                    ValidateJsonValue("systemActions", listItemName, "CommandNumber", commandsObject, JsonValueKind.Number);
 
                     if (!string.IsNullOrEmpty(CommandId))
                     {
@@ -423,64 +429,51 @@ namespace BotEngineClient
                         {
                             case "click":
                                 Key = "Location";
-                                if (!commandsObject.ContainsKey(Key))
+                                if (ValidateJsonValue("systemActions", listItemName, Key, commandsObject, "JsonObject", "with X/Y"))
                                 {
-                                    Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is missing required field \"{2}\"", listItemName, commandsItem.GetPath(), Key));
-                                }
-                                else
-                                {
-                                    if (!(commandsObject[Key] is JsonObject))
+                                    if (ValidateJsonValue("systemActions", listItemName, commandsObject[Key], "JsonObject", "with X/Y"))
                                     {
-                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Object with X/Y but found {2}", listItemName, commandsObject[Key].GetPath(), commandsObject[Key].GetType()));
-                                    }
-                                    else
-                                    {
-                                        ValidateJsonValue("systemActions", listItemName, "X", commandsItem, commandsObject[Key].AsObject(), JsonValueKind.Number);
-                                        ValidateJsonValue("systemActions", listItemName, "Y", commandsItem, commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                        ValidateJsonValue("systemActions", listItemName, "X", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                        ValidateJsonValue("systemActions", listItemName, "Y", commandsObject[Key].AsObject(), JsonValueKind.Number);
                                     }
                                 }
                                 break;
                             case "clickwhennotfoundinarea":
-                                ValidateJsonValue("systemActions", listItemName, "ImageName", commandsItem, commandsObject, JsonValueKind.String);
+                                ValidateJsonValue("systemActions", listItemName, "ImageName", commandsObject, JsonValueKind.String);
                                 Key = "Areas";
-                                if (!commandsObject.ContainsKey(Key))
+                                if (ValidateJsonValue("systemActions", listItemName, Key, commandsObject, "JsonArray", "with X/Y/width/height objects"))
                                 {
-                                    Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is missing required field \"{2}\"", listItemName, commandsItem.GetPath(), Key));
-                                }
-                                else
-                                {
-                                    if (!(commandsObject[Key] is JsonArray))
+                                    foreach (JsonNode areasItem in commandsObject[Key].AsArray())
                                     {
-                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Array with X/Y/width/height objects but found {2}", listItemName, commandsObject[Key].GetPath(), commandsObject[Key].GetType()));
-                                    }
-                                    else
-                                    {
-                                        foreach (JsonNode areasItem in commandsObject[Key].AsArray())
+                                        if (ValidateJsonValue("systemActions", listItemName, areasItem, "JsonObject", "with X/Y/width/height objects"))
                                         {
-                                            if (!(areasItem is JsonObject))
-                                            {
-                                                Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Object with X/Y but found {2}", listItemName, areasItem.GetPath(), areasItem.GetType()));
-                                            }
-                                            else
-                                            {
-                                                JsonObject areasObject = (JsonObject)areasItem;
-                                                ValidateJsonValue("systemActions", listItemName, "X", areasItem, areasObject, JsonValueKind.Number);
-                                                ValidateJsonValue("systemActions", listItemName, "Y", areasItem, areasObject, JsonValueKind.Number);
-                                                ValidateJsonValue("systemActions", listItemName, "width", areasItem, areasObject, JsonValueKind.Number);
-                                                ValidateJsonValue("systemActions", listItemName, "height", areasItem, areasObject, JsonValueKind.Number);
-                                            }
+                                            JsonObject areasObject = (JsonObject)areasItem;
+                                            ValidateJsonValue("systemActions", listItemName, "X",  areasObject, JsonValueKind.Number);
+                                            ValidateJsonValue("systemActions", listItemName, "Y",  areasObject, JsonValueKind.Number);
+                                            ValidateJsonValue("systemActions", listItemName, "width",  areasObject, JsonValueKind.Number);
+                                            ValidateJsonValue("systemActions", listItemName, "height",  areasObject, JsonValueKind.Number);
                                         }
                                     }
                                 }
                                 break;
                             case "drag":
+                                ValidateJsonValue("systemActions", listItemName, "Delay", commandsObject, JsonValueKind.Number);
+                                Key = "Swipe";
+                                if (ValidateJsonValue("systemActions", listItemName, Key, commandsObject, "JsonObject", "with X1/Y1/X2/Y2 objects"))
+                                {
+                                    ValidateJsonValue("systemActions", listItemName, "X1", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                    ValidateJsonValue("systemActions", listItemName, "Y1", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                    ValidateJsonValue("systemActions", listItemName, "X2", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                    ValidateJsonValue("systemActions", listItemName, "Y2", commandsObject[Key].AsObject(), JsonValueKind.Number);
+                                }
+                                break;
                             case "exit":
                             case "enterloopcoordinate":
                             case "findclick":
                                 break;
                             case "findclickandwait":
-                                ValidateJsonValue("systemActions", listItemName, "ImageName", commandsItem, commandsObject, JsonValueKind.String);
-                                ValidateJsonValue("systemActions", listItemName, "TimeOut", commandsItem, commandsObject, JsonValueKind.Number);
+                                ValidateJsonValue("systemActions", listItemName, "ImageName", commandsObject, JsonValueKind.String);
+                                ValidateJsonValue("systemActions", listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
                                 break;
                             case "ifexists":
                             case "ifnotexists":
@@ -504,11 +497,13 @@ namespace BotEngineClient
             }
         }
 
-        private void ValidateJsonValue(string location, string listItemName, string Key, JsonNode jsonNode, JsonObject jsonObject, JsonValueKind jsonType)
+
+
+        private void ValidateJsonValue(string location, string listItemName, string Key, JsonObject jsonObject, JsonValueKind jsonType)
         {
             if (!jsonObject.ContainsKey(Key))
             {
-                Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is missing required field \"{3}\"", location, listItemName, jsonNode.GetPath(), Key));
+                Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is missing required field \"{3}\"", location, listItemName, jsonObject.GetPath(), Key));
             }
             else
             {
@@ -523,6 +518,52 @@ namespace BotEngineClient
                         Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting {3} but found {4}", location, listItemName, jsonObject[Key].GetPath(), jsonType, itemNode.ValueKind));
                 }
             }
+        }
+
+        private bool ValidateJsonValue(string location, string listItemName, string Key, JsonObject jsonObject, string jsonType, string jsonTypeExtraInfo)
+        {
+            if (!jsonObject.ContainsKey(Key))
+            {
+                Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is missing required field \"{3}\"", location, listItemName, jsonObject.GetPath(), Key));
+                return false;
+            }
+            else
+            {
+                if (!jsonObject[Key].GetType().ToString().EndsWith(jsonType))
+                {
+                    if (!(jsonObject[Key] is JsonValue))
+                    {
+                        Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting {3} {4} but found {5}", location, listItemName, jsonObject[Key].GetPath(), jsonType, jsonTypeExtraInfo, jsonObject[Key].GetType()));
+                        return false;
+                    }
+                    else
+                    {
+                        JsonElement itemNode = jsonObject[Key].GetValue<JsonElement>();
+                        Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting {3} {4} but found {5}", location, listItemName, jsonObject[Key].GetPath(), jsonType, jsonTypeExtraInfo, itemNode.ValueKind));
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private bool ValidateJsonValue(string location, string listItemName, JsonNode jsonNode, string jsonType, string jsonTypeExtraInfo)
+        {
+            if (!jsonNode.GetType().ToString().EndsWith(jsonType))
+            {
+                if (!(jsonNode is JsonValue))
+                {
+                    Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting {3} {4} but found {5}", location, listItemName, jsonNode.GetPath(), jsonType, jsonTypeExtraInfo, jsonNode.GetType()));
+                    return false;
+                }
+                else
+                {
+                    JsonElement itemNode = jsonNode.GetValue<JsonElement>();
+                    Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting {3} {4} but found {5}", location, listItemName, jsonNode.GetPath(), jsonType, jsonTypeExtraInfo, itemNode.ValueKind));
+                    return false;
+                }
+            }
+            return true;
         }
 
         public bool ValidateListConfig(string jsonListFileName)
@@ -592,8 +633,8 @@ namespace BotEngineClient
                                     if (arrayItem is JsonObject)
                                     {
                                         JsonObject arrayObject = (JsonObject)arrayItem;
-                                        ValidateJsonValue("Coordinates", coordItem.Key, "X", arrayItem, arrayObject, JsonValueKind.Number);
-                                        ValidateJsonValue("Coordinates", coordItem.Key, "Y", arrayItem, arrayObject, JsonValueKind.Number);
+                                        ValidateJsonValue("Coordinates", coordItem.Key, "X", arrayObject, JsonValueKind.Number);
+                                        ValidateJsonValue("Coordinates", coordItem.Key, "Y", arrayObject, JsonValueKind.Number);
                                     }
                                     else
                                     {

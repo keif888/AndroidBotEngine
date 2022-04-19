@@ -86,7 +86,7 @@ namespace TestBotEngineClient
             Assert.IsFalse(jsonHelper.ValidateGameConfigStructure(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
             // ToDo: Reinstate this when all the tests are completed.
-            //Assert.AreEqual<int>(25, jsonHelper.Errors.Count);
+            //Assert.AreEqual<int>(41, jsonHelper.Errors.Count);
             
             CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"BadFindString\" at path $.findStrings.BadFindString.findString is of the wrong type.  Was expecting String but found System.Text.Json.Nodes.JsonArray");
             CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"MissingFindString\" at path $.findStrings.MissingFindString is missing required field \"findString\"");
@@ -115,6 +115,42 @@ namespace TestBotEngineClient
             CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"CommandIdMissing\" at path $.systemActions.CommandIdMissing.Commands[0] is missing required field \"CommandId\"");
             CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"CommandIdWrongType\" at path $.systemActions.CommandIdWrongType.Commands[0].CommandId is of the wrong type.  Was expecting String but found Number");
             CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"BadCommandId\" at path $.systemActions.BadCommandId.Commands[0].CommandId with value \"IAmNotValid\" is not valid.  Was expecting a Command like one of the following \"WaitFor\", \"Click\", \"IfExists\", \"FindClickAndWait\"");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickXMissing\" at path $.systemActions.ClickXMissing.Commands[0].Location is missing required field \"X\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickYMissing\" at path $.systemActions.ClickYMissing.Commands[0].Location is missing required field \"Y\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickXWrongType\" at path $.systemActions.ClickXWrongType.Commands[0].Location.X is of the wrong type.  Was expecting Number but found String");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickYWrongType\" at path $.systemActions.ClickYWrongType.Commands[0].Location.Y is of the wrong type.  Was expecting Number but found System.Text.Json.Nodes.JsonArray");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickWhenNotFoundInAreaMissingAreas\" at path $.systemActions.ClickWhenNotFoundInAreaMissingAreas.Commands[0] is missing required field \"Areas\"");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickWhenNotFoundInAreaErrors\" at path $.systemActions.ClickWhenNotFoundInAreaErrors.Commands[0].Areas[0] is missing required field \"X\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickWhenNotFoundInAreaErrors\" at path $.systemActions.ClickWhenNotFoundInAreaErrors.Commands[0].Areas[0] is missing required field \"Y\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickWhenNotFoundInAreaErrors\" at path $.systemActions.ClickWhenNotFoundInAreaErrors.Commands[0].Areas[0] is missing required field \"width\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickWhenNotFoundInAreaErrors\" at path $.systemActions.ClickWhenNotFoundInAreaErrors.Commands[0].Areas[0] is missing required field \"height\"");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickWhenNotFoundInAreaErrors\" at path $.systemActions.ClickWhenNotFoundInAreaErrors.Commands[0].Areas[1].X is of the wrong type.  Was expecting Number but found String");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickWhenNotFoundInAreaErrors\" at path $.systemActions.ClickWhenNotFoundInAreaErrors.Commands[0].Areas[1].Y is of the wrong type.  Was expecting Number but found System.Text.Json.Nodes.JsonObject");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickWhenNotFoundInAreaErrors\" at path $.systemActions.ClickWhenNotFoundInAreaErrors.Commands[0].Areas[1].width is of the wrong type.  Was expecting Number but found System.Text.Json.Nodes.JsonArray");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickWhenNotFoundInAreaErrors\" at path $.systemActions.ClickWhenNotFoundInAreaErrors.Commands[0].Areas[1].height is of the wrong type.  Was expecting Number but found True");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"ClickWhenNotFoundInAreaErrors\" at path $.systemActions.ClickWhenNotFoundInAreaErrors.Commands[0].Areas[2] is of the wrong type.  Was expecting JsonObject with X/Y/width/height objects but found String");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragDelayMissing\" at path $.systemActions.DragDelayMissing.Commands[0] is missing required field \"Delay\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragDelayWrongType\" at path $.systemActions.DragDelayWrongType.Commands[0].Delay is of the wrong type.  Was expecting Number but found String");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeMissing\" at path $.systemActions.DragSwipeMissing.Commands[0] is missing required field \"Swipe\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeWrongType\" at path $.systemActions.DragSwipeWrongType.Commands[0].Swipe is of the wrong type.  Was expecting JsonObject with X1/Y1/X2/Y2 objects but found System.Text.Json.Nodes.JsonArray");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeValuesMissing\" at path $.systemActions.DragSwipeValuesMissing.Commands[0].Swipe is missing required field \"X1\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeValuesMissing\" at path $.systemActions.DragSwipeValuesMissing.Commands[0].Swipe is missing required field \"Y1\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeValuesMissing\" at path $.systemActions.DragSwipeValuesMissing.Commands[0].Swipe is missing required field \"X2\"");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeValuesMissing\" at path $.systemActions.DragSwipeValuesMissing.Commands[0].Swipe is missing required field \"Y2\"");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeValuesWrongType\" at path $.systemActions.DragSwipeValuesWrongType.Commands[0].Swipe.X1 is of the wrong type.  Was expecting Number but found String");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeValuesWrongType\" at path $.systemActions.DragSwipeValuesWrongType.Commands[0].Swipe.Y1 is of the wrong type.  Was expecting Number but found System.Text.Json.Nodes.JsonArray");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeValuesWrongType\" at path $.systemActions.DragSwipeValuesWrongType.Commands[0].Swipe.X2 is of the wrong type.  Was expecting Number but found True");
+            CollectionAssert.Contains(jsonHelper.Errors, "systemActions list item \"DragSwipeValuesWrongType\" at path $.systemActions.DragSwipeValuesWrongType.Commands[0].Swipe.Y2 is of the wrong type.  Was expecting Number but found System.Text.Json.Nodes.JsonObject");
+
         }
 
     }

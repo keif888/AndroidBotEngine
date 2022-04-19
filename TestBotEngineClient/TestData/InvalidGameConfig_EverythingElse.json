@@ -158,6 +158,17 @@
       },
       "textTolerance": 0.2,
       "backgroundTolerance": 0.2
+    },
+    "ValidFindString": {
+      "findString": "|<City>*129$28.yCTzz0NrzszyTzbyELmzt1D3zaQwDyNvYztbaHzaSPbyNwCTtbkw1a7bs6QSTzzztzzzzDzzzkzzzz7s",
+      "searchArea": {
+        "X": 20,
+        "Y": 940,
+        "width": 70,
+        "height": 70
+      },
+      "textTolerance": 0.2,
+      "backgroundTolerance": 0.2
     }
   },
   "systemActions": {
@@ -258,63 +269,179 @@
         }
       ]
     },
-    "Valid": {
+    "ClickXMissing": {
       "Frequency": 1,
       "ActionType": "Scheduled",
       "Commands": [
         {
           "CommandNumber": 10,
           "CommandId": "Click",
-          "ImageName": "Phone",
           "Location": {
-            "X": 52,
             "Y": 900
           }
-        },
+        }
+      ]
+    },
+    "ClickXWrongType": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "Click",
+          "Location": {
+            "X": "String",
+            "Y": 900
+          }
+        }
+      ]
+    },
+    "ClickYMissing": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "Click",
+          "Location": {
+            "X": 52
+          }
+        }
+      ]
+    },
+    "ClickYWrongType": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "Click",
+          "Location": {
+            "X": 52,
+            "Y": []
+          }
+        }
+      ]
+    },
+    "ClickWhenNotFoundInAreaMissingAreas": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 60,
+          "CommandId": "ClickWhenNotFoundInArea",
+          "ImageName": "UrnTick"
+        }
+      ]
+    },
+    "ClickWhenNotFoundInAreaErrors": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
         {
           "CommandNumber": 60,
           "CommandId": "ClickWhenNotFoundInArea",
           "ImageName": "UrnTick",
           "Areas": [
             {
-              "X": 125,
-              "Y": 370,
-              "width": 60,
-              "height": 40
+              "Object": "Value"
             },
             {
-              "X": 375,
-              "Y": 370,
-              "width": 60,
-              "height": 40
+              "X": "",
+              "Y": {},
+              "width": [],
+              "height": true
             },
-            {
-              "X": 370,
-              "Y": 610,
-              "width": 60,
-              "height": 60
-            },
-            {
-              "X": 125,
-              "Y": 610,
-              "width": 60,
-              "height": 40
-            },
-            {
-              "X": 125,
-              "Y": 485,
-              "width": 60,
-              "height": 40
-            },
-            {
-              "X": 260,
-              "Y": 485,
-              "width": 60,
-              "height": 40
-            }
+            "String"
           ]
         }
-
+      ]
+    },
+    "DragDelayMissing": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "Drag",
+          "Swipe": {
+            "X1": 78,
+            "Y1": 853,
+            "X2": 79,
+            "Y2": 592
+          }
+        }
+      ]
+    },
+    "DragDelayWrongType": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "Drag",
+          "Delay": "String",
+          "Swipe": {
+            "X1": 78,
+            "Y1": 853,
+            "X2": 79,
+            "Y2": 592
+          }
+        }
+      ]
+    },
+    "DragSwipeMissing": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "Drag",
+          "Delay": 150
+        }
+      ]
+    },
+    "DragSwipeWrongType": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "Drag",
+          "Delay": 150,
+          "Swipe": [78, 853, 79, 592]
+        }
+      ]
+    },
+    "DragSwipeValuesMissing": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "Drag",
+          "Delay": 150,
+          "Swipe": {
+            "X3": 78
+          }
+        }
+      ]
+    },
+    "DragSwipeValuesWrongType": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "Drag",
+          "Delay": 150,
+          "Swipe": {
+            "X1": "78",
+            "Y1": [ 853 ],
+            "X2": true,
+            "Y2": { "592": "True" }
+          }
+        }
       ]
     }
   },
@@ -328,6 +455,20 @@
           "CommandId": "StartGame",
           "TimeOut": 120000,
           "Value": "com.android.chrome/com.android.chrome/com.google.android.apps.chrome.Main"
+        }
+      ]
+    },
+    "Click": {
+      "Frequency": 1,
+      "ActionType": "Scheduled",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "Click",
+          "Location": {
+            "X": 52,
+            "Y": 900
+          }
         }
       ]
     },

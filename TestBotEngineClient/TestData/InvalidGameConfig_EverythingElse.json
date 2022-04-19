@@ -231,12 +231,12 @@
     },
     "BadCommandInCommands": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [ "Junk" ]
     },
     "CommandIdMissing": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -247,7 +247,7 @@
     },
     "CommandIdWrongType": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -259,7 +259,7 @@
     },
     "BadCommandId": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -271,7 +271,7 @@
     },
     "ClickXMissing": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -284,7 +284,7 @@
     },
     "ClickXWrongType": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -298,7 +298,7 @@
     },
     "ClickYMissing": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -311,7 +311,7 @@
     },
     "ClickYWrongType": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -325,7 +325,7 @@
     },
     "ClickWhenNotFoundInAreaMissingAreas": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 60,
@@ -336,7 +336,7 @@
     },
     "ClickWhenNotFoundInAreaErrors": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 60,
@@ -359,7 +359,7 @@
     },
     "DragDelayMissing": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -375,7 +375,7 @@
     },
     "DragDelayWrongType": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -392,7 +392,7 @@
     },
     "DragSwipeMissing": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -403,7 +403,7 @@
     },
     "DragSwipeWrongType": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -415,7 +415,7 @@
     },
     "DragSwipeValuesMissing": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -429,7 +429,7 @@
     },
     "DragSwipeValuesWrongType": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -446,7 +446,7 @@
     },
     "EnterLoopCoordinatesMissing": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 40,
@@ -456,7 +456,7 @@
     },
     "EnterLoopCoordinatesBadType": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 40,
@@ -467,7 +467,7 @@
     },
     "IfExistsImageNameMissing": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -485,7 +485,7 @@
     },
     "IfExistsImageNameWrongType": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -504,7 +504,7 @@
     },
     "IfExistsCommandsWrongType": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,
@@ -516,7 +516,7 @@
     },
     "IfNotExistsCommandsMissing": {
       "Frequency": 1,
-      "ActionType": "Scheduled",
+      "ActionType": "System",
       "Commands": [
         {
           "CommandNumber": 10,

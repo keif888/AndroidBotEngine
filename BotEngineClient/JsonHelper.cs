@@ -266,12 +266,9 @@ namespace BotEngineClient
                                                 switch (itemNode.GetString().ToLower())
                                                 {
                                                     case "system":
-                                                    case "scheduled":
-                                                    case "daily":
-                                                    case "always":
                                                         break;
                                                     default:
-                                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} with value \"{2}\" is not valid.  Was expecting one of the following \"System\", \"Scheduled\", \"Daily\", \"Always\"", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), itemNode.GetString()));
+                                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} with value \"{2}\" is not valid.  Was expecting \"System\"", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), itemNode.GetString()));
                                                         break;
                                                 }
                                             }
@@ -312,7 +309,7 @@ namespace BotEngineClient
                         {
                             foreach (KeyValuePair<string, JsonNode?> actionsItem in actionsObject)
                             {
-                                if (!(actionsItem.Value is JsonObject systemActionJsonObject))
+                                if (!(actionsItem.Value is JsonObject actionJsonObject))
                                 {
                                     JsonElement jsonElement = actionsItem.Value.GetValue<JsonElement>();
                                     Errors.Add(string.Format("findStrings item {0} at path {1} is of the wrong type.  Was expecting Object, but found {2}", actionsItem.Key, actionsItem.Value.GetPath(), jsonElement.ValueKind));
@@ -320,14 +317,53 @@ namespace BotEngineClient
                                 else
                                 {
                                     // Check for required fields.
-                                    if (!systemActionJsonObject.ContainsKey("ActionType"))
+                                    if (!actionJsonObject.ContainsKey("ActionType"))
                                     {
-                                        Errors.Add(string.Format("actions item {0} at path {1} is missing required field \"ActionType\"", actionsItem.Key, actionsItem.Value.GetPath()));
+                                        Errors.Add(string.Format("actions list item \"{0}\" at path {1} is missing required field \"ActionType\"", actionsItem.Key, actionsItem.Value.GetPath()));
                                     }
-                                    if (!systemActionJsonObject.ContainsKey("Commands"))
+                                    else
                                     {
-                                        Errors.Add(string.Format("actions item {0} at path {1} is missing required field \"Commands\"", actionsItem.Key, actionsItem.Value.GetPath()));
+                                        if (!(actionJsonObject["ActionType"] is JsonValue))
+                                        {
+                                            Errors.Add(string.Format("actions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", actionsItem.Key, actionJsonObject["ActionType"].GetPath(), actionJsonObject["ActionType"].GetType()));
+                                        }
+                                        else
+                                        {
+                                            JsonElement itemNode = actionJsonObject["ActionType"].GetValue<JsonElement>();
+                                            if (itemNode.ValueKind != JsonValueKind.String)
+                                                Errors.Add(string.Format("actions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", actionsItem.Key, actionJsonObject["ActionType"].GetPath(), itemNode.ValueKind));
+                                            else
+                                            {
+                                                switch (itemNode.GetString().ToLower())
+                                                {
+                                                    case "system":
+                                                    case "scheduled":
+                                                    case "daily":
+                                                    case "always":
+                                                        break;
+                                                    default:
+                                                        Errors.Add(string.Format("actions list item \"{0}\" at path {1} with value \"{2}\" is not valid.  Was expecting one of the following \"System\", \"Scheduled\", \"Daily\", \"Always\"", actionsItem.Key, actionJsonObject["ActionType"].GetPath(), itemNode.GetString()));
+                                                        break;
+                                                }
+                                            }
+                                        }
                                     }
+                                    if (!actionJsonObject.ContainsKey("Commands"))
+                                    {
+                                        Errors.Add(string.Format("actions list item \"{0}\" at path {1} is missing required field \"Commands\"", actionsItem.Key, actionsItem.Value.GetPath()));
+                                    }
+                                    else
+                                    {
+                                        if (!(actionJsonObject["Commands"] is JsonArray commandsJsonArray))
+                                        {
+                                            Errors.Add(string.Format("actions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Array but found {2}", actionsItem.Key, actionJsonObject["Commands"].GetPath(), actionJsonObject["Commands"].GetType()));
+                                        }
+                                        else
+                                        {
+                                            ValidateCommands("actions", actionsItem.Key, commandsJsonArray);
+                                        }
+                                    }
+
                                     // ToDo: Validate the required fields types.
                                 }
                             }

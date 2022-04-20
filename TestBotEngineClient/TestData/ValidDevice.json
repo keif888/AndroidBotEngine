@@ -9,6 +9,12 @@
       "LastRun": "2022-04-15T22:53:32.6077396+10:00",
       "ActionEnabled": true,
       "Frequency": 1
+    },
+    "Daily6PMEvent": {
+      "LastRun": "2022-04-15T22:53:32.6077396+10:00",
+      "ActionEnabled": true,
+      "Frequency": null,
+      "DailyScheduledTime": "1900-01-01T20:01:00.0000000+10:00"
     }
   }
 }

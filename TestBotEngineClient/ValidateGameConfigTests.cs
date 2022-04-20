@@ -90,7 +90,7 @@ namespace TestBotEngineClient
             
             CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"BadFindString\" at path $.findStrings.BadFindString.findString is of the wrong type.  Was expecting String but found System.Text.Json.Nodes.JsonArray");
             CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"MissingFindString\" at path $.findStrings.MissingFindString is missing required field \"findString\"");
-            CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"BadSearchArea\" at path $.findStrings.BadSearchArea.searchArea is of the wrong type.  Was expecting Object containing a search area");
+            CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"BadSearchArea\" at path $.findStrings.BadSearchArea.searchArea is of the wrong type.  Was expecting JsonObject containing a search area but found String");
             CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"MissingSearchArea\" at path $.findStrings.MissingSearchArea is missing required field \"searchArea\"");
             CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"BadTextTolerance\" at path $.findStrings.BadTextTolerance.textTolerance is of the wrong type.  Was expecting Number but found String");
             CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"MissingTextTolerance\" at path $.findStrings.MissingTextTolerance is missing required field \"textTolerance\"");

@@ -15,8 +15,21 @@ namespace TestBotEngineClient
 
             Assert.IsTrue(jsonHelper.ValidateDeviceConfigStructure(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
-            Assert.IsTrue(jsonHelper.Errors.Count == 0);
+            Assert.AreEqual<int>(0, jsonHelper.Errors.Count);
         }
 
+
+        [TestMethod]
+        public void TestValidateDeviceConfig_WrongConfigFile()
+        {
+            string fileName = @".\TestData\ValidGameConfig.json";
+            JsonHelper jsonHelper = new JsonHelper();
+
+            Assert.IsFalse(jsonHelper.ValidateDeviceConfigStructure(fileName));
+            Assert.IsNotNull(jsonHelper.Errors);
+            Assert.AreEqual<int>(2, jsonHelper.Errors.Count);
+            CollectionAssert.Contains(jsonHelper.Errors, "\"FileId\" indicates that this is not \"DeviceConfig\" but GameConfig");
+            CollectionAssert.Contains(jsonHelper.Errors, "Required field \"LastActionTaken\" missing.");
+        }
     }
 }

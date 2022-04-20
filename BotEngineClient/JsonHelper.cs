@@ -9,13 +9,19 @@ namespace BotEngineClient
 {
     public class JsonHelper
     {
-        public List<string> Errors;
+        public List<string> Errors { get; private set; }
 
         public JsonHelper()
         {
             Errors = new List<string>();
         }
 
+        /// <summary>
+        /// Validates that the main config file is structured correctly, and has no data type issues.
+        /// Ignores extra data in the file that isn't used by the game engine.
+        /// </summary>
+        /// <param name="jsonGameFileName">The full path to the Json file to be checked.</param>
+        /// <returns>True when there are no errors.</returns>
         public bool ValidateGameConfigStructure(string jsonGameFileName)
         {
             int startErrorCount = Errors.Count;

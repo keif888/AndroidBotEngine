@@ -23,6 +23,7 @@ namespace ScriptEditor
         private bool UnsavedChanges;
         private AdbServer? server;
         private JsonHelper.ConfigFileType loadedFileType;
+        private string JsonFileName;
         private TreeNode ActiveTreeNode;
 
         public ScriptEditor()
@@ -31,36 +32,24 @@ namespace ScriptEditor
             gameConfig = new BOTConfig();
             deviceConfig = new BOTDeviceConfig();
             listConfig = new BOTListConfig();
-            gbClick.Top = 5;
-            gbDrag.Top = 5;
-            gbImageName.Top = 5;
-            gbImageNameAndWait.Top = 5;
-            gbImageNames.Top = 5;
-            gbLoopCoordinate.Top = 5;
-            gbSleep.Top = 5;
-            gbClick.Left = 5;
-            gbDrag.Left = 5;
-            gbImageName.Left = 5;
-            gbImageNameAndWait.Left = 5;
-            gbImageNames.Left = 5;
-            gbLoopCoordinate.Left = 5;
-            gbSleep.Left = 5;
-            gbAction.Top = 5;
-            gbAction.Left = 5;
-            gbFindText.Top = 5;
-            gbFindText.Left = 5;
-            gbWFNC.Top = 5;
-            gbWFNC.Left = 5;
-            gbAppControl.Top = 5;
-            gbAppControl.Left = 5;
-            gbPickAction.Top = 5;
-            gbPickAction.Left = 5;
-            gbAppName.Top = 5;
-            gbAppName.Left = 5;
-            gbActionOverride.Top = 5;
-            gbActionOverride.Left = 5;
-            gbImageArea.Top = 5;
-            gbImageArea.Left = 5;
+            // Reset all the Group Boxes.
+            ResetGroupBox(gbClick);
+            ResetGroupBox(gbDrag);
+            ResetGroupBox(gbImageName);
+            ResetGroupBox(gbImageNameAndWait);
+            ResetGroupBox(gbImageNames);
+            ResetGroupBox(gbLoopCoordinate);
+            ResetGroupBox(gbSleep);
+            ResetGroupBox(gbAction);
+            ResetGroupBox(gbFindText);
+            ResetGroupBox(gbWFNC);
+            ResetGroupBox(gbAppControl);
+            ResetGroupBox(gbPickAction);
+            ResetGroupBox(gbAppName);
+            ResetGroupBox(gbActionOverride);
+            ResetGroupBox(gbImageArea);
+            ResetGroupBox(gbList);
+
             this.Size = new Size(800, 485);
             splitContainer1.SplitterDistance = 320;
             ChangePending = false;
@@ -69,6 +58,19 @@ namespace ScriptEditor
             loadedFileType = JsonHelper.ConfigFileType.Error;
             ActiveTreeNode = null;
             btnUpdate.Enabled = false;
+        }
+
+        /// <summary>
+        /// Ensure that a GroupBox is in the corect position, and hidden
+        /// </summary>
+        /// <param name="item"></param>
+        private void ResetGroupBox(GroupBox item)
+        {
+            item.Top = 5;
+            item.Left = 5;
+            item.Dock = DockStyle.Top;
+            item.Enabled = false;
+            item.Visible = false;
         }
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -116,6 +118,10 @@ namespace ScriptEditor
                     jsonErrors.setText(errorString);
                     jsonErrors.ShowDialog();
                 }
+                else
+                {
+                    JsonFileName = fileName;
+                }
             }
         }
 
@@ -138,6 +144,7 @@ namespace ScriptEditor
             cbImageNamesForList.Items.Clear();
             cbPickActionAction.Items.Clear();
             TreeNode findStringsNode = tvBotData.Nodes.Add("findStrings");
+            findStringsNode.Name = "findStrings";
             foreach (KeyValuePair<string, BotEngineClient.FindString> item in gameConfig.findStrings)
             {
                 TreeNode treeNode = new TreeNode
@@ -152,12 +159,14 @@ namespace ScriptEditor
                 cbImageNamesForList.Items.Add(item.Key);
             }
             TreeNode systemActionsNode = tvBotData.Nodes.Add("systemActions");
+            systemActionsNode.Name = "systemActions";
             foreach (KeyValuePair<string, BotEngineClient.Action> item in gameConfig.systemActions)
             {
                 LoadActionTreeNode(systemActionsNode, item);
                 cbPickActionAction.Items.Add(item.Key);
             }
             TreeNode actionsNode = tvBotData.Nodes.Add("actions");
+            actionsNode.Name = "actions";
             foreach (KeyValuePair<string, BotEngineClient.Action> item in gameConfig.actions)
             {
                 LoadActionTreeNode(actionsNode, item);
@@ -190,6 +199,7 @@ namespace ScriptEditor
             cbImageNamesForList.Items.Clear();
             cbPickActionAction.Items.Clear();
             TreeNode lastActionNode = tvBotData.Nodes.Add("LastActionTaken");
+            lastActionNode.Name = "LastActionTaken";
             foreach (KeyValuePair<string, BotEngineClient.ActionActivity> item in deviceConfig.LastActionTaken)
             {
                 TreeNode treeNode = new TreeNode
@@ -227,6 +237,7 @@ namespace ScriptEditor
             cbImageNamesForList.Items.Clear();
             cbPickActionAction.Items.Clear();
             TreeNode coordinatesNode = tvBotData.Nodes.Add("Coordinates");
+            coordinatesNode.Name = "Coordinates";
             foreach (KeyValuePair<string, List<XYCoords>> item in listConfig.Coordinates)
             {
                 TreeNode treeNode = new TreeNode
@@ -356,18 +367,18 @@ namespace ScriptEditor
         private void TvBotData_AfterSelect(object sender, TreeViewEventArgs e)
         {
             gbClick.Enabled = false;
-            gbDrag.Enabled = false;
-            gbImageName.Enabled = false;
-            gbImageNameAndWait.Enabled = false;
-            gbImageNames.Enabled = false;
-            gbLoopCoordinate.Enabled = false;
-            gbSleep.Enabled = false;
             gbClick.Visible = false;
+            gbDrag.Enabled = false;
             gbDrag.Visible = false;
+            gbImageName.Enabled = false;
             gbImageName.Visible = false;
+            gbImageNameAndWait.Enabled = false;
             gbImageNameAndWait.Visible = false;
+            gbImageNames.Enabled = false;
             gbImageNames.Visible = false;
             gbLoopCoordinate.Visible = false;
+            gbLoopCoordinate.Enabled = false;
+            gbSleep.Enabled = false;
             gbSleep.Visible = false;
             gbAction.Visible = false;
             gbAction.Enabled = false;
@@ -385,6 +396,8 @@ namespace ScriptEditor
             gbPickAction.Visible = false;
             gbImageArea.Enabled = false;
             gbImageArea.Visible = false;
+            gbList.Enabled = false;
+            gbList.Visible = false;
             btnUpdate.Enabled = false;
 
             if (e.Node != null)
@@ -566,8 +579,19 @@ namespace ScriptEditor
                         gbImageArea.Visible = true;
                         break;
                     case "loopcoordinates":
-                        //ToDo: Bind LoopCoordinates
+                        if (commandCopy.Coordinates != null)
+                            tbListName.Text = commandCopy.Coordinates;
+                        else
+                            tbListName.Text = string.Empty;
+                        gbList.Enabled = true;
+                        gbList.Visible = true;
+                        break;
+                    case "exit":
+                    case "restart":
+                        // Nothing to do here, as there is no UI element for these.
+                        break;
                     default:
+                        MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
                         break;
                 }
             }
@@ -644,10 +668,9 @@ namespace ScriptEditor
             }
             else if ((e.Node.Tag != null) && (e.Node.Tag is BotEngineClient.ActionActivity actionActivity))
             {
-                // ToDo: Display the data for Device Config
-
                 tbActionOverrideEnabled.Checked = actionActivity.ActionEnabled;
                 tbActionOverrideName.Text = e.Node.Name;
+                dtpActionOverrideLastRun.Value = actionActivity.LastRun;
                 if (actionActivity.DailyScheduledTime != null)
                 {
                     if (actionActivity.DailyScheduledTime != DateTime.MinValue)
@@ -679,6 +702,7 @@ namespace ScriptEditor
             }
 
             ChangePending = false;
+            btnUpdate.Enabled = false;
         }
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -701,10 +725,11 @@ namespace ScriptEditor
             {
                 UnsavedChanges = true;
                 ChangePending = false;
+                btnUpdate.Enabled = false;
                 saveToolStripMenuItem.Enabled = true;
                 if (selectedTag is FindString findTag)
                 {
-                    tvBotData.SelectedNode.Name = tbFindTextName.Text;
+                    ActiveTreeNode.Name = tbFindTextName.Text;
                     findTag.backgroundTolerance = float.Parse(tbFindTextBackTolerance.Text);
                     findTag.textTolerance = float.Parse(tbFindTextTextTolerance.Text);
                     findTag.findString = tbFindTextSearch.Text;
@@ -715,7 +740,7 @@ namespace ScriptEditor
                 }
                 else if (selectedTag is BotEngineClient.Action botAction)
                 {
-                    tvBotData.SelectedNode.Name = tbActionName.Text;
+                    ActiveTreeNode.Name = tbActionName.Text;
 
                     botAction.ActionType = cbActionType.Text;
                     switch (botAction.ActionType.ToLower())
@@ -830,16 +855,78 @@ namespace ScriptEditor
                             commandCopy.TimeOut = int.Parse(tbAppNameTimeout.Text);
                             break;
                         default:
+                            MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
                             break;
                     }
+                }
+                else if (selectedTag is ActionActivity actionActivity)
+                {
+                    actionActivity.ActionEnabled = tbActionOverrideEnabled.Checked;
+                    actionActivity.LastRun = dtpActionOverrideLastRun.Value;
+                    if (tbActionOverrideFrequency.Text == string.Empty)
+                        actionActivity.Frequency = null;
+                    else
+                        actionActivity.Frequency = int.Parse(tbActionOverrideFrequency.Text);
+                    if (dtptbActionOverrideTimeOfDay.Checked)
+                        actionActivity.DailyScheduledTime = dtptbActionOverrideTimeOfDay.Value;
+                    else
+                        actionActivity.DailyScheduledTime = null;
+                    ActiveTreeNode.Text = string.Format("{0} - {1}", tbActionOverrideName.Text, actionActivity.ActionEnabled ? "Enabled" : "Disabled");
                 }
             }
         }
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            switch (loadedFileType)
+            {
+                case JsonHelper.ConfigFileType.GameConfig:
+                    //ToDo: Save GameConfig file
+                    break;
+                case JsonHelper.ConfigFileType.ListConfig:
+                    // ToDo: Save ListConfig file
+                    break;
+                case JsonHelper.ConfigFileType.DeviceConfig:
+                    SaveDeviceConfig();
+                    break;
+                default:
+                    break;
+            }
             UnsavedChanges = false;
+        }
+
+        private void SaveDeviceConfig()
+        {
+            BOTDeviceConfig deviceConfig = new BOTDeviceConfig();
+            deviceConfig.FileId = loadedFileType.ToString();
+            deviceConfig.LastActionTaken = new Dictionary<string, ActionActivity>();
+            foreach (TreeNode parent in tvBotData.Nodes)
+            {
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "LastActionTaken")
+                {
+                    foreach (TreeNode child in parent.Nodes)
+                    {
+                        deviceConfig.LastActionTaken.Add(child.Name, (ActionActivity)child.Tag);
+                    }
+                }
+            }
+            try
+            {
+                if (File.Exists(JsonFileName))
+                {
+                    if (File.Exists(JsonFileName + ".bak"))
+                    {
+                        File.Delete(JsonFileName + ".bak");
+                    }
+                    File.Copy(JsonFileName, JsonFileName + ".bak");
+                }
+                string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(deviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
+                File.WriteAllText(JsonFileName, jsonData);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to save file with {0}", ex.Message), "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void testToolStripMenuItem_Click(object sender, EventArgs e)

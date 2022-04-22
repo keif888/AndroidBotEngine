@@ -576,10 +576,13 @@ namespace BotEngineClient
                     else
                     {
                         JsonElement itemNode = jsonObject[Key].GetValue<JsonElement>();
-                        if ((itemNode.ValueKind != jsonType) || (jsonType == JsonValueKind.True && itemNode.ValueKind != JsonValueKind.False && itemNode.ValueKind != jsonType))
+                        if (itemNode.ValueKind != jsonType)
                         {
-                            Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting {3} but found {4}", location, listItemName, jsonObject[Key].GetPath(), jsonType, itemNode.ValueKind));
-                            return false;
+                            if (!(itemNode.ValueKind == JsonValueKind.False && jsonType == JsonValueKind.True))
+                            {
+                                Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting {3} but found {4}", location, listItemName, jsonObject[Key].GetPath(), jsonType, itemNode.ValueKind));
+                                return false;
+                            }
                         }
                     }
             }
@@ -861,10 +864,13 @@ namespace BotEngineClient
                                     if (lastActionItem.Value.AsObject().ContainsKey("DailyScheduledTime"))
                                         if (ValidateJsonValue("LastActionTaken", lastActionItem.Key, "DailyScheduledTime", lastActionItem.Value.AsObject(), JsonValueKind.String))
                                         {
-                                            DateTime temp;
-                                            if (!lastActionItem.Value.AsObject()["DailyScheduledTime"].AsValue().TryGetValue<DateTime>(out temp))
+                                            if (lastActionItem.Value.AsObject()["DailyScheduledTime"] != null)
                                             {
-                                                Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting DateTime but found {3}", "LastActionTaken", lastActionItem.Key, lastActionItem.Value.AsObject()["DailyScheduledTime"].GetPath(), lastActionItem.Value.AsObject()["DailyScheduledTime"].AsValue()));
+                                                DateTime temp;
+                                                if (!lastActionItem.Value.AsObject()["DailyScheduledTime"].AsValue().TryGetValue<DateTime>(out temp))
+                                                {
+                                                    Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting DateTime but found {3}", "LastActionTaken", lastActionItem.Key, lastActionItem.Value.AsObject()["DailyScheduledTime"].GetPath(), lastActionItem.Value.AsObject()["DailyScheduledTime"].AsValue()));
+                                                }
                                             }
                                         }
                                 }

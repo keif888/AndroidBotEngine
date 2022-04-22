@@ -5,13 +5,23 @@ using System.Text;
 namespace BotEngineClient
 {
     /// <summary>
+    /// Class to hold the config identifier, and then all the others as optional.
+    /// </summary>
+    public class BOTConfigIdentifier
+    {
+        public string FileId { get; set; }
+    }
+
+
+
+    /// <summary>
     /// Class for json Game Config.
     /// Stores dictionaries of:
     /// The strings that identify items to look for
     /// The system actions that can be called from other actions
     /// The bot actions that can be scheduled to play the bot
     /// </summary>
-    public class BOTConfig
+    public class BOTConfig : BOTConfigIdentifier
     {
         public Dictionary<string, FindString> findStrings { get; set; }
         public Dictionary<string, Action> systemActions { get; set; }
@@ -259,14 +269,14 @@ namespace BotEngineClient
         public int Y2 { get; set; }
     }
 
-    public class BOTListConfig
+    public class BOTListConfig : BOTConfigIdentifier
     {
         public Dictionary<string, List<XYCoords>>? Coordinates { get; set; }
     }
 
 
 
-    public class BOTDeviceConfig
+    public class BOTDeviceConfig : BOTConfigIdentifier
     {
         public Dictionary<string, ActionActivity> LastActionTaken { get; set; }
     }

@@ -47,6 +47,9 @@ namespace ScriptEditor
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tvBotData = new System.Windows.Forms.TreeView();
+            this.gbList = new System.Windows.Forms.GroupBox();
+            this.tbListName = new System.Windows.Forms.TextBox();
+            this.label34 = new System.Windows.Forms.Label();
             this.gbImageArea = new System.Windows.Forms.GroupBox();
             this.btImageAreaRemove = new System.Windows.Forms.Button();
             this.btImageAreaAdd = new System.Windows.Forms.Button();
@@ -62,7 +65,7 @@ namespace ScriptEditor
             this.cbImageAreasImage = new System.Windows.Forms.ComboBox();
             this.gbActionOverride = new System.Windows.Forms.GroupBox();
             this.label29 = new System.Windows.Forms.Label();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.dtpActionOverrideLastRun = new System.Windows.Forms.DateTimePicker();
             this.tbActionOverrideEnabled = new System.Windows.Forms.CheckBox();
             this.dtptbActionOverrideTimeOfDay = new System.Windows.Forms.DateTimePicker();
             this.label26 = new System.Windows.Forms.Label();
@@ -156,6 +159,7 @@ namespace ScriptEditor
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.gbList.SuspendLayout();
             this.gbImageArea.SuspendLayout();
             this.gbActionOverride.SuspendLayout();
             this.gbAppName.SuspendLayout();
@@ -301,6 +305,7 @@ namespace ScriptEditor
             // 
             this.splitContainer1.Cursor = System.Windows.Forms.Cursors.VSplit;
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainer1.Location = new System.Drawing.Point(0, 24);
             this.splitContainer1.Name = "splitContainer1";
             // 
@@ -310,6 +315,7 @@ namespace ScriptEditor
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.gbList);
             this.splitContainer1.Panel2.Controls.Add(this.gbImageArea);
             this.splitContainer1.Panel2.Controls.Add(this.gbActionOverride);
             this.splitContainer1.Panel2.Controls.Add(this.gbAppName);
@@ -341,6 +347,36 @@ namespace ScriptEditor
             this.tvBotData.TabIndex = 0;
             this.tvBotData.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvBotData_BeforeSelect);
             this.tvBotData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TvBotData_AfterSelect);
+            // 
+            // gbList
+            // 
+            this.gbList.Controls.Add(this.tbListName);
+            this.gbList.Controls.Add(this.label34);
+            this.gbList.Enabled = false;
+            this.gbList.Location = new System.Drawing.Point(174, 535);
+            this.gbList.Name = "gbList";
+            this.gbList.Size = new System.Drawing.Size(255, 48);
+            this.gbList.TabIndex = 101;
+            this.gbList.TabStop = false;
+            this.gbList.Text = "List";
+            this.gbList.Visible = false;
+            // 
+            // tbListName
+            // 
+            this.tbListName.Location = new System.Drawing.Point(73, 19);
+            this.tbListName.Name = "tbListName";
+            this.tbListName.Size = new System.Drawing.Size(169, 23);
+            this.tbListName.TabIndex = 1;
+            this.tbListName.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            // 
+            // label34
+            // 
+            this.label34.AutoSize = true;
+            this.label34.Location = new System.Drawing.Point(7, 23);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(60, 15);
+            this.label34.TabIndex = 0;
+            this.label34.Text = "List Name";
             // 
             // gbImageArea
             // 
@@ -480,7 +516,7 @@ namespace ScriptEditor
             // gbActionOverride
             // 
             this.gbActionOverride.Controls.Add(this.label29);
-            this.gbActionOverride.Controls.Add(this.dateTimePicker1);
+            this.gbActionOverride.Controls.Add(this.dtpActionOverrideLastRun);
             this.gbActionOverride.Controls.Add(this.tbActionOverrideEnabled);
             this.gbActionOverride.Controls.Add(this.dtptbActionOverrideTimeOfDay);
             this.gbActionOverride.Controls.Add(this.label26);
@@ -506,14 +542,14 @@ namespace ScriptEditor
             this.label29.TabIndex = 2;
             this.label29.Text = "Last Run";
             // 
-            // dateTimePicker1
+            // dtpActionOverrideLastRun
             // 
-            this.dateTimePicker1.CustomFormat = "dd/MM/yyyy HH:mm:ss";
-            this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dateTimePicker1.Location = new System.Drawing.Point(76, 47);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(154, 23);
-            this.dateTimePicker1.TabIndex = 3;
+            this.dtpActionOverrideLastRun.CustomFormat = "dd/MM/yyyy HH:mm:ss";
+            this.dtpActionOverrideLastRun.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dtpActionOverrideLastRun.Location = new System.Drawing.Point(76, 47);
+            this.dtpActionOverrideLastRun.Name = "dtpActionOverrideLastRun";
+            this.dtpActionOverrideLastRun.Size = new System.Drawing.Size(154, 23);
+            this.dtpActionOverrideLastRun.TabIndex = 3;
             // 
             // tbActionOverrideEnabled
             // 
@@ -525,6 +561,7 @@ namespace ScriptEditor
             this.tbActionOverrideEnabled.TabIndex = 4;
             this.tbActionOverrideEnabled.Text = "    ?Enabled";
             this.tbActionOverrideEnabled.UseVisualStyleBackColor = true;
+            this.tbActionOverrideEnabled.CheckedChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // dtptbActionOverrideTimeOfDay
             // 
@@ -549,6 +586,7 @@ namespace ScriptEditor
             // 
             this.tbActionOverrideName.Location = new System.Drawing.Point(76, 18);
             this.tbActionOverrideName.Name = "tbActionOverrideName";
+            this.tbActionOverrideName.ReadOnly = true;
             this.tbActionOverrideName.Size = new System.Drawing.Size(154, 23);
             this.tbActionOverrideName.TabIndex = 1;
             this.tbActionOverrideName.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
@@ -577,9 +615,9 @@ namespace ScriptEditor
             this.label28.AutoSize = true;
             this.label28.Location = new System.Drawing.Point(6, 106);
             this.label28.Name = "label28";
-            this.label28.Size = new System.Drawing.Size(78, 15);
+            this.label28.Size = new System.Drawing.Size(84, 15);
             this.label28.TabIndex = 5;
-            this.label28.Text = "Frequency (s)";
+            this.label28.Text = "Frequency (m)";
             // 
             // gbAppName
             // 
@@ -847,7 +885,7 @@ namespace ScriptEditor
             this.gbFindText.Enabled = false;
             this.gbFindText.Location = new System.Drawing.Point(460, 10);
             this.gbFindText.Name = "gbFindText";
-            this.gbFindText.Size = new System.Drawing.Size(500, 168);
+            this.gbFindText.Size = new System.Drawing.Size(507, 168);
             this.gbFindText.TabIndex = 18;
             this.gbFindText.TabStop = false;
             this.gbFindText.Text = "FindText";
@@ -949,6 +987,8 @@ namespace ScriptEditor
             // 
             // tbFindTextSearch
             // 
+            this.tbFindTextSearch.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tbFindTextSearch.Location = new System.Drawing.Point(53, 44);
             this.tbFindTextSearch.Name = "tbFindTextSearch";
             this.tbFindTextSearch.Size = new System.Drawing.Size(450, 23);
@@ -1073,9 +1113,9 @@ namespace ScriptEditor
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(3, 80);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(78, 15);
+            this.label7.Size = new System.Drawing.Size(84, 15);
             this.label7.TabIndex = 4;
-            this.label7.Text = "Frequency (s)";
+            this.label7.Text = "Frequency (m)";
             // 
             // btnUpdate
             // 
@@ -1106,9 +1146,9 @@ namespace ScriptEditor
             this.label5.AutoSize = true;
             this.label5.Location = new System.Drawing.Point(6, 19);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(72, 15);
+            this.label5.Size = new System.Drawing.Size(83, 15);
             this.label5.TabIndex = 0;
-            this.label5.Text = "Sleep Time s";
+            this.label5.Text = "Sleep Time ms";
             // 
             // tbDelay
             // 
@@ -1433,6 +1473,8 @@ namespace ScriptEditor
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.gbList.ResumeLayout(false);
+            this.gbList.PerformLayout();
             this.gbImageArea.ResumeLayout(false);
             this.gbImageArea.PerformLayout();
             this.gbActionOverride.ResumeLayout(false);
@@ -1571,7 +1613,7 @@ namespace ScriptEditor
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.GroupBox gbActionOverride;
         private System.Windows.Forms.Label label29;
-        private System.Windows.Forms.DateTimePicker dateTimePicker1;
+        private System.Windows.Forms.DateTimePicker dtpActionOverrideLastRun;
         private System.Windows.Forms.CheckBox tbActionOverrideEnabled;
         private System.Windows.Forms.DateTimePicker dtptbActionOverrideTimeOfDay;
         private System.Windows.Forms.Label label26;
@@ -1592,6 +1634,9 @@ namespace ScriptEditor
         private System.Windows.Forms.MaskedTextBox tbImageAreasW;
         private System.Windows.Forms.Button btImageAreaRemove;
         private System.Windows.Forms.Button btImageAreaAdd;
+        private System.Windows.Forms.GroupBox gbList;
+        private System.Windows.Forms.TextBox tbListName;
+        private System.Windows.Forms.Label label34;
     }
 }
 

@@ -494,7 +494,15 @@ namespace BotEngineClient
                                 break;
                             case "loopuntilfound":
                             case "loopuntilnotfound":
-                                ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
+                                if (commandsObject.ContainsKey("ImageNames"))
+                                {
+                                    if (ValidateJsonValue(location, listItemName, "ImageNames", commandsObject, "JsonArray", "with one or more Strings"))
+                                    {
+                                        //ToDo: Validate that the array contains strings.
+                                    }
+                                }
+                                else
+                                    ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
                                 ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
                                 Key = "Commands";
                                 if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonArray", "with one or more Command objects"))

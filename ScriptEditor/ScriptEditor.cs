@@ -20,8 +20,10 @@ namespace ScriptEditor
         private BOTDeviceConfig deviceConfig;
         private BOTListConfig listConfig;
         private bool ChangePending;
+        private bool UnsavedChanges;
         private AdbServer? server;
         private JsonHelper.ConfigFileType loadedFileType;
+        private TreeNode ActiveTreeNode;
 
         public ScriptEditor()
         {
@@ -55,11 +57,15 @@ namespace ScriptEditor
             gbPickAction.Left = 5;
             gbAppName.Top = 5;
             gbAppName.Left = 5;
+            gbActionOverride.Top = 5;
+            gbActionOverride.Left = 5;
             this.Size = new Size(800, 485);
             splitContainer1.SplitterDistance = 320;
             ChangePending = false;
+            UnsavedChanges = false;
             saveToolStripMenuItem.Enabled = false;
             loadedFileType = JsonHelper.ConfigFileType.Error;
+            ActiveTreeNode = null;
         }
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -157,6 +163,7 @@ namespace ScriptEditor
 
             tvBotData.ResumeLayout();
             ChangePending = false;
+            UnsavedChanges = false;
             saveToolStripMenuItem.Enabled = false;
             loadedFileType = JsonHelper.ConfigFileType.GameConfig;
         }
@@ -193,6 +200,7 @@ namespace ScriptEditor
 
             tvBotData.ResumeLayout();
             ChangePending = false;
+            UnsavedChanges = false;
             saveToolStripMenuItem.Enabled = false;
             loadedFileType = JsonHelper.ConfigFileType.DeviceConfig;
         }
@@ -240,6 +248,7 @@ namespace ScriptEditor
 
             tvBotData.ResumeLayout();
             ChangePending = false;
+            UnsavedChanges = false;
             saveToolStripMenuItem.Enabled = false;
             loadedFileType = JsonHelper.ConfigFileType.DeviceConfig;
         }
@@ -367,7 +376,13 @@ namespace ScriptEditor
             gbAppControl.Enabled = false;
             gbAppName.Visible = false;
             gbAppName.Enabled = false;
+            gbActionOverride.Visible = false;
+            gbActionOverride.Enabled = false;
+            gbPickAction.Enabled = false;
+            gbPickAction.Visible = false;
 
+            if (e.Node != null)
+                ActiveTreeNode = e.Node;
 
             if ((e.Node.Tag != null) && (e.Node.Tag is Command command))
             {
@@ -527,7 +542,9 @@ namespace ScriptEditor
                         gbAppName.Visible = true;
                         break;
                     case "clickwhennotfoundinarea":
+                        //ToDo: Bind ClickWhenNotFoundInArea
                     case "loopcoordinates":
+                        //ToDo: Bind LoopCoordinates
                     default:
                         break;
                 }
@@ -557,13 +574,20 @@ namespace ScriptEditor
                 if (actionCopy.DailyScheduledTime != null)
                 {
                     if (actionCopy.DailyScheduledTime != DateTime.MinValue)
+                    {
                         dtpActionTimeOfDay.Text = actionCopy.DailyScheduledTime.ToString();
+                        dtpActionTimeOfDay.Checked = true;
+                    }
                     else
-                        dtpActionTimeOfDay.Text = "2001-01-01 10:00am";
+                    {
+                        dtpActionTimeOfDay.Value = new DateTime(2001, 01, 01, 10, 00, 00);
+                        dtpActionTimeOfDay.Checked = false;
+                    }
                 }
                 else
                 {
-                    dtpActionTimeOfDay.Text = "2001-01-01 10:00am";
+                    dtpActionTimeOfDay.Value = new DateTime(2001, 01, 01, 10, 00, 00);
+                    dtpActionTimeOfDay.Checked = false;
                 }
                 tbActionFrequency.Text = actionCopy.Frequency.ToString();
             }
@@ -599,12 +623,45 @@ namespace ScriptEditor
             else if ((e.Node.Tag != null) && (e.Node.Tag is BotEngineClient.ActionActivity actionActivity))
             {
                 // ToDo: Display the data for Device Config
+
+                tbActionOverrideEnabled.Checked = actionActivity.ActionEnabled;
+                tbActionOverrideName.Text = e.Node.Name;
+                if (actionActivity.DailyScheduledTime != null)
+                {
+                    if (actionActivity.DailyScheduledTime != DateTime.MinValue)
+                    {
+                        dtptbActionOverrideTimeOfDay.Value = (DateTime)actionActivity.DailyScheduledTime;
+                        dtptbActionOverrideTimeOfDay.Checked = true;
+                    }
+                    else
+                    {
+                        dtptbActionOverrideTimeOfDay.Value = new DateTime(2001, 01, 01, 10, 00, 00);
+                        dtptbActionOverrideTimeOfDay.Checked = false;
+                    }
+                }
+                else
+                {
+                    dtptbActionOverrideTimeOfDay.Value = new DateTime(2001, 01, 01, 10, 00, 00);
+                    dtptbActionOverrideTimeOfDay.Checked = false;
+                }
+                if (actionActivity.Frequency != null)
+                {
+                    tbActionFrequency.Text = actionActivity.Frequency.ToString();
+                }
+                else
+                {
+                    tbActionFrequency.Text = string.Empty;
+                }
+                gbActionOverride.Enabled = true;
+                gbActionOverride.Visible = true;
             }
+
+            ChangePending = false;
         }
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (ChangePending)
+            if (UnsavedChanges)
             {
                 if (MessageBox.Show("You have pending changes, exit?", "Pending Changes", MessageBoxButtons.YesNo) == DialogResult.Yes)
                     this.Close();
@@ -617,10 +674,11 @@ namespace ScriptEditor
 
         private void BtnUpdate_Click(object sender, EventArgs e)
         {
-            var selectedTag = tvBotData.SelectedNode.Tag;
+            var selectedTag = ActiveTreeNode.Tag;
             if (selectedTag != null)
             {
-                ChangePending = true;
+                UnsavedChanges = true;
+                ChangePending = false;
                 saveToolStripMenuItem.Enabled = true;
                 if (selectedTag is FindString findTag)
                 {
@@ -665,6 +723,7 @@ namespace ScriptEditor
                             }
                             commandCopy.Location.X = int.Parse(tbPointX.Text);
                             commandCopy.Location.Y = int.Parse(tbPointY.Text);
+                            ActiveTreeNode.Text = string.Format("{0} ({1},{2})", commandCopy.CommandId, commandCopy.Location.X, commandCopy.Location.Y);
                             break;
                         case "loopuntilfound":
                         case "loopuntilnotfound":
@@ -739,9 +798,15 @@ namespace ScriptEditor
                             commandCopy.ActionName = cbPickActionAction.Text;
                             break;
                         case "clickwhennotfoundinarea":
+                        //ToDo: Bind clickwhennotfoundinarea
                         case "loopcoordinates":
+                            //ToDo: Bind LoopCoordinates
+                            break;
                         case "startgame":
                         case "stopgame":
+                            commandCopy.Value = tbAppNameAppId.Text;
+                            commandCopy.TimeOut = int.Parse(tbAppNameTimeout.Text);
+                            break;
                         default:
                             break;
                     }
@@ -752,6 +817,7 @@ namespace ScriptEditor
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+            UnsavedChanges = false;
         }
 
         private void testToolStripMenuItem_Click(object sender, EventArgs e)
@@ -766,6 +832,35 @@ namespace ScriptEditor
             {
                 string searchText = fte.SearchText;
                 Rectangle searchArea = fte.SearchRectangle;
+            }
+        }
+
+        private void AllFields_TextChanged(object sender, EventArgs e)
+        {
+            ChangePending = true;
+        }
+
+        private void tvBotData_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        {
+            if (ChangePending)
+            {
+                DialogResult answer = MessageBox.Show("There are pending changes.  Keep Them?", "Pending Changes", MessageBoxButtons.YesNoCancel);
+                switch (answer)
+                {
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                    case DialogResult.Yes:
+                        BtnUpdate_Click(sender, null);
+                        e.Cancel = false;
+                        break;
+                    case DialogResult.No:
+                        e.Cancel = false;
+                        break;
+                    default:
+                        e.Cancel = true;
+                        break;
+                }
             }
         }
     }

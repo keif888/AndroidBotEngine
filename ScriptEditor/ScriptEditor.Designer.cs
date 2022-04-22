@@ -47,6 +47,16 @@ namespace ScriptEditor
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tvBotData = new System.Windows.Forms.TreeView();
+            this.gbActionOverride = new System.Windows.Forms.GroupBox();
+            this.label29 = new System.Windows.Forms.Label();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.tbActionOverrideEnabled = new System.Windows.Forms.CheckBox();
+            this.dtptbActionOverrideTimeOfDay = new System.Windows.Forms.DateTimePicker();
+            this.label26 = new System.Windows.Forms.Label();
+            this.tbActionOverrideName = new System.Windows.Forms.TextBox();
+            this.label27 = new System.Windows.Forms.Label();
+            this.tbActionOverrideFrequency = new System.Windows.Forms.MaskedTextBox();
+            this.label28 = new System.Windows.Forms.Label();
             this.gbAppName = new System.Windows.Forms.GroupBox();
             this.label25 = new System.Windows.Forms.Label();
             this.tbAppNameTimeout = new System.Windows.Forms.MaskedTextBox();
@@ -133,6 +143,7 @@ namespace ScriptEditor
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.gbActionOverride.SuspendLayout();
             this.gbAppName.SuspendLayout();
             this.gbPickAction.SuspendLayout();
             this.gbAppControl.SuspendLayout();
@@ -285,6 +296,7 @@ namespace ScriptEditor
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.gbActionOverride);
             this.splitContainer1.Panel2.Controls.Add(this.gbAppName);
             this.splitContainer1.Panel2.Controls.Add(this.gbPickAction);
             this.splitContainer1.Panel2.Controls.Add(this.gbAppControl);
@@ -312,7 +324,112 @@ namespace ScriptEditor
             this.tvBotData.Name = "tvBotData";
             this.tvBotData.Size = new System.Drawing.Size(277, 595);
             this.tvBotData.TabIndex = 0;
+            this.tvBotData.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvBotData_BeforeSelect);
             this.tvBotData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TvBotData_AfterSelect);
+            // 
+            // gbActionOverride
+            // 
+            this.gbActionOverride.Controls.Add(this.label29);
+            this.gbActionOverride.Controls.Add(this.dateTimePicker1);
+            this.gbActionOverride.Controls.Add(this.tbActionOverrideEnabled);
+            this.gbActionOverride.Controls.Add(this.dtptbActionOverrideTimeOfDay);
+            this.gbActionOverride.Controls.Add(this.label26);
+            this.gbActionOverride.Controls.Add(this.tbActionOverrideName);
+            this.gbActionOverride.Controls.Add(this.label27);
+            this.gbActionOverride.Controls.Add(this.tbActionOverrideFrequency);
+            this.gbActionOverride.Controls.Add(this.label28);
+            this.gbActionOverride.Enabled = false;
+            this.gbActionOverride.Location = new System.Drawing.Point(12, 362);
+            this.gbActionOverride.Name = "gbActionOverride";
+            this.gbActionOverride.Size = new System.Drawing.Size(236, 164);
+            this.gbActionOverride.TabIndex = 24;
+            this.gbActionOverride.TabStop = false;
+            this.gbActionOverride.Text = "Action Overrides";
+            this.gbActionOverride.Visible = false;
+            // 
+            // label29
+            // 
+            this.label29.AutoSize = true;
+            this.label29.Location = new System.Drawing.Point(6, 51);
+            this.label29.Name = "label29";
+            this.label29.Size = new System.Drawing.Size(52, 15);
+            this.label29.TabIndex = 2;
+            this.label29.Text = "Last Run";
+            // 
+            // dateTimePicker1
+            // 
+            this.dateTimePicker1.CustomFormat = "dd/MM/yyyy HH:mm:ss";
+            this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dateTimePicker1.Location = new System.Drawing.Point(76, 47);
+            this.dateTimePicker1.Name = "dateTimePicker1";
+            this.dateTimePicker1.Size = new System.Drawing.Size(154, 23);
+            this.dateTimePicker1.TabIndex = 3;
+            // 
+            // tbActionOverrideEnabled
+            // 
+            this.tbActionOverrideEnabled.AutoSize = true;
+            this.tbActionOverrideEnabled.Location = new System.Drawing.Point(6, 76);
+            this.tbActionOverrideEnabled.Name = "tbActionOverrideEnabled";
+            this.tbActionOverrideEnabled.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.tbActionOverrideEnabled.Size = new System.Drawing.Size(85, 19);
+            this.tbActionOverrideEnabled.TabIndex = 4;
+            this.tbActionOverrideEnabled.Text = "    ?Enabled";
+            this.tbActionOverrideEnabled.UseVisualStyleBackColor = true;
+            // 
+            // dtptbActionOverrideTimeOfDay
+            // 
+            this.dtptbActionOverrideTimeOfDay.Format = System.Windows.Forms.DateTimePickerFormat.Time;
+            this.dtptbActionOverrideTimeOfDay.Location = new System.Drawing.Point(94, 126);
+            this.dtptbActionOverrideTimeOfDay.Name = "dtptbActionOverrideTimeOfDay";
+            this.dtptbActionOverrideTimeOfDay.ShowCheckBox = true;
+            this.dtptbActionOverrideTimeOfDay.Size = new System.Drawing.Size(109, 23);
+            this.dtptbActionOverrideTimeOfDay.TabIndex = 8;
+            this.dtptbActionOverrideTimeOfDay.Value = new System.DateTime(2022, 4, 12, 10, 0, 0, 0);
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(6, 132);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(66, 15);
+            this.label26.TabIndex = 7;
+            this.label26.Text = "TimeOfDay";
+            // 
+            // tbActionOverrideName
+            // 
+            this.tbActionOverrideName.Location = new System.Drawing.Point(76, 18);
+            this.tbActionOverrideName.Name = "tbActionOverrideName";
+            this.tbActionOverrideName.Size = new System.Drawing.Size(154, 23);
+            this.tbActionOverrideName.TabIndex = 1;
+            this.tbActionOverrideName.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            // 
+            // label27
+            // 
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(6, 21);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(39, 15);
+            this.label27.TabIndex = 0;
+            this.label27.Text = "Name";
+            // 
+            // tbActionOverrideFrequency
+            // 
+            this.tbActionOverrideFrequency.Location = new System.Drawing.Point(94, 98);
+            this.tbActionOverrideFrequency.Mask = "#0000";
+            this.tbActionOverrideFrequency.Name = "tbActionOverrideFrequency";
+            this.tbActionOverrideFrequency.Size = new System.Drawing.Size(71, 23);
+            this.tbActionOverrideFrequency.TabIndex = 6;
+            this.tbActionOverrideFrequency.ValidatingType = typeof(int);
+            this.tbActionOverrideFrequency.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(6, 106);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(78, 15);
+            this.label28.TabIndex = 5;
+            this.label28.Text = "Frequency (s)";
             // 
             // gbAppName
             // 
@@ -335,7 +452,7 @@ namespace ScriptEditor
             this.label25.Location = new System.Drawing.Point(7, 56);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(79, 15);
-            this.label25.TabIndex = 12;
+            this.label25.TabIndex = 2;
             this.label25.Text = "Wait Time ms";
             // 
             // tbAppNameTimeout
@@ -344,8 +461,9 @@ namespace ScriptEditor
             this.tbAppNameTimeout.Mask = "#00000";
             this.tbAppNameTimeout.Name = "tbAppNameTimeout";
             this.tbAppNameTimeout.Size = new System.Drawing.Size(71, 23);
-            this.tbAppNameTimeout.TabIndex = 11;
+            this.tbAppNameTimeout.TabIndex = 3;
             this.tbAppNameTimeout.ValidatingType = typeof(int);
+            this.tbAppNameTimeout.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label24
             // 
@@ -353,7 +471,7 @@ namespace ScriptEditor
             this.label24.Location = new System.Drawing.Point(7, 27);
             this.label24.Name = "label24";
             this.label24.Size = new System.Drawing.Size(42, 15);
-            this.label24.TabIndex = 1;
+            this.label24.TabIndex = 0;
             this.label24.Text = "App Id";
             // 
             // tbAppNameAppId
@@ -361,7 +479,8 @@ namespace ScriptEditor
             this.tbAppNameAppId.Location = new System.Drawing.Point(77, 20);
             this.tbAppNameAppId.Name = "tbAppNameAppId";
             this.tbAppNameAppId.Size = new System.Drawing.Size(355, 23);
-            this.tbAppNameAppId.TabIndex = 0;
+            this.tbAppNameAppId.TabIndex = 1;
+            this.tbAppNameAppId.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // gbPickAction
             // 
@@ -414,7 +533,7 @@ namespace ScriptEditor
             this.label20.Location = new System.Drawing.Point(8, 56);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(79, 15);
-            this.label20.TabIndex = 24;
+            this.label20.TabIndex = 2;
             this.label20.Text = "Wait Time ms";
             // 
             // tbAppControlWait
@@ -423,15 +542,17 @@ namespace ScriptEditor
             this.tbAppControlWait.Mask = "#00000";
             this.tbAppControlWait.Name = "tbAppControlWait";
             this.tbAppControlWait.Size = new System.Drawing.Size(71, 23);
-            this.tbAppControlWait.TabIndex = 23;
+            this.tbAppControlWait.TabIndex = 3;
             this.tbAppControlWait.ValidatingType = typeof(int);
+            this.tbAppControlWait.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // tbAppControlName
             // 
             this.tbAppControlName.Location = new System.Drawing.Point(52, 21);
             this.tbAppControlName.Name = "tbAppControlName";
             this.tbAppControlName.Size = new System.Drawing.Size(154, 23);
-            this.tbAppControlName.TabIndex = 22;
+            this.tbAppControlName.TabIndex = 1;
+            this.tbAppControlName.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label19
             // 
@@ -439,7 +560,7 @@ namespace ScriptEditor
             this.label19.Location = new System.Drawing.Point(6, 25);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(39, 15);
-            this.label19.TabIndex = 21;
+            this.label19.TabIndex = 0;
             this.label19.Text = "Name";
             // 
             // gbWFNC
@@ -468,7 +589,7 @@ namespace ScriptEditor
             this.nudWFNCDetectPercent.Location = new System.Drawing.Point(119, 47);
             this.nudWFNCDetectPercent.Name = "nudWFNCDetectPercent";
             this.nudWFNCDetectPercent.Size = new System.Drawing.Size(47, 23);
-            this.nudWFNCDetectPercent.TabIndex = 24;
+            this.nudWFNCDetectPercent.TabIndex = 7;
             // 
             // label18
             // 
@@ -476,7 +597,7 @@ namespace ScriptEditor
             this.label18.Location = new System.Drawing.Point(10, 49);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(103, 15);
-            this.label18.TabIndex = 23;
+            this.label18.TabIndex = 6;
             this.label18.Text = "Detect Percentage";
             // 
             // label17
@@ -485,7 +606,7 @@ namespace ScriptEditor
             this.label17.Location = new System.Drawing.Point(10, 76);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(79, 15);
-            this.label17.TabIndex = 22;
+            this.label17.TabIndex = 8;
             this.label17.Text = "Wait Time ms";
             // 
             // tbWFNCWait
@@ -494,8 +615,9 @@ namespace ScriptEditor
             this.tbWFNCWait.Mask = "#00000";
             this.tbWFNCWait.Name = "tbWFNCWait";
             this.tbWFNCWait.Size = new System.Drawing.Size(71, 23);
-            this.tbWFNCWait.TabIndex = 21;
+            this.tbWFNCWait.TabIndex = 9;
             this.tbWFNCWait.ValidatingType = typeof(int);
+            this.tbWFNCWait.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // tbWFNCX1
             // 
@@ -503,8 +625,9 @@ namespace ScriptEditor
             this.tbWFNCX1.Mask = "000";
             this.tbWFNCX1.Name = "tbWFNCX1";
             this.tbWFNCX1.Size = new System.Drawing.Size(26, 23);
-            this.tbWFNCX1.TabIndex = 16;
+            this.tbWFNCX1.TabIndex = 1;
             this.tbWFNCX1.ValidatingType = typeof(int);
+            this.tbWFNCX1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label15
             // 
@@ -512,7 +635,7 @@ namespace ScriptEditor
             this.label15.Location = new System.Drawing.Point(8, 24);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(42, 15);
-            this.label15.TabIndex = 15;
+            this.label15.TabIndex = 0;
             this.label15.Text = "Search";
             // 
             // tbWFNCY2
@@ -521,8 +644,9 @@ namespace ScriptEditor
             this.tbWFNCY2.Mask = "000";
             this.tbWFNCY2.Name = "tbWFNCY2";
             this.tbWFNCY2.Size = new System.Drawing.Size(26, 23);
-            this.tbWFNCY2.TabIndex = 20;
+            this.tbWFNCY2.TabIndex = 5;
             this.tbWFNCY2.ValidatingType = typeof(int);
+            this.tbWFNCY2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // tbWFNCY1
             // 
@@ -530,8 +654,9 @@ namespace ScriptEditor
             this.tbWFNCY1.Mask = "000";
             this.tbWFNCY1.Name = "tbWFNCY1";
             this.tbWFNCY1.Size = new System.Drawing.Size(26, 23);
-            this.tbWFNCY1.TabIndex = 17;
+            this.tbWFNCY1.TabIndex = 2;
             this.tbWFNCY1.ValidatingType = typeof(int);
+            this.tbWFNCY1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label16
             // 
@@ -539,7 +664,7 @@ namespace ScriptEditor
             this.label16.Location = new System.Drawing.Point(118, 24);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(19, 15);
-            this.label16.TabIndex = 19;
+            this.label16.TabIndex = 3;
             this.label16.Text = "To";
             // 
             // tbWFNCX2
@@ -548,8 +673,9 @@ namespace ScriptEditor
             this.tbWFNCX2.Mask = "000";
             this.tbWFNCX2.Name = "tbWFNCX2";
             this.tbWFNCX2.Size = new System.Drawing.Size(26, 23);
-            this.tbWFNCX2.TabIndex = 18;
+            this.tbWFNCX2.TabIndex = 4;
             this.tbWFNCX2.ValidatingType = typeof(int);
+            this.tbWFNCX2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // gbFindText
             // 
@@ -582,7 +708,7 @@ namespace ScriptEditor
             this.label13.Location = new System.Drawing.Point(8, 138);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(85, 15);
-            this.label13.TabIndex = 18;
+            this.label13.TabIndex = 12;
             this.label13.Text = "Back Tolerance";
             // 
             // tbFindTextBackTolerance
@@ -591,7 +717,8 @@ namespace ScriptEditor
             this.tbFindTextBackTolerance.Mask = "0.000";
             this.tbFindTextBackTolerance.Name = "tbFindTextBackTolerance";
             this.tbFindTextBackTolerance.Size = new System.Drawing.Size(40, 23);
-            this.tbFindTextBackTolerance.TabIndex = 17;
+            this.tbFindTextBackTolerance.TabIndex = 13;
+            this.tbFindTextBackTolerance.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // tbFindTextTextTolerance
             // 
@@ -599,7 +726,8 @@ namespace ScriptEditor
             this.tbFindTextTextTolerance.Mask = "0.000";
             this.tbFindTextTextTolerance.Name = "tbFindTextTextTolerance";
             this.tbFindTextTextTolerance.Size = new System.Drawing.Size(40, 23);
-            this.tbFindTextTextTolerance.TabIndex = 16;
+            this.tbFindTextTextTolerance.TabIndex = 11;
+            this.tbFindTextTextTolerance.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label12
             // 
@@ -607,7 +735,7 @@ namespace ScriptEditor
             this.label12.Location = new System.Drawing.Point(8, 107);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(81, 15);
-            this.label12.TabIndex = 15;
+            this.label12.TabIndex = 10;
             this.label12.Text = "Text Tolerance";
             // 
             // tbFindTextSearchX1
@@ -616,8 +744,9 @@ namespace ScriptEditor
             this.tbFindTextSearchX1.Mask = "000";
             this.tbFindTextSearchX1.Name = "tbFindTextSearchX1";
             this.tbFindTextSearchX1.Size = new System.Drawing.Size(26, 23);
-            this.tbFindTextSearchX1.TabIndex = 10;
+            this.tbFindTextSearchX1.TabIndex = 5;
             this.tbFindTextSearchX1.ValidatingType = typeof(int);
+            this.tbFindTextSearchX1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label10
             // 
@@ -625,7 +754,7 @@ namespace ScriptEditor
             this.label10.Location = new System.Drawing.Point(6, 77);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(42, 15);
-            this.label10.TabIndex = 9;
+            this.label10.TabIndex = 4;
             this.label10.Text = "Search";
             // 
             // tbFindTextSearchY2
@@ -634,8 +763,9 @@ namespace ScriptEditor
             this.tbFindTextSearchY2.Mask = "000";
             this.tbFindTextSearchY2.Name = "tbFindTextSearchY2";
             this.tbFindTextSearchY2.Size = new System.Drawing.Size(26, 23);
-            this.tbFindTextSearchY2.TabIndex = 14;
+            this.tbFindTextSearchY2.TabIndex = 9;
             this.tbFindTextSearchY2.ValidatingType = typeof(int);
+            this.tbFindTextSearchY2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // tbFindTextSearchY1
             // 
@@ -643,8 +773,9 @@ namespace ScriptEditor
             this.tbFindTextSearchY1.Mask = "000";
             this.tbFindTextSearchY1.Name = "tbFindTextSearchY1";
             this.tbFindTextSearchY1.Size = new System.Drawing.Size(26, 23);
-            this.tbFindTextSearchY1.TabIndex = 11;
+            this.tbFindTextSearchY1.TabIndex = 6;
             this.tbFindTextSearchY1.ValidatingType = typeof(int);
+            this.tbFindTextSearchY1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label11
             // 
@@ -652,7 +783,7 @@ namespace ScriptEditor
             this.label11.Location = new System.Drawing.Point(116, 77);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(19, 15);
-            this.label11.TabIndex = 13;
+            this.label11.TabIndex = 7;
             this.label11.Text = "To";
             // 
             // tbFindTextSearchX2
@@ -661,8 +792,9 @@ namespace ScriptEditor
             this.tbFindTextSearchX2.Mask = "000";
             this.tbFindTextSearchX2.Name = "tbFindTextSearchX2";
             this.tbFindTextSearchX2.Size = new System.Drawing.Size(26, 23);
-            this.tbFindTextSearchX2.TabIndex = 12;
+            this.tbFindTextSearchX2.TabIndex = 8;
             this.tbFindTextSearchX2.ValidatingType = typeof(int);
+            this.tbFindTextSearchX2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // tbFindTextSearch
             // 
@@ -670,6 +802,7 @@ namespace ScriptEditor
             this.tbFindTextSearch.Name = "tbFindTextSearch";
             this.tbFindTextSearch.Size = new System.Drawing.Size(450, 23);
             this.tbFindTextSearch.TabIndex = 3;
+            this.tbFindTextSearch.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label9
             // 
@@ -686,6 +819,7 @@ namespace ScriptEditor
             this.tbFindTextName.Name = "tbFindTextName";
             this.tbFindTextName.Size = new System.Drawing.Size(154, 23);
             this.tbFindTextName.TabIndex = 1;
+            this.tbFindTextName.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label8
             // 
@@ -721,7 +855,7 @@ namespace ScriptEditor
             this.label22.Location = new System.Drawing.Point(0, 55);
             this.label22.Name = "label22";
             this.label22.Size = new System.Drawing.Size(31, 15);
-            this.label22.TabIndex = 24;
+            this.label22.TabIndex = 2;
             this.label22.Text = "Type";
             // 
             // cbActionType
@@ -735,15 +869,16 @@ namespace ScriptEditor
             this.cbActionType.Location = new System.Drawing.Point(49, 52);
             this.cbActionType.Name = "cbActionType";
             this.cbActionType.Size = new System.Drawing.Size(154, 23);
-            this.cbActionType.TabIndex = 23;
+            this.cbActionType.TabIndex = 3;
             // 
             // dtpActionTimeOfDay
             // 
             this.dtpActionTimeOfDay.Format = System.Windows.Forms.DateTimePickerFormat.Time;
             this.dtpActionTimeOfDay.Location = new System.Drawing.Point(91, 105);
             this.dtpActionTimeOfDay.Name = "dtpActionTimeOfDay";
+            this.dtpActionTimeOfDay.ShowCheckBox = true;
             this.dtpActionTimeOfDay.Size = new System.Drawing.Size(109, 23);
-            this.dtpActionTimeOfDay.TabIndex = 22;
+            this.dtpActionTimeOfDay.TabIndex = 7;
             this.dtpActionTimeOfDay.Value = new System.DateTime(2022, 4, 12, 10, 0, 0, 0);
             // 
             // label21
@@ -752,7 +887,7 @@ namespace ScriptEditor
             this.label21.Location = new System.Drawing.Point(6, 111);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(66, 15);
-            this.label21.TabIndex = 21;
+            this.label21.TabIndex = 6;
             this.label21.Text = "TimeOfDay";
             // 
             // tbActionName
@@ -760,7 +895,8 @@ namespace ScriptEditor
             this.tbActionName.Location = new System.Drawing.Point(49, 22);
             this.tbActionName.Name = "tbActionName";
             this.tbActionName.Size = new System.Drawing.Size(154, 23);
-            this.tbActionName.TabIndex = 20;
+            this.tbActionName.TabIndex = 1;
+            this.tbActionName.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label14
             // 
@@ -768,7 +904,7 @@ namespace ScriptEditor
             this.label14.Location = new System.Drawing.Point(3, 26);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(39, 15);
-            this.label14.TabIndex = 19;
+            this.label14.TabIndex = 0;
             this.label14.Text = "Name";
             // 
             // tbActionFrequency
@@ -777,7 +913,7 @@ namespace ScriptEditor
             this.tbActionFrequency.Mask = "#0000";
             this.tbActionFrequency.Name = "tbActionFrequency";
             this.tbActionFrequency.Size = new System.Drawing.Size(71, 23);
-            this.tbActionFrequency.TabIndex = 12;
+            this.tbActionFrequency.TabIndex = 5;
             this.tbActionFrequency.ValidatingType = typeof(int);
             // 
             // label7
@@ -786,7 +922,7 @@ namespace ScriptEditor
             this.label7.Location = new System.Drawing.Point(3, 80);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(78, 15);
-            this.label7.TabIndex = 0;
+            this.label7.TabIndex = 4;
             this.label7.Text = "Frequency (s)";
             // 
             // btnUpdate
@@ -795,7 +931,7 @@ namespace ScriptEditor
             this.btnUpdate.Location = new System.Drawing.Point(12, 560);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(75, 23);
-            this.btnUpdate.TabIndex = 16;
+            this.btnUpdate.TabIndex = 99;
             this.btnUpdate.Text = "Update";
             this.btnUpdate.UseVisualStyleBackColor = true;
             this.btnUpdate.Click += new System.EventHandler(this.BtnUpdate_Click);
@@ -819,7 +955,7 @@ namespace ScriptEditor
             this.label5.Location = new System.Drawing.Point(6, 19);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(72, 15);
-            this.label5.TabIndex = 12;
+            this.label5.TabIndex = 0;
             this.label5.Text = "Sleep Time s";
             // 
             // tbDelay
@@ -828,8 +964,9 @@ namespace ScriptEditor
             this.tbDelay.Mask = "000000";
             this.tbDelay.Name = "tbDelay";
             this.tbDelay.Size = new System.Drawing.Size(71, 23);
-            this.tbDelay.TabIndex = 11;
+            this.tbDelay.TabIndex = 1;
             this.tbDelay.ValidatingType = typeof(int);
+            this.tbDelay.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // gbImageNames
             // 
@@ -854,7 +991,7 @@ namespace ScriptEditor
             this.label6.Location = new System.Drawing.Point(6, 223);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(79, 15);
-            this.label6.TabIndex = 13;
+            this.label6.TabIndex = 4;
             this.label6.Text = "Wait Time ms";
             // 
             // tbImageNamesWait
@@ -863,8 +1000,9 @@ namespace ScriptEditor
             this.tbImageNamesWait.Mask = "#00000";
             this.tbImageNamesWait.Name = "tbImageNamesWait";
             this.tbImageNamesWait.Size = new System.Drawing.Size(71, 23);
-            this.tbImageNamesWait.TabIndex = 12;
+            this.tbImageNamesWait.TabIndex = 5;
             this.tbImageNamesWait.ValidatingType = typeof(int);
+            this.tbImageNamesWait.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // btnRemoveImageNames
             // 
@@ -922,7 +1060,7 @@ namespace ScriptEditor
             this.cbImageNameWithWait.Location = new System.Drawing.Point(8, 23);
             this.cbImageNameWithWait.Name = "cbImageNameWithWait";
             this.cbImageNameWithWait.Size = new System.Drawing.Size(230, 23);
-            this.cbImageNameWithWait.TabIndex = 11;
+            this.cbImageNameWithWait.TabIndex = 0;
             // 
             // label4
             // 
@@ -930,7 +1068,7 @@ namespace ScriptEditor
             this.label4.Location = new System.Drawing.Point(8, 54);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(79, 15);
-            this.label4.TabIndex = 10;
+            this.label4.TabIndex = 1;
             this.label4.Text = "Wait Time ms";
             // 
             // tbTimeout
@@ -939,8 +1077,9 @@ namespace ScriptEditor
             this.tbTimeout.Mask = "#00000";
             this.tbTimeout.Name = "tbTimeout";
             this.tbTimeout.Size = new System.Drawing.Size(71, 23);
-            this.tbTimeout.TabIndex = 9;
+            this.tbTimeout.TabIndex = 2;
             this.tbTimeout.ValidatingType = typeof(int);
+            this.tbTimeout.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // gbImageName
             // 
@@ -960,7 +1099,7 @@ namespace ScriptEditor
             this.cbImageNameNoWait.Location = new System.Drawing.Point(8, 23);
             this.cbImageNameNoWait.Name = "cbImageNameNoWait";
             this.cbImageNameNoWait.Size = new System.Drawing.Size(230, 23);
-            this.cbImageNameNoWait.TabIndex = 16;
+            this.cbImageNameNoWait.TabIndex = 0;
             // 
             // gbLoopCoordinate
             // 
@@ -1020,8 +1159,9 @@ namespace ScriptEditor
             this.tbDragX1.Mask = "000";
             this.tbDragX1.Name = "tbDragX1";
             this.tbDragX1.Size = new System.Drawing.Size(26, 23);
-            this.tbDragX1.TabIndex = 4;
+            this.tbDragX1.TabIndex = 1;
             this.tbDragX1.ValidatingType = typeof(int);
+            this.tbDragX1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label2
             // 
@@ -1029,7 +1169,7 @@ namespace ScriptEditor
             this.label2.Location = new System.Drawing.Point(10, 30);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(35, 15);
-            this.label2.TabIndex = 3;
+            this.label2.TabIndex = 0;
             this.label2.Text = "From";
             // 
             // tbDragY2
@@ -1038,8 +1178,9 @@ namespace ScriptEditor
             this.tbDragY2.Mask = "000";
             this.tbDragY2.Name = "tbDragY2";
             this.tbDragY2.Size = new System.Drawing.Size(26, 23);
-            this.tbDragY2.TabIndex = 8;
+            this.tbDragY2.TabIndex = 5;
             this.tbDragY2.ValidatingType = typeof(int);
+            this.tbDragY2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // tbDragY1
             // 
@@ -1047,8 +1188,9 @@ namespace ScriptEditor
             this.tbDragY1.Mask = "000";
             this.tbDragY1.Name = "tbDragY1";
             this.tbDragY1.Size = new System.Drawing.Size(26, 23);
-            this.tbDragY1.TabIndex = 5;
+            this.tbDragY1.TabIndex = 2;
             this.tbDragY1.ValidatingType = typeof(int);
+            this.tbDragY1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label3
             // 
@@ -1056,7 +1198,7 @@ namespace ScriptEditor
             this.label3.Location = new System.Drawing.Point(115, 30);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(19, 15);
-            this.label3.TabIndex = 7;
+            this.label3.TabIndex = 3;
             this.label3.Text = "To";
             // 
             // tbDragX2
@@ -1065,8 +1207,9 @@ namespace ScriptEditor
             this.tbDragX2.Mask = "000";
             this.tbDragX2.Name = "tbDragX2";
             this.tbDragX2.Size = new System.Drawing.Size(26, 23);
-            this.tbDragX2.TabIndex = 6;
+            this.tbDragX2.TabIndex = 4;
             this.tbDragX2.ValidatingType = typeof(int);
+            this.tbDragX2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // gbClick
             // 
@@ -1088,7 +1231,7 @@ namespace ScriptEditor
             this.label1.Location = new System.Drawing.Point(9, 25);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(32, 15);
-            this.label1.TabIndex = 9;
+            this.label1.TabIndex = 0;
             this.label1.Text = "Here";
             // 
             // tbPointX
@@ -1099,6 +1242,7 @@ namespace ScriptEditor
             this.tbPointX.Size = new System.Drawing.Size(26, 23);
             this.tbPointX.TabIndex = 1;
             this.tbPointX.ValidatingType = typeof(int);
+            this.tbPointX.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // tbPointY
             // 
@@ -1107,6 +1251,7 @@ namespace ScriptEditor
             this.tbPointY.Name = "tbPointY";
             this.tbPointY.Size = new System.Drawing.Size(25, 23);
             this.tbPointY.TabIndex = 2;
+            this.tbPointY.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // openFileDialog1
             // 
@@ -1131,6 +1276,8 @@ namespace ScriptEditor
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.gbActionOverride.ResumeLayout(false);
+            this.gbActionOverride.PerformLayout();
             this.gbAppName.ResumeLayout(false);
             this.gbAppName.PerformLayout();
             this.gbPickAction.ResumeLayout(false);
@@ -1263,6 +1410,16 @@ namespace ScriptEditor
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Windows.Forms.GroupBox gbActionOverride;
+        private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.DateTimePicker dateTimePicker1;
+        private System.Windows.Forms.CheckBox tbActionOverrideEnabled;
+        private System.Windows.Forms.DateTimePicker dtptbActionOverrideTimeOfDay;
+        private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.TextBox tbActionOverrideName;
+        private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.MaskedTextBox tbActionOverrideFrequency;
+        private System.Windows.Forms.Label label28;
     }
 }
 

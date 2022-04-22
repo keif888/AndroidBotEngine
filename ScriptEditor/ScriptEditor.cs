@@ -16,14 +16,19 @@ namespace ScriptEditor
 {
     public partial class ScriptEditor : Form
     {
-        private BOTConfig moeConfig;
+        private BOTConfig gameConfig;
+        private BOTDeviceConfig deviceConfig;
+        private BOTListConfig listConfig;
         private bool ChangePending;
         private AdbServer? server;
+        private JsonHelper.ConfigFileType loadedFileType;
 
         public ScriptEditor()
         {
             InitializeComponent();
-            moeConfig = new BOTConfig();
+            gameConfig = new BOTConfig();
+            deviceConfig = new BOTDeviceConfig();
+            listConfig = new BOTListConfig();
             gbClick.Top = 5;
             gbDrag.Top = 5;
             gbImageName.Top = 5;
@@ -54,6 +59,7 @@ namespace ScriptEditor
             splitContainer1.SplitterDistance = 320;
             ChangePending = false;
             saveToolStripMenuItem.Enabled = false;
+            loadedFileType = JsonHelper.ConfigFileType.Error;
         }
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -61,53 +67,181 @@ namespace ScriptEditor
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 string fileName = openFileDialog1.FileName;
-                string jsonString = File.ReadAllText(fileName);
-                try
+                JsonHelper jsonHelper = new JsonHelper();
+                switch (jsonHelper.getFileType(fileName))
                 {
-                    moeConfig = JsonSerializer.Deserialize<BOTConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+                    case JsonHelper.ConfigFileType.DeviceConfig:
+                        if (jsonHelper.ValidateDeviceConfigStructure(fileName))
+                        {
+                            LoadDeviceConfigFile(fileName);
+                        }
+                        break;
+                    case JsonHelper.ConfigFileType.GameConfig:
+                        if (jsonHelper.ValidateGameConfigStructure(fileName))
+                        {
+                            LoadGameConfigFile(fileName);
+                        }
+                        break;
+                    case JsonHelper.ConfigFileType.ListConfig:
+                        if (jsonHelper.ValidateListConfigStructure(fileName))
+                        {
+                            LoadListConfigFile(fileName);
+                        }
+                        break;
+                    default:
+                        break;
                 }
-                catch (Exception ex)
+                if (jsonHelper.Errors.Count > 0)
                 {
-                    MessageBox.Show(string.Format("Unable to parse file.\r\n{0}", ex.Message));
-                    return;
-                }
-                tvBotData.SuspendLayout();
-                tvBotData.Nodes.Clear();
-                cbImageNameNoWait.Items.Clear();
-                cbImageNameWithWait.Items.Clear();
-                cbImageNamesForList.Items.Clear();
-                cbPickActionAction.Items.Clear();
-                TreeNode findStringsNode = tvBotData.Nodes.Add("findStrings");
-                foreach (KeyValuePair<string, BotEngineClient.FindString> item in moeConfig.findStrings)
-                {
-                    TreeNode treeNode = new TreeNode
+                    JsonErrors jsonErrors = new JsonErrors();
+                    StringBuilder errorString = new StringBuilder();
+                    errorString.AppendLine(string.Format("The following errors were encountered when attempting to load the file {0}", fileName));
+                    errorString.AppendLine(new string('-', 48));
+                    errorString.AppendLine("| The file has not been loaded into the editor. |");
+                    errorString.AppendLine(new string('-',48));
+                    errorString.AppendLine("");
+                    foreach (string item in jsonHelper.Errors)
                     {
-                        Name = item.Key,
-                        Tag = item.Value,
-                        Text = item.Key
-                    };
-                    findStringsNode.Nodes.Add(treeNode);
-                    cbImageNameNoWait.Items.Add(item.Key);
-                    cbImageNameWithWait.Items.Add(item.Key);
-                    cbImageNamesForList.Items.Add(item.Key);
+                        errorString.AppendLine(item);
+                    }
+                    jsonErrors.setText(errorString);
+                    jsonErrors.ShowDialog();
                 }
-                TreeNode systemActionsNode = tvBotData.Nodes.Add("systemActions");
-                foreach (KeyValuePair<string, BotEngineClient.Action> item in moeConfig.systemActions)
-                {
-                    LoadActionTreeNode(systemActionsNode, item);
-                    cbPickActionAction.Items.Add(item.Key);
-                }
-                TreeNode actionsNode = tvBotData.Nodes.Add("actions");
-                foreach (KeyValuePair<string, BotEngineClient.Action> item in moeConfig.actions)
-                {
-                    LoadActionTreeNode(actionsNode, item);
-                    cbPickActionAction.Items.Add(item.Key);
-                }
-
-                tvBotData.ResumeLayout();
-                ChangePending = false;
-                saveToolStripMenuItem.Enabled = false;
             }
+        }
+
+        private void LoadGameConfigFile(string fileName)
+        {
+            string jsonString = File.ReadAllText(fileName);
+            try
+            {
+                gameConfig = JsonSerializer.Deserialize<BOTConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to parse file.\r\n{0}", ex.Message));
+                return;
+            }
+            tvBotData.SuspendLayout();
+            tvBotData.Nodes.Clear();
+            cbImageNameNoWait.Items.Clear();
+            cbImageNameWithWait.Items.Clear();
+            cbImageNamesForList.Items.Clear();
+            cbPickActionAction.Items.Clear();
+            TreeNode findStringsNode = tvBotData.Nodes.Add("findStrings");
+            foreach (KeyValuePair<string, BotEngineClient.FindString> item in gameConfig.findStrings)
+            {
+                TreeNode treeNode = new TreeNode
+                {
+                    Name = item.Key,
+                    Tag = item.Value,
+                    Text = item.Key
+                };
+                findStringsNode.Nodes.Add(treeNode);
+                cbImageNameNoWait.Items.Add(item.Key);
+                cbImageNameWithWait.Items.Add(item.Key);
+                cbImageNamesForList.Items.Add(item.Key);
+            }
+            TreeNode systemActionsNode = tvBotData.Nodes.Add("systemActions");
+            foreach (KeyValuePair<string, BotEngineClient.Action> item in gameConfig.systemActions)
+            {
+                LoadActionTreeNode(systemActionsNode, item);
+                cbPickActionAction.Items.Add(item.Key);
+            }
+            TreeNode actionsNode = tvBotData.Nodes.Add("actions");
+            foreach (KeyValuePair<string, BotEngineClient.Action> item in gameConfig.actions)
+            {
+                LoadActionTreeNode(actionsNode, item);
+                cbPickActionAction.Items.Add(item.Key);
+            }
+
+            tvBotData.ResumeLayout();
+            ChangePending = false;
+            saveToolStripMenuItem.Enabled = false;
+            loadedFileType = JsonHelper.ConfigFileType.GameConfig;
+        }
+
+        private void LoadDeviceConfigFile(string fileName)
+        {
+            string jsonString = File.ReadAllText(fileName);
+            try
+            {
+                deviceConfig = JsonSerializer.Deserialize<BOTDeviceConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to parse file.\r\n{0}", ex.Message));
+                return;
+            }
+            tvBotData.SuspendLayout();
+            tvBotData.Nodes.Clear();
+            cbImageNameNoWait.Items.Clear();
+            cbImageNameWithWait.Items.Clear();
+            cbImageNamesForList.Items.Clear();
+            cbPickActionAction.Items.Clear();
+            TreeNode lastActionNode = tvBotData.Nodes.Add("LastActionTaken");
+            foreach (KeyValuePair<string, BotEngineClient.ActionActivity> item in deviceConfig.LastActionTaken)
+            {
+                TreeNode treeNode = new TreeNode
+                {
+                    Name = item.Key,
+                    Tag = item.Value,
+                    Text = string.Format("{0} - {1}", item.Key, item.Value.ActionEnabled ? "Enabled" : "Disabled") 
+                };
+                lastActionNode.Nodes.Add(treeNode);
+            }
+
+            tvBotData.ResumeLayout();
+            ChangePending = false;
+            saveToolStripMenuItem.Enabled = false;
+            loadedFileType = JsonHelper.ConfigFileType.DeviceConfig;
+        }
+
+        private void LoadListConfigFile(string fileName)
+        {
+            string jsonString = File.ReadAllText(fileName);
+            try
+            {
+                listConfig = JsonSerializer.Deserialize<BOTListConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to parse file.\r\n{0}", ex.Message));
+                return;
+            }
+            tvBotData.SuspendLayout();
+            tvBotData.Nodes.Clear();
+            cbImageNameNoWait.Items.Clear();
+            cbImageNameWithWait.Items.Clear();
+            cbImageNamesForList.Items.Clear();
+            cbPickActionAction.Items.Clear();
+            TreeNode coordinatesNode = tvBotData.Nodes.Add("Coordinates");
+            foreach (KeyValuePair<string, List<XYCoords>> item in listConfig.Coordinates)
+            {
+                TreeNode treeNode = new TreeNode
+                {
+                    Name = item.Key,
+                    Tag = item.Value,
+                    Text = item.Key
+                };
+
+                foreach (XYCoords coord in item.Value)
+                {
+                    TreeNode child = new TreeNode
+                    {
+                        Name = string.Format("({0},{1})", coord.X, coord.Y),
+                        Tag = coord,
+                        Text = string.Format("({0},{1})", coord.X, coord.Y)
+                    };
+                    treeNode.Nodes.Add(child);
+                }
+                coordinatesNode.Nodes.Add(treeNode);
+            }
+
+            tvBotData.ResumeLayout();
+            ChangePending = false;
+            saveToolStripMenuItem.Enabled = false;
+            loadedFileType = JsonHelper.ConfigFileType.DeviceConfig;
         }
 
         private void LoadActionTreeNode(TreeNode parent, KeyValuePair<string, BotEngineClient.Action> item)
@@ -446,6 +580,25 @@ namespace ScriptEditor
                 tbFindTextSearchY1.Text = findStringCopy.searchArea.Y.ToString();
                 tbFindTextSearchX2.Text = (findStringCopy.searchArea.X + findStringCopy.searchArea.width).ToString();
                 tbFindTextSearchY2.Text = (findStringCopy.searchArea.Y + findStringCopy.searchArea.height).ToString();
+            }
+            else if ((e.Node.Tag != null) && (e.Node.Tag is XYCoords coords))
+            {
+                if (coords != null)
+                {
+                    tbPointX.Text = coords.X.ToString();
+                    tbPointY.Text = coords.Y.ToString();
+                }
+                else
+                {
+                    tbPointX.Text = "0";
+                    tbPointY.Text = "0";
+                }
+                gbClick.Enabled = true;
+                gbClick.Visible = true;
+            }
+            else if ((e.Node.Tag != null) && (e.Node.Tag is BotEngineClient.ActionActivity actionActivity))
+            {
+                // ToDo: Display the data for Device Config
             }
         }
 

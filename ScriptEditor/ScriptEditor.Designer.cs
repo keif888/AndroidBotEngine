@@ -241,14 +241,14 @@ namespace ScriptEditor
             // setupToolStripMenuItem
             // 
             this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
-            this.setupToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.setupToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
             this.setupToolStripMenuItem.Text = "&Setup";
             this.setupToolStripMenuItem.Click += new System.EventHandler(this.setupToolStripMenuItem_Click);
             // 
             // validateToolStripMenuItem
             // 
             this.validateToolStripMenuItem.Name = "validateToolStripMenuItem";
-            this.validateToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.validateToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
             this.validateToolStripMenuItem.Text = "&Validate";
             // 
             // testToolStripMenuItem
@@ -321,7 +321,7 @@ namespace ScriptEditor
             this.gbAppName.Controls.Add(this.label24);
             this.gbAppName.Controls.Add(this.tbAppNameAppId);
             this.gbAppName.Enabled = false;
-            this.gbAppName.Location = new System.Drawing.Point(9, 476);
+            this.gbAppName.Location = new System.Drawing.Point(453, 484);
             this.gbAppName.Name = "gbAppName";
             this.gbAppName.Size = new System.Drawing.Size(438, 84);
             this.gbAppName.TabIndex = 23;
@@ -791,7 +791,8 @@ namespace ScriptEditor
             // 
             // btnUpdate
             // 
-            this.btnUpdate.Location = new System.Drawing.Point(12, 391);
+            this.btnUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnUpdate.Location = new System.Drawing.Point(12, 560);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(75, 23);
             this.btnUpdate.TabIndex = 16;
@@ -1078,7 +1079,7 @@ namespace ScriptEditor
             this.gbClick.Size = new System.Drawing.Size(245, 56);
             this.gbClick.TabIndex = 9;
             this.gbClick.TabStop = false;
-            this.gbClick.Text = "Click";
+            this.gbClick.Text = "Point";
             this.gbClick.Visible = false;
             // 
             // label1

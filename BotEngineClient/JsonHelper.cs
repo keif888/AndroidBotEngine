@@ -10,10 +10,87 @@ namespace BotEngineClient
     public class JsonHelper
     {
         public List<string> Errors { get; private set; }
+        public enum ConfigFileType
+        {
+            Error,
+            GameConfig,
+            ListConfig,
+            DeviceConfig
+        }
 
         public JsonHelper()
         {
             Errors = new List<string>();
+        }
+
+
+        /// <summary>
+        /// Determine the supposed content type of the json file
+        /// </summary>
+        /// <param name="jsonFileName">The name of the json file to check.</param>
+        /// <returns>Error or the type of json content in the file.</returns>
+        public ConfigFileType getFileType(string jsonFileName)
+        {
+            int startErrorCount = Errors.Count;
+            JsonDocumentOptions documentOptions = new JsonDocumentOptions
+            {
+                AllowTrailingCommas = true,
+                CommentHandling = JsonCommentHandling.Skip
+            };
+            JsonNodeOptions nodeOptions = new JsonNodeOptions
+            {
+                PropertyNameCaseInsensitive = false
+            };
+
+            string jsonList = File.ReadAllText(jsonFileName);
+            try
+            {
+                JsonNode jsonListNode = JsonNode.Parse(jsonList, nodeOptions, documentOptions);
+                if (jsonListNode is JsonObject jsonObject)
+                {
+                    if (!jsonObject.ContainsKey("FileId"))
+                    {
+                        Errors.Add("Required field \"FileId\" missing.  Unable to determine that the input file is of a known type");
+                    }
+                    else
+                    {
+                        JsonNode fileIdValue = jsonObject["FileId"];
+                        if (fileIdValue is JsonValue)
+                        {
+                            JsonElement value = fileIdValue.GetValue<JsonElement>();
+                            if (value.ValueKind == JsonValueKind.String)
+                            {
+                                string fileId = value.GetString();
+                                switch (fileId.ToLower())
+                                {
+                                    case "gameconfig":
+                                        return ConfigFileType.GameConfig;
+                                    case "listconfig":
+                                        return ConfigFileType.ListConfig;
+                                    case "deviceconfig":
+                                        return ConfigFileType.DeviceConfig;
+                                    default:
+                                        Errors.Add(string.Format("\"FileId\" indicates that this is not \"DeviceConfig\", \"GameConfig\", or \"ListConfig\" but {0}", fileId));
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                Errors.Add(string.Format("\"FileId\" value is of incorrect type.  Expecting a String but got {0}", value.ValueKind));
+                            }
+                        }
+                        else
+                        {
+                            Errors.Add("Required field \"FileId\" is of the wrong type.  Expecting a String Value");
+                        }
+                    }
+                }
+            }
+            catch (JsonException ex)
+            {
+                Errors.Add(string.Format("File {0} is not well formed JSON.  Error {1} captured.", jsonFileName, ex.Message));
+            }
+            return ConfigFileType.Error;
         }
 
         /// <summary>
@@ -571,7 +648,7 @@ namespace BotEngineClient
         /// </summary>
         /// <param name="jsonListFileName"></param>
         /// <returns></returns>
-        public bool ValidateListConfig(string jsonListFileName)
+        public bool ValidateListConfigStructure(string jsonListFileName)
         {
             int startErrorCount = Errors.Count;
             JsonDocumentOptions documentOptions = new JsonDocumentOptions

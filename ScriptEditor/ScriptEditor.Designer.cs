@@ -47,6 +47,19 @@ namespace ScriptEditor
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tvBotData = new System.Windows.Forms.TreeView();
+            this.gbImageArea = new System.Windows.Forms.GroupBox();
+            this.btImageAreaRemove = new System.Windows.Forms.Button();
+            this.btImageAreaAdd = new System.Windows.Forms.Button();
+            this.tbImageAreasX = new System.Windows.Forms.MaskedTextBox();
+            this.label32 = new System.Windows.Forms.Label();
+            this.tbImageAreasH = new System.Windows.Forms.MaskedTextBox();
+            this.tbImageAreasY = new System.Windows.Forms.MaskedTextBox();
+            this.label33 = new System.Windows.Forms.Label();
+            this.tbImageAreasW = new System.Windows.Forms.MaskedTextBox();
+            this.label31 = new System.Windows.Forms.Label();
+            this.lbImageAreaAreas = new System.Windows.Forms.ListBox();
+            this.label30 = new System.Windows.Forms.Label();
+            this.cbImageAreasImage = new System.Windows.Forms.ComboBox();
             this.gbActionOverride = new System.Windows.Forms.GroupBox();
             this.label29 = new System.Windows.Forms.Label();
             this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
@@ -143,6 +156,7 @@ namespace ScriptEditor
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.gbImageArea.SuspendLayout();
             this.gbActionOverride.SuspendLayout();
             this.gbAppName.SuspendLayout();
             this.gbPickAction.SuspendLayout();
@@ -170,7 +184,7 @@ namespace ScriptEditor
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1184, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1387, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -296,6 +310,7 @@ namespace ScriptEditor
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.gbImageArea);
             this.splitContainer1.Panel2.Controls.Add(this.gbActionOverride);
             this.splitContainer1.Panel2.Controls.Add(this.gbAppName);
             this.splitContainer1.Panel2.Controls.Add(this.gbPickAction);
@@ -312,8 +327,8 @@ namespace ScriptEditor
             this.splitContainer1.Panel2.Controls.Add(this.gbDrag);
             this.splitContainer1.Panel2.Controls.Add(this.gbClick);
             this.splitContainer1.Panel2.Cursor = System.Windows.Forms.Cursors.Default;
-            this.splitContainer1.Size = new System.Drawing.Size(1184, 595);
-            this.splitContainer1.SplitterDistance = 277;
+            this.splitContainer1.Size = new System.Drawing.Size(1387, 595);
+            this.splitContainer1.SplitterDistance = 142;
             this.splitContainer1.TabIndex = 1;
             // 
             // tvBotData
@@ -322,10 +337,145 @@ namespace ScriptEditor
             this.tvBotData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvBotData.Location = new System.Drawing.Point(0, 0);
             this.tvBotData.Name = "tvBotData";
-            this.tvBotData.Size = new System.Drawing.Size(277, 595);
+            this.tvBotData.Size = new System.Drawing.Size(142, 595);
             this.tvBotData.TabIndex = 0;
             this.tvBotData.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvBotData_BeforeSelect);
             this.tvBotData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TvBotData_AfterSelect);
+            // 
+            // gbImageArea
+            // 
+            this.gbImageArea.Controls.Add(this.btImageAreaRemove);
+            this.gbImageArea.Controls.Add(this.btImageAreaAdd);
+            this.gbImageArea.Controls.Add(this.tbImageAreasX);
+            this.gbImageArea.Controls.Add(this.label32);
+            this.gbImageArea.Controls.Add(this.tbImageAreasH);
+            this.gbImageArea.Controls.Add(this.tbImageAreasY);
+            this.gbImageArea.Controls.Add(this.label33);
+            this.gbImageArea.Controls.Add(this.tbImageAreasW);
+            this.gbImageArea.Controls.Add(this.label31);
+            this.gbImageArea.Controls.Add(this.lbImageAreaAreas);
+            this.gbImageArea.Controls.Add(this.label30);
+            this.gbImageArea.Controls.Add(this.cbImageAreasImage);
+            this.gbImageArea.Enabled = false;
+            this.gbImageArea.Location = new System.Drawing.Point(834, 184);
+            this.gbImageArea.Name = "gbImageArea";
+            this.gbImageArea.Size = new System.Drawing.Size(305, 219);
+            this.gbImageArea.TabIndex = 100;
+            this.gbImageArea.TabStop = false;
+            this.gbImageArea.Text = "Image Areas";
+            this.gbImageArea.Visible = false;
+            // 
+            // btImageAreaRemove
+            // 
+            this.btImageAreaRemove.Location = new System.Drawing.Point(224, 186);
+            this.btImageAreaRemove.Name = "btImageAreaRemove";
+            this.btImageAreaRemove.Size = new System.Drawing.Size(75, 23);
+            this.btImageAreaRemove.TabIndex = 17;
+            this.btImageAreaRemove.Text = "Remove";
+            this.btImageAreaRemove.UseVisualStyleBackColor = true;
+            this.btImageAreaRemove.Click += new System.EventHandler(this.btImageAreaRemove_Click);
+            // 
+            // btImageAreaAdd
+            // 
+            this.btImageAreaAdd.Location = new System.Drawing.Point(75, 186);
+            this.btImageAreaAdd.Name = "btImageAreaAdd";
+            this.btImageAreaAdd.Size = new System.Drawing.Size(75, 23);
+            this.btImageAreaAdd.TabIndex = 16;
+            this.btImageAreaAdd.Text = "Add";
+            this.btImageAreaAdd.UseVisualStyleBackColor = true;
+            this.btImageAreaAdd.Click += new System.EventHandler(this.btImageAreaAdd_Click);
+            // 
+            // tbImageAreasX
+            // 
+            this.tbImageAreasX.Location = new System.Drawing.Point(75, 157);
+            this.tbImageAreasX.Mask = "000";
+            this.tbImageAreasX.Name = "tbImageAreasX";
+            this.tbImageAreasX.Size = new System.Drawing.Size(26, 23);
+            this.tbImageAreasX.TabIndex = 11;
+            this.tbImageAreasX.ValidatingType = typeof(int);
+            // 
+            // label32
+            // 
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(6, 160);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(42, 15);
+            this.label32.TabIndex = 10;
+            this.label32.Text = "Search";
+            // 
+            // tbImageAreasH
+            // 
+            this.tbImageAreasH.Location = new System.Drawing.Point(201, 157);
+            this.tbImageAreasH.Mask = "000";
+            this.tbImageAreasH.Name = "tbImageAreasH";
+            this.tbImageAreasH.Size = new System.Drawing.Size(26, 23);
+            this.tbImageAreasH.TabIndex = 15;
+            this.tbImageAreasH.ValidatingType = typeof(int);
+            // 
+            // tbImageAreasY
+            // 
+            this.tbImageAreasY.Location = new System.Drawing.Point(107, 157);
+            this.tbImageAreasY.Mask = "000";
+            this.tbImageAreasY.Name = "tbImageAreasY";
+            this.tbImageAreasY.Size = new System.Drawing.Size(26, 23);
+            this.tbImageAreasY.TabIndex = 12;
+            this.tbImageAreasY.ValidatingType = typeof(int);
+            // 
+            // label33
+            // 
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(139, 161);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(19, 15);
+            this.label33.TabIndex = 13;
+            this.label33.Text = "To";
+            // 
+            // tbImageAreasW
+            // 
+            this.tbImageAreasW.Location = new System.Drawing.Point(169, 157);
+            this.tbImageAreasW.Mask = "000";
+            this.tbImageAreasW.Name = "tbImageAreasW";
+            this.tbImageAreasW.Size = new System.Drawing.Size(26, 23);
+            this.tbImageAreasW.TabIndex = 14;
+            this.tbImageAreasW.ValidatingType = typeof(int);
+            // 
+            // label31
+            // 
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(6, 55);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(36, 15);
+            this.label31.TabIndex = 3;
+            this.label31.Text = "Areas";
+            // 
+            // lbImageAreaAreas
+            // 
+            this.lbImageAreaAreas.AllowDrop = true;
+            this.lbImageAreaAreas.FormattingEnabled = true;
+            this.lbImageAreaAreas.ItemHeight = 15;
+            this.lbImageAreaAreas.Location = new System.Drawing.Point(75, 55);
+            this.lbImageAreaAreas.Name = "lbImageAreaAreas";
+            this.lbImageAreaAreas.Size = new System.Drawing.Size(224, 94);
+            this.lbImageAreaAreas.TabIndex = 2;
+            this.lbImageAreaAreas.SelectedIndexChanged += new System.EventHandler(this.lbImageAreaAreas_SelectedIndexChanged);
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(6, 26);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(40, 15);
+            this.label30.TabIndex = 0;
+            this.label30.Text = "Image";
+            // 
+            // cbImageAreasImage
+            // 
+            this.cbImageAreasImage.FormattingEnabled = true;
+            this.cbImageAreasImage.Location = new System.Drawing.Point(75, 23);
+            this.cbImageAreasImage.Name = "cbImageAreasImage";
+            this.cbImageAreasImage.Size = new System.Drawing.Size(224, 23);
+            this.cbImageAreasImage.TabIndex = 1;
+            this.cbImageAreasImage.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // gbActionOverride
             // 
@@ -502,6 +652,7 @@ namespace ScriptEditor
             this.cbPickActionAction.Name = "cbPickActionAction";
             this.cbPickActionAction.Size = new System.Drawing.Size(232, 23);
             this.cbPickActionAction.TabIndex = 1;
+            this.cbPickActionAction.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label23
             // 
@@ -870,6 +1021,7 @@ namespace ScriptEditor
             this.cbActionType.Name = "cbActionType";
             this.cbActionType.Size = new System.Drawing.Size(154, 23);
             this.cbActionType.TabIndex = 3;
+            this.cbActionType.TextChanged += new System.EventHandler(this.cbActionType_TextChanged);
             // 
             // dtpActionTimeOfDay
             // 
@@ -1012,6 +1164,7 @@ namespace ScriptEditor
             this.btnRemoveImageNames.TabIndex = 3;
             this.btnRemoveImageNames.Text = "Remove";
             this.btnRemoveImageNames.UseVisualStyleBackColor = true;
+            this.btnRemoveImageNames.Click += new System.EventHandler(this.btnRemoveImageNames_Click);
             // 
             // btnAddImageNames
             // 
@@ -1021,6 +1174,7 @@ namespace ScriptEditor
             this.btnAddImageNames.TabIndex = 2;
             this.btnAddImageNames.Text = "Add";
             this.btnAddImageNames.UseVisualStyleBackColor = true;
+            this.btnAddImageNames.Click += new System.EventHandler(this.btnAddImageNames_Click);
             // 
             // cbImageNamesForList
             // 
@@ -1039,6 +1193,7 @@ namespace ScriptEditor
             this.lbImageNames.Name = "lbImageNames";
             this.lbImageNames.Size = new System.Drawing.Size(194, 139);
             this.lbImageNames.TabIndex = 0;
+            this.lbImageNames.SelectedValueChanged += new System.EventHandler(this.lbImageNames_SelectedValueChanged);
             // 
             // gbImageNameAndWait
             // 
@@ -1061,6 +1216,7 @@ namespace ScriptEditor
             this.cbImageNameWithWait.Name = "cbImageNameWithWait";
             this.cbImageNameWithWait.Size = new System.Drawing.Size(230, 23);
             this.cbImageNameWithWait.TabIndex = 0;
+            this.cbImageNameWithWait.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label4
             // 
@@ -1100,6 +1256,7 @@ namespace ScriptEditor
             this.cbImageNameNoWait.Name = "cbImageNameNoWait";
             this.cbImageNameNoWait.Size = new System.Drawing.Size(230, 23);
             this.cbImageNameNoWait.TabIndex = 0;
+            this.cbImageNameNoWait.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // gbLoopCoordinate
             // 
@@ -1264,7 +1421,7 @@ namespace ScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1184, 619);
+            this.ClientSize = new System.Drawing.Size(1387, 619);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -1276,6 +1433,8 @@ namespace ScriptEditor
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.gbImageArea.ResumeLayout(false);
+            this.gbImageArea.PerformLayout();
             this.gbActionOverride.ResumeLayout(false);
             this.gbActionOverride.PerformLayout();
             this.gbAppName.ResumeLayout(false);
@@ -1420,6 +1579,19 @@ namespace ScriptEditor
         private System.Windows.Forms.Label label27;
         private System.Windows.Forms.MaskedTextBox tbActionOverrideFrequency;
         private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.GroupBox gbImageArea;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.ListBox lbImageAreaAreas;
+        private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.ComboBox cbImageAreasImage;
+        private System.Windows.Forms.MaskedTextBox tbImageAreasX;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.MaskedTextBox tbImageAreasH;
+        private System.Windows.Forms.MaskedTextBox tbImageAreasY;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.MaskedTextBox tbImageAreasW;
+        private System.Windows.Forms.Button btImageAreaRemove;
+        private System.Windows.Forms.Button btImageAreaAdd;
     }
 }
 

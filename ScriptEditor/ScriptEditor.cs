@@ -59,6 +59,8 @@ namespace ScriptEditor
             gbAppName.Left = 5;
             gbActionOverride.Top = 5;
             gbActionOverride.Left = 5;
+            gbImageArea.Top = 5;
+            gbImageArea.Left = 5;
             this.Size = new Size(800, 485);
             splitContainer1.SplitterDistance = 320;
             ChangePending = false;
@@ -66,6 +68,7 @@ namespace ScriptEditor
             saveToolStripMenuItem.Enabled = false;
             loadedFileType = JsonHelper.ConfigFileType.Error;
             ActiveTreeNode = null;
+            btnUpdate.Enabled = false;
         }
 
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
@@ -380,6 +383,9 @@ namespace ScriptEditor
             gbActionOverride.Enabled = false;
             gbPickAction.Enabled = false;
             gbPickAction.Visible = false;
+            gbImageArea.Enabled = false;
+            gbImageArea.Visible = false;
+            btnUpdate.Enabled = false;
 
             if (e.Node != null)
                 ActiveTreeNode = e.Node;
@@ -542,7 +548,23 @@ namespace ScriptEditor
                         gbAppName.Visible = true;
                         break;
                     case "clickwhennotfoundinarea":
-                        //ToDo: Bind ClickWhenNotFoundInArea
+                        if (commandCopy.ImageName != null)
+                        {
+                            cbImageAreasImage.Text = commandCopy.ImageName;
+                        }
+                        else
+                            cbImageAreasImage.Text = string.Empty;
+                        lbImageAreaAreas.Items.Clear();
+                        if (commandCopy.Areas != null)
+                        {
+                            foreach (SearchArea areaItem in commandCopy.Areas)
+                            {
+                                lbImageAreaAreas.Items.Add(string.Format("({0}, {1}) - ({2}, {3})", areaItem.X, areaItem.Y, areaItem.X + areaItem.width, areaItem.Y + areaItem.height));
+                            }
+                        }
+                        gbImageArea.Enabled = true;
+                        gbImageArea.Visible = true;
+                        break;
                     case "loopcoordinates":
                         //ToDo: Bind LoopCoordinates
                     default:
@@ -837,7 +859,7 @@ namespace ScriptEditor
 
         private void AllFields_TextChanged(object sender, EventArgs e)
         {
-            ChangePending = true;
+            setChangePending();
         }
 
         private void tvBotData_BeforeSelect(object sender, TreeViewCancelEventArgs e)
@@ -862,6 +884,67 @@ namespace ScriptEditor
                         break;
                 }
             }
+        }
+
+        private void cbActionType_TextChanged(object sender, EventArgs e)
+        {
+            //ToDo: Adjust Enabled fields, and update flags.
+            setChangePending();
+        }
+
+        private void btnAddImageNames_Click(object sender, EventArgs e)
+        {
+            setChangePending();
+            lbImageNames.Items.Add(cbImageNamesForList.SelectedItem.ToString());
+        }
+
+        private void btnRemoveImageNames_Click(object sender, EventArgs e)
+        {
+            if (lbImageNames.SelectedItems.Count > 0)
+            {
+                setChangePending();
+                lbImageNames.Items.RemoveAt(lbImageNames.SelectedIndex);
+            }
+        }
+
+        private void lbImageNames_SelectedValueChanged(object sender, EventArgs e)
+        {
+            if (lbImageNames.SelectedItem != null)
+                cbImageNamesForList.Text = lbImageNames.SelectedItem.ToString();
+        }
+
+        private void btImageAreaAdd_Click(object sender, EventArgs e)
+        {
+            setChangePending();
+            lbImageAreaAreas.Items.Add(string.Format("({0}, {1}) - ({2}, {3})", tbImageAreasX.Text, tbImageAreasY.Text, tbImageAreasW.Text, tbImageAreasH.Text));
+        }
+
+        private void btImageAreaRemove_Click(object sender, EventArgs e)
+        {
+            if (lbImageAreaAreas.SelectedItems.Count > 0)
+            {
+                setChangePending();
+                lbImageAreaAreas.Items.RemoveAt(lbImageAreaAreas.SelectedIndex);
+            }
+        }
+
+        private void lbImageAreaAreas_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lbImageAreaAreas.SelectedItem != null)
+            {
+                char[] delimiters = { ',', '-' };
+                string[] values = lbImageAreaAreas.SelectedItem.ToString().Replace("(","").Replace(")","").Replace(" ","").Split(delimiters);
+                tbImageAreasX.Text = values[0];
+                tbImageAreasY.Text = values[1];
+                tbImageAreasW.Text = values[2];
+                tbImageAreasH.Text = values[3];
+            }
+        }
+
+        private void setChangePending()
+        {
+            ChangePending = true;
+            btnUpdate.Enabled = true;
         }
     }
 }

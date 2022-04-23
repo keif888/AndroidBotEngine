@@ -38,6 +38,17 @@ namespace BotEngineClient
         }
     }
 
+    /// <summary>
+    /// The list of valid values for ActionType.
+    /// </summary>
+    public enum ValidActionType
+    {
+        Always,
+        Daily,
+        Scheduled,
+        System
+    }
+
     public class Action
     {
         /// <summary>

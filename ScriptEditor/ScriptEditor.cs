@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Text.Json;
 using BotEngineClient;
 using SharpAdbClient;
+using static BotEngineClient.BotEngine;
 
 namespace ScriptEditor
 {
@@ -288,60 +289,61 @@ namespace ScriptEditor
             foreach (BotEngineClient.Command command in commands)
             {
                 string childText = string.Format("{0}", command.CommandId);
-                switch (command.CommandId.ToLower())
-                {
-                    case "clickwhennotfoundinarea":
-                    case "exit":
-                    case "enterloopcoordinate":
-                    case "restart":
-                    case "startgame":
-                    case "stopgame":
-                        childText = string.Format("{0}", command.CommandId);
-                        break;
-                    case "runaction":
-                        if (command.ActionName != null)
-                            childText = string.Format("{0} ({1})", command.CommandId, command.ActionName);
-                        break;
-                    case "loopcoordinates":
-                        childText = string.Format("{0} ({1})", command.CommandId, command.Coordinates);
-                        break;
-                    case "click":
-                        if (command.Location != null)
-                            childText = string.Format("{0} ({1},{2})", command.CommandId, command.Location.X, command.Location.Y);
-                        break;
-                    case "sleep":
-                        childText = string.Format("{0} ({1})", command.CommandId, command.Delay);
-                        break;
-                    case "ifexists":
-                    case "ifnotexists":
-                    case "findclick":
-                    case "findclickandwait":
-                    case "loopuntilnotfound":
-                    case "loopuntilfound":
-                    case "waitfor":
-                    case "waitforthenclick":
-                        if (command.ImageName != null)
-                            childText = string.Format("{0} ({1})", command.CommandId, command.ImageName);
-                        else
-                            childText = string.Format("{0} (list)", command.CommandId);
-                        break;
-                    case "drag":
-                        if (command.Swipe != null)
-                        {
-                            childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.Swipe.X1, command.Swipe.Y1, command.Swipe.X2, command.Swipe.Y2);
-                        }
-                        break;
-                    case "waitforchange":
-                    case "waitfornochange":
-                        if (command.ChangeDetectArea != null)
-                        {
-                            childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.ChangeDetectArea.X, command.ChangeDetectArea.Y, command.ChangeDetectArea.X + command.ChangeDetectArea.width, command.ChangeDetectArea.Y + command.ChangeDetectArea.height);
-                        }
-                        break;
-                    default:
-                        childText = command.CommandId;
-                        break;
-                }
+                childText = command.CommandId;
+                if (Enum.TryParse(command.CommandId, true, out ValidCommandIds validCommandIds))
+                    switch (validCommandIds)
+                    {
+                        case ValidCommandIds.Click:
+                            if (command.Location != null)
+                                childText = string.Format("{0} ({1},{2})", command.CommandId, command.Location.X, command.Location.Y);
+                            break;
+                        case ValidCommandIds.Drag:
+                            if (command.Swipe != null)
+                                childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.Swipe.X1, command.Swipe.Y1, command.Swipe.X2, command.Swipe.Y2);
+                            break;
+                        case ValidCommandIds.EnterLoopCoordinate:
+                            if (command.Value != null)
+                                childText = string.Format("{0} ({1})", command.CommandId, command.Value);
+                            break;
+                        case ValidCommandIds.LoopCoordinates:
+                            if (command.Coordinates != null)
+                                childText = string.Format("{0} ({1})", command.CommandId, command.Coordinates);
+                            break;
+                        case ValidCommandIds.RunAction:
+                            if (command.ActionName != null)
+                                childText = string.Format("{0} ({1})", command.CommandId, command.ActionName);
+                            break;
+                        case ValidCommandIds.Sleep:
+                            childText = string.Format("{0} ({1})", command.CommandId, command.Delay);
+                            break;
+                        case ValidCommandIds.IfExists:
+                        case ValidCommandIds.IfNotExists:
+                        case ValidCommandIds.FindClick:
+                        case ValidCommandIds.FindClickAndWait:
+                        case ValidCommandIds.LoopUntilFound:
+                        case ValidCommandIds.LoopUntilNotFound:
+                        case ValidCommandIds.WaitFor:
+                        case ValidCommandIds.WaitForThenClick:
+                            if (command.ImageName != null)
+                                childText = string.Format("{0} ({1})", command.CommandId, command.ImageName);
+                            else
+                                childText = string.Format("{0} (list)", command.CommandId);
+                            break;
+                        case ValidCommandIds.WaitForChange:
+                        case ValidCommandIds.WaitForNoChange:
+                            if (command.ChangeDetectArea != null)
+                                childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.ChangeDetectArea.X, command.ChangeDetectArea.Y, command.ChangeDetectArea.X + command.ChangeDetectArea.width, command.ChangeDetectArea.Y + command.ChangeDetectArea.height);
+                            break;
+                        case ValidCommandIds.ClickWhenNotFoundInArea:
+                        case ValidCommandIds.Exit:
+                        case ValidCommandIds.Restart:
+                        case ValidCommandIds.StartGame:
+                        case ValidCommandIds.StopGame:
+                        default:
+                            childText = command.CommandId;
+                            break;
+                    }
+
                 // Create a copy of the command, to put in the Tag, as we don't want the Commands.
                 // They will be recomposed from the TreeNodes.
                 BotEngineClient.Command commandCopy = command.DeepCopy();
@@ -406,194 +408,205 @@ namespace ScriptEditor
             if ((e.Node.Tag != null) && (e.Node.Tag is Command command))
             {
                 Command commandCopy = command;
-                switch (commandCopy.CommandId.ToLower())
-                {
-                    case "click":
-                        if (commandCopy.Location != null)
-                        {
-                            tbPointX.Text = commandCopy.Location.X.ToString();
-                            tbPointY.Text = commandCopy.Location.Y.ToString();
-                        }
-                        else
-                        {
-                            tbPointX.Text = "0";
-                            tbPointY.Text = "0";
-                        }
-                        gbClick.Enabled = true;
-                        gbClick.Visible = true;
-                        break;
-                    case "loopuntilfound":
-                    case "loopuntilnotfound":
-                        lbImageNames.Items.Clear();
-                        if (commandCopy.ImageNames != null)
-                            foreach (string item in commandCopy.ImageNames)
+                if (Enum.TryParse(commandCopy.CommandId, true, out ValidCommandIds validCommandIds))
+                    switch (validCommandIds)
+                    {
+                        case ValidCommandIds.Click:
+                            if (commandCopy.Location != null)
                             {
-                                lbImageNames.Items.Add(item);
+                                tbPointX.Text = commandCopy.Location.X.ToString();
+                                tbPointY.Text = commandCopy.Location.Y.ToString();
                             }
-                        if (commandCopy.ImageName != null)
-                            lbImageNames.Items.Add(commandCopy.ImageName);
-                        if (commandCopy.TimeOut != null)
-                            tbImageNamesWait.Text = commandCopy.TimeOut.ToString();
-                        else
-                            tbImageNamesWait.Text = "";
-                        gbImageNames.Enabled = true;
-                        gbImageNames.Visible = true;
-                        break;
-                    case "findclick":
-                    case "ifexists":
-                    case "ifnotexists":
-                        if (commandCopy.ImageName != null)
-                            cbImageNameNoWait.SelectedItem = commandCopy.ImageName;
-                        else
-                            cbImageNameNoWait.SelectedIndex = -1;
-                        gbImageName.Enabled = true;
-                        gbImageName.Visible = true;
-                        break;
-                    case "sleep":
-                        if (commandCopy.Delay != null)
-                            tbDelay.Text = commandCopy.Delay.ToString();
-                        else
-                            tbDelay.Text = "";
-                        gbSleep.Enabled = true;
-                        gbSleep.Visible = true;
-                        break;
-                    case "findclickandwait":
-                    case "waitfor":
-                    case "waitforthenclick":
-                        if (commandCopy.ImageName != null)
-                            cbImageNameWithWait.SelectedItem = commandCopy.ImageName;
-                        else
-                            cbImageNameWithWait.SelectedIndex = -1;
-                        if (commandCopy.TimeOut != null)
-                            tbTimeout.Text = commandCopy.TimeOut.ToString();
-                        else
-                            tbTimeout.Text = "";
-                        gbImageNameAndWait.Enabled = true;
-                        gbImageNameAndWait.Visible = true;
-                        break;
-                    case "waitforchange":
-                    case "waitfornochange":
-                        tbWFNCWait.Text = commandCopy.TimeOut.ToString();
-                        if (commandCopy.ChangeDetectArea != null)
-                        {
-                            tbWFNCX1.Text = commandCopy.ChangeDetectArea.X.ToString();
-                            tbWFNCY1.Text = commandCopy.ChangeDetectArea.Y.ToString();
-                            tbWFNCX2.Text = (commandCopy.ChangeDetectArea.X + commandCopy.ChangeDetectArea.width).ToString();
-                            tbWFNCY2.Text = (commandCopy.ChangeDetectArea.Y + commandCopy.ChangeDetectArea.height).ToString();
-                        }
-                        else
-                        {
-                            tbWFNCX1.Text = "0";
-                            tbWFNCY1.Text = "0";
-                            tbWFNCX2.Text = "0";
-                            tbWFNCY2.Text = "0";
-                        }
-                        if (commandCopy.ChangeDetectDifference != null)
-                        {
-                            nudWFNCDetectPercent.Value = (decimal)(commandCopy.ChangeDetectDifference * 100.0);
-                        }
-                        else
-                        {
-                            nudWFNCDetectPercent.Value = 30;
-                        }
-                        gbWFNC.Enabled = true;
-                        gbWFNC.Visible = true;
-                        break;
-                    case "drag":
-                        if (commandCopy.Swipe != null)
-                        {
-                            tbDragX1.Text = commandCopy.Swipe.X1.ToString();
-                            tbDragY1.Text = commandCopy.Swipe.Y1.ToString();
-                            tbDragX2.Text = commandCopy.Swipe.X2.ToString();
-                            tbDragY2.Text = commandCopy.Swipe.Y2.ToString();
-                        }
-                        else
-                        {
-                            tbDragX1.Text = "0";
-                            tbDragY1.Text = "0";
-                            tbDragX2.Text = "0";
-                            tbDragY2.Text = "0";
-                        }
-                        gbDrag.Enabled = true;
-                        gbDrag.Visible = true;
-                        break;
-                    case "enterloopcoordinate":
-                        if (commandCopy.Value != null)
-                        {
-                            if (commandCopy.Value.ToLower() == "x")
-                            { rbLoopCoordX.Checked = true; }
                             else
-                            { rbLoopCoordY.Checked = true; }
-                        }
-                        else
-                        {
-                            rbLoopCoordX.Checked = false;
-                            rbLoopCoordY.Checked = false;
-                        }
-                        gbLoopCoordinate.Enabled = true;
-                        gbLoopCoordinate.Visible = true;
-                        break;
-                    case "runaction":
-                        if (commandCopy.ActionName != null)
-                        {
-                            cbPickActionAction.Text = commandCopy.ActionName;
-                        }
-                        else
-                        {
-                            cbPickActionAction.Text = string.Empty;
-                        }
-                        gbPickAction.Enabled = true;
-                        gbPickAction.Visible = true;
-                        break;
-                    case "startgame":
-                    case "stopgame":
-                        if (commandCopy.Value != null)
-                        {
-                            tbAppNameAppId.Text = commandCopy.Value;
-                        }
-                        if (commandCopy.TimeOut != null)
-                        {
-                            tbAppNameTimeout.Text = commandCopy.TimeOut.ToString();
-                        }
-                        else
-                            tbAppNameTimeout.Text = "";
-                        gbAppName.Enabled = true;
-                        gbAppName.Visible = true;
-                        break;
-                    case "clickwhennotfoundinarea":
-                        if (commandCopy.ImageName != null)
-                        {
-                            cbImageAreasImage.Text = commandCopy.ImageName;
-                        }
-                        else
-                            cbImageAreasImage.Text = string.Empty;
-                        lbImageAreaAreas.Items.Clear();
-                        if (commandCopy.Areas != null)
-                        {
-                            foreach (SearchArea areaItem in commandCopy.Areas)
                             {
-                                lbImageAreaAreas.Items.Add(string.Format("({0}, {1}) - ({2}, {3})", areaItem.X, areaItem.Y, areaItem.X + areaItem.width, areaItem.Y + areaItem.height));
+                                tbPointX.Text = "0";
+                                tbPointY.Text = "0";
                             }
-                        }
-                        gbImageArea.Enabled = true;
-                        gbImageArea.Visible = true;
-                        break;
-                    case "loopcoordinates":
-                        if (commandCopy.Coordinates != null)
-                            tbListName.Text = commandCopy.Coordinates;
-                        else
-                            tbListName.Text = string.Empty;
-                        gbList.Enabled = true;
-                        gbList.Visible = true;
-                        break;
-                    case "exit":
-                    case "restart":
-                        // Nothing to do here, as there is no UI element for these.
-                        break;
-                    default:
-                        MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
-                        break;
-                }
+                            gbClick.Enabled = true;
+                            gbClick.Visible = true;
+                            break;
+                        case ValidCommandIds.ClickWhenNotFoundInArea:
+                            if (commandCopy.ImageName != null)
+                            {
+                                cbImageAreasImage.Text = commandCopy.ImageName;
+                            }
+                            else
+                                cbImageAreasImage.Text = string.Empty;
+                            lbImageAreaAreas.Items.Clear();
+                            if (commandCopy.Areas != null)
+                            {
+                                foreach (SearchArea areaItem in commandCopy.Areas)
+                                {
+                                    lbImageAreaAreas.Items.Add(string.Format("({0}, {1}) - ({2}, {3})", areaItem.X, areaItem.Y, areaItem.X + areaItem.width, areaItem.Y + areaItem.height));
+                                }
+                            }
+                            gbImageArea.Enabled = true;
+                            gbImageArea.Visible = true;
+                            break;
+                        case ValidCommandIds.Drag:
+                            if (commandCopy.Swipe != null)
+                            {
+                                tbDragX1.Text = commandCopy.Swipe.X1.ToString();
+                                tbDragY1.Text = commandCopy.Swipe.Y1.ToString();
+                                tbDragX2.Text = commandCopy.Swipe.X2.ToString();
+                                tbDragY2.Text = commandCopy.Swipe.Y2.ToString();
+                            }
+                            else
+                            {
+                                tbDragX1.Text = "0";
+                                tbDragY1.Text = "0";
+                                tbDragX2.Text = "0";
+                                tbDragY2.Text = "0";
+                            }
+                            gbDrag.Enabled = true;
+                            gbDrag.Visible = true;
+                            break;
+                        case ValidCommandIds.Exit:
+                            // Nothing to do here, no UI element.
+                            break;
+                        case ValidCommandIds.EnterLoopCoordinate:
+                            if (commandCopy.Value != null)
+                            {
+                                if (commandCopy.Value.ToLower() == "x")
+                                { rbLoopCoordX.Checked = true; }
+                                else
+                                { rbLoopCoordY.Checked = true; }
+                            }
+                            else
+                            {
+                                rbLoopCoordX.Checked = false;
+                                rbLoopCoordY.Checked = false;
+                            }
+                            gbLoopCoordinate.Enabled = true;
+                            gbLoopCoordinate.Visible = true;
+                            break;
+                        case ValidCommandIds.FindClick:
+                            // ToDo: Add IgnoreMissing
+                            if (commandCopy.ImageName != null)
+                                cbImageNameNoWait.SelectedItem = commandCopy.ImageName;
+                            else
+                                cbImageNameNoWait.SelectedIndex = -1;
+                            gbImageName.Enabled = true;
+                            gbImageName.Visible = true;
+                            break;
+                        case ValidCommandIds.IfExists:
+                        case ValidCommandIds.IfNotExists:
+                            if (commandCopy.ImageName != null)
+                                cbImageNameNoWait.SelectedItem = commandCopy.ImageName;
+                            else
+                                cbImageNameNoWait.SelectedIndex = -1;
+                            gbImageName.Enabled = true;
+                            gbImageName.Visible = true; break;
+                        case ValidCommandIds.LoopCoordinates:
+                            if (commandCopy.Coordinates != null)
+                                tbListName.Text = commandCopy.Coordinates;
+                            else
+                                tbListName.Text = string.Empty;
+                            gbList.Enabled = true;
+                            gbList.Visible = true;
+                            break;
+                        case ValidCommandIds.FindClickAndWait:
+                        case ValidCommandIds.LoopUntilFound:
+                        case ValidCommandIds.LoopUntilNotFound:
+                            lbImageNames.Items.Clear();
+                            if (commandCopy.ImageNames != null)
+                                foreach (string item in commandCopy.ImageNames)
+                                {
+                                    lbImageNames.Items.Add(item);
+                                }
+                            if (commandCopy.ImageName != null)
+                                lbImageNames.Items.Add(commandCopy.ImageName);
+                            if (commandCopy.TimeOut != null)
+                                tbImageNamesWait.Text = commandCopy.TimeOut.ToString();
+                            else
+                                tbImageNamesWait.Text = "";
+                            gbImageNames.Enabled = true;
+                            gbImageNames.Visible = true;
+                            break;
+                        case ValidCommandIds.Restart:
+                            // Nothing to do here, no UI element.
+                            break;
+                        case ValidCommandIds.RunAction:
+                            if (commandCopy.ActionName != null)
+                            {
+                                cbPickActionAction.Text = commandCopy.ActionName;
+                            }
+                            else
+                            {
+                                cbPickActionAction.Text = string.Empty;
+                            }
+                            gbPickAction.Enabled = true;
+                            gbPickAction.Visible = true;
+                            break;
+                        case ValidCommandIds.Sleep:
+                            if (commandCopy.Delay != null)
+                                tbDelay.Text = commandCopy.Delay.ToString();
+                            else
+                                tbDelay.Text = "";
+                            gbSleep.Enabled = true;
+                            gbSleep.Visible = true;
+                            break;
+                        case ValidCommandIds.StartGame:
+                        case ValidCommandIds.StopGame:
+                            if (commandCopy.Value != null)
+                            {
+                                tbAppNameAppId.Text = commandCopy.Value;
+                            }
+                            if (commandCopy.TimeOut != null)
+                            {
+                                tbAppNameTimeout.Text = commandCopy.TimeOut.ToString();
+                            }
+                            else
+                                tbAppNameTimeout.Text = "";
+                            gbAppName.Enabled = true;
+                            gbAppName.Visible = true;
+                            break;
+                        case ValidCommandIds.WaitFor:
+                        case ValidCommandIds.WaitForThenClick:
+                            if (commandCopy.ImageName != null)
+                                cbImageNameWithWait.SelectedItem = commandCopy.ImageName;
+                            else
+                                cbImageNameWithWait.SelectedIndex = -1;
+                            if (commandCopy.TimeOut != null)
+                                tbTimeout.Text = commandCopy.TimeOut.ToString();
+                            else
+                                tbTimeout.Text = "";
+                            gbImageNameAndWait.Enabled = true;
+                            gbImageNameAndWait.Visible = true;
+                            break;
+                        case ValidCommandIds.WaitForChange:
+                        case ValidCommandIds.WaitForNoChange:
+                            tbWFNCWait.Text = commandCopy.TimeOut.ToString();
+                            if (commandCopy.ChangeDetectArea != null)
+                            {
+                                tbWFNCX1.Text = commandCopy.ChangeDetectArea.X.ToString();
+                                tbWFNCY1.Text = commandCopy.ChangeDetectArea.Y.ToString();
+                                tbWFNCX2.Text = (commandCopy.ChangeDetectArea.X + commandCopy.ChangeDetectArea.width).ToString();
+                                tbWFNCY2.Text = (commandCopy.ChangeDetectArea.Y + commandCopy.ChangeDetectArea.height).ToString();
+                            }
+                            else
+                            {
+                                tbWFNCX1.Text = "0";
+                                tbWFNCY1.Text = "0";
+                                tbWFNCX2.Text = "0";
+                                tbWFNCY2.Text = "0";
+                            }
+                            if (commandCopy.ChangeDetectDifference != null)
+                            {
+                                nudWFNCDetectPercent.Value = (decimal)(commandCopy.ChangeDetectDifference * 100.0);
+                            }
+                            else
+                            {
+                                nudWFNCDetectPercent.Value = 30;
+                            }
+                            gbWFNC.Enabled = true;
+                            gbWFNC.Visible = true; break;
+                        default:
+                            MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
+                            break;
+                    }
+                else
+                    MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
             }
             else if ((e.Node.Tag != null) && (e.Node.Tag is BotEngineClient.Action action))
             {
@@ -602,20 +615,23 @@ namespace ScriptEditor
                 BotEngineClient.Action actionCopy = action;
                 tbActionName.Text = e.Node.Name;
                 cbActionType.Text = actionCopy.ActionType;
-                switch (actionCopy.ActionType.ToLower())
+                dtpActionTimeOfDay.Enabled = false;
+                tbActionFrequency.Enabled = false;
+                if (Enum.TryParse(actionCopy.ActionType, true, out ValidActionType validActionType))
                 {
-                    case "scheduled":
-                        dtpActionTimeOfDay.Enabled = false;
-                        tbActionFrequency.Enabled = true;
-                        break;
-                    case "daily":
-                        dtpActionTimeOfDay.Enabled = true;
-                        tbActionFrequency.Enabled = false;
-                        break;
-                    default:
-                        dtpActionTimeOfDay.Enabled = false;
-                        tbActionFrequency.Enabled = false;
-                        break;
+                    switch (validActionType)
+                    {
+                        case ValidActionType.Daily:
+                            dtpActionTimeOfDay.Enabled = true;
+                            tbActionFrequency.Enabled = false;
+                            break;
+                        case ValidActionType.Scheduled:
+                            dtpActionTimeOfDay.Enabled = false;
+                            tbActionFrequency.Enabled = true;
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 if (actionCopy.DailyScheduledTime != null)
                 {
@@ -636,6 +652,10 @@ namespace ScriptEditor
                     dtpActionTimeOfDay.Checked = false;
                 }
                 tbActionFrequency.Text = actionCopy.Frequency.ToString();
+                if (e.Node.Parent.Name == "systemActions")
+                    cbActionType.Enabled = false;
+                else
+                    cbActionType.Enabled = true;
             }
             else if ((e.Node.Tag != null) && (e.Node.Tag is FindString findString))
             {
@@ -743,121 +763,152 @@ namespace ScriptEditor
                     ActiveTreeNode.Name = tbActionName.Text;
 
                     botAction.ActionType = cbActionType.Text;
-                    switch (botAction.ActionType.ToLower())
+                    botAction.Frequency = null;
+                    botAction.DailyScheduledTime = null;
+                    if (Enum.TryParse(botAction.ActionType, true, out ValidActionType validActionType))
                     {
-                        case "scheduled":
-                            botAction.Frequency = int.Parse(tbActionFrequency.Text);
-                            botAction.DailyScheduledTime = null;
-                            break;
-                        case "daily":
-                            botAction.Frequency = null;
-                            botAction.DailyScheduledTime = dtpActionTimeOfDay.Value;
-                            break;
-                        default:
-                            botAction.Frequency = null;
-                            botAction.DailyScheduledTime = null;
-                            break;
+                        switch (validActionType)
+                        {
+                            case ValidActionType.Daily:
+                                botAction.Frequency = null;
+                                botAction.DailyScheduledTime = dtpActionTimeOfDay.Value;
+                                break;
+                            case ValidActionType.Scheduled:
+                                botAction.Frequency = int.Parse(tbActionFrequency.Text);
+                                botAction.DailyScheduledTime = null;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
                 else if (selectedTag is Command commandCopy)
                 {
-                    switch (commandCopy.CommandId.ToLower())
-                    {
-                        case "click":
-                            if (commandCopy.Location == null)
-                            {
-                                commandCopy.Location = new XYCoords();
-                            }
-                            commandCopy.Location.X = int.Parse(tbPointX.Text);
-                            commandCopy.Location.Y = int.Parse(tbPointY.Text);
-                            ActiveTreeNode.Text = string.Format("{0} ({1},{2})", commandCopy.CommandId, commandCopy.Location.X, commandCopy.Location.Y);
-                            break;
-                        case "loopuntilfound":
-                        case "loopuntilnotfound":
-                            if (lbImageNames.Items.Count == 0)
-                            {
-                                commandCopy.ImageName = null;
-                                commandCopy.ImageNames = null;
-                            }
-                            else if (lbImageNames.Items.Count == 1)
-                            {
-                                commandCopy.ImageName = (string)lbImageNames.Items[0];
-                                commandCopy.ImageNames = null;
-                            }
-                            else
-                            {
-                                commandCopy.ImageName = null;
-                                foreach (string item in lbImageNames.Items)
+                    if (Enum.TryParse(commandCopy.CommandId, true, out ValidCommandIds validCommandIds))
+                        switch (validCommandIds)
+                        {
+                            case ValidCommandIds.Click:
+                                if (commandCopy.Location == null)
                                 {
-                                    commandCopy.ImageNames.Add(item);
+                                    commandCopy.Location = new XYCoords();
                                 }
-                            }
-                            commandCopy.TimeOut = int.Parse(tbImageNamesWait.Text);
-                            break;
-                        case "findclick":
-                        case "ifexists":
-                        case "ifnotexists":
-                            commandCopy.ImageName = (string)cbImageNameNoWait.SelectedItem;
-                            break;
-                        case "sleep":
-                            commandCopy.Delay = int.Parse(tbDelay.Text);
-                            break;
-                        case "findclickandwait":
-                        case "waitfor":
-                        case "waitforthenclick":
-                            commandCopy.ImageName = (string)cbImageNameWithWait.SelectedItem;
-                            commandCopy.TimeOut = int.Parse(tbTimeout.Text);
-                            break;
-                        case "waitforchange":
-                        case "waitfornochange":
-                            commandCopy.TimeOut = int.Parse(tbWFNCWait.Text);
-                            if (commandCopy.ChangeDetectArea == null)
-                            {
-                                commandCopy.ChangeDetectArea = new SearchArea();
-                            }
-                            commandCopy.ChangeDetectArea.X = int.Parse(tbWFNCX1.Text);
-                            commandCopy.ChangeDetectArea.Y = int.Parse(tbWFNCY1.Text);
-                            commandCopy.ChangeDetectArea.width = int.Parse(tbWFNCX2.Text) - commandCopy.ChangeDetectArea.X;
-                            commandCopy.ChangeDetectArea.height = int.Parse(tbWFNCY2.Text) - commandCopy.ChangeDetectArea.Y;
-                            commandCopy.ChangeDetectDifference = (float)nudWFNCDetectPercent.Value / 100.0f;
-                            break;
-                        case "drag":
-                            if (commandCopy.Swipe == null)
-                            {
-                                commandCopy.Swipe = new SwipeCoords();
-                            }
-                            commandCopy.Swipe.X1 = int.Parse(tbDragX1.Text);
-                            commandCopy.Swipe.Y1 = int.Parse(tbDragY1.Text);
-                            commandCopy.Swipe.X2 = int.Parse(tbDragX2.Text);
-                            commandCopy.Swipe.Y2 = int.Parse(tbDragY2.Text);
-                            break;
-                        case "enterloopcoordinate":
-                            if (rbLoopCoordX.Checked)
-                            { 
-                                commandCopy.Value = "X"; 
-                            }
-                            else
-                            {
-                                commandCopy.Value = "Y";
-                            }
-                            break;
-                        case "runaction":
-                            commandCopy.ActionName = cbPickActionAction.Text;
-                            break;
-                        case "clickwhennotfoundinarea":
-                        //ToDo: Bind clickwhennotfoundinarea
-                        case "loopcoordinates":
-                            //ToDo: Bind LoopCoordinates
-                            break;
-                        case "startgame":
-                        case "stopgame":
-                            commandCopy.Value = tbAppNameAppId.Text;
-                            commandCopy.TimeOut = int.Parse(tbAppNameTimeout.Text);
-                            break;
-                        default:
-                            MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
-                            break;
-                    }
+                                commandCopy.Location.X = int.Parse(tbPointX.Text);
+                                commandCopy.Location.Y = int.Parse(tbPointY.Text);
+                                ActiveTreeNode.Text = string.Format("{0} ({1},{2})", commandCopy.CommandId, commandCopy.Location.X, commandCopy.Location.Y);
+                                break;
+                            case ValidCommandIds.ClickWhenNotFoundInArea:
+                                commandCopy.ImageName = cbImageAreasImage.Text;
+                                commandCopy.Areas.Clear();
+                                char[] delimiters = { ',', '-' };
+                                foreach (string item in lbImageAreaAreas.Items)
+                                {
+                                    string[] values = item.Replace("(", "").Replace(")", "").Replace(" ", "").Split(delimiters);
+                                    SearchArea searchArea = new SearchArea();
+                                    searchArea.X = int.Parse(values[0]);
+                                    searchArea.Y = int.Parse(values[1]);
+                                    searchArea.width = int.Parse(values[2]) - searchArea.X;
+                                    searchArea.height = int.Parse(values[3]) - searchArea.Y;
+                                    commandCopy.Areas.Add(searchArea);
+                                }
+                                break;
+                            case ValidCommandIds.Drag:
+                                if (commandCopy.Swipe == null)
+                                {
+                                    commandCopy.Swipe = new SwipeCoords();
+                                }
+                                commandCopy.Swipe.X1 = int.Parse(tbDragX1.Text);
+                                commandCopy.Swipe.Y1 = int.Parse(tbDragY1.Text);
+                                commandCopy.Swipe.X2 = int.Parse(tbDragX2.Text);
+                                commandCopy.Swipe.Y2 = int.Parse(tbDragY2.Text);
+                                break;
+                            case ValidCommandIds.Exit:
+                                break;
+                            case ValidCommandIds.EnterLoopCoordinate:
+                                if (rbLoopCoordX.Checked)
+                                {
+                                    commandCopy.Value = "X";
+                                }
+                                else
+                                {
+                                    commandCopy.Value = "Y";
+                                }
+                                break;
+                            case ValidCommandIds.FindClick:
+                                commandCopy.ImageName = (string)cbImageNameNoWait.SelectedItem;
+                                // ToDo: Add IgnoreMissing
+                                break;
+                            case ValidCommandIds.IfExists:
+                            case ValidCommandIds.IfNotExists:
+                                commandCopy.ImageName = (string)cbImageNameNoWait.SelectedItem;
+                                break;
+                            case ValidCommandIds.LoopCoordinates:
+                                commandCopy.Coordinates = tbListName.Text;
+                                break;
+                            case ValidCommandIds.LoopUntilFound:
+                            case ValidCommandIds.LoopUntilNotFound:
+                                if (lbImageNames.Items.Count == 0)
+                                {
+                                    commandCopy.ImageName = null;
+                                    commandCopy.ImageNames = null;
+                                }
+                                else if (lbImageNames.Items.Count == 1)
+                                {
+                                    commandCopy.ImageName = (string)lbImageNames.Items[0];
+                                    commandCopy.ImageNames = null;
+                                    ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ImageName);
+                                }
+                                else
+                                {
+                                    commandCopy.ImageName = null;
+                                    foreach (string item in lbImageNames.Items)
+                                    {
+                                        commandCopy.ImageNames.Add(item);
+                                    }
+                                    ActiveTreeNode.Text = string.Format("{0} (list)", validCommandIds);
+                                }
+                                commandCopy.TimeOut = int.Parse(tbImageNamesWait.Text);
+                                break;
+                            case ValidCommandIds.Restart:
+                                break;
+                            case ValidCommandIds.RunAction:
+                                commandCopy.ActionName = cbPickActionAction.Text;
+                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ActionName);
+                                break;
+                            case ValidCommandIds.Sleep:
+                                commandCopy.Delay = int.Parse(tbDelay.Text);
+                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.Delay);
+                                break;
+                            case ValidCommandIds.StartGame:
+                            case ValidCommandIds.StopGame:
+                                commandCopy.Value = tbAppNameAppId.Text;
+                                commandCopy.TimeOut = int.Parse(tbAppNameTimeout.Text);
+                                break;
+                            case ValidCommandIds.FindClickAndWait:
+                            case ValidCommandIds.WaitFor:
+                            case ValidCommandIds.WaitForThenClick:
+                                commandCopy.ImageName = (string)cbImageNameWithWait.SelectedItem;
+                                commandCopy.TimeOut = int.Parse(tbTimeout.Text);
+                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ImageName);
+                                break;
+                            case ValidCommandIds.WaitForChange:
+                            case ValidCommandIds.WaitForNoChange:
+                                commandCopy.TimeOut = int.Parse(tbWFNCWait.Text);
+                                if (commandCopy.ChangeDetectArea == null)
+                                {
+                                    commandCopy.ChangeDetectArea = new SearchArea();
+                                }
+                                commandCopy.ChangeDetectArea.X = int.Parse(tbWFNCX1.Text);
+                                commandCopy.ChangeDetectArea.Y = int.Parse(tbWFNCY1.Text);
+                                commandCopy.ChangeDetectArea.width = int.Parse(tbWFNCX2.Text) - commandCopy.ChangeDetectArea.X;
+                                commandCopy.ChangeDetectArea.height = int.Parse(tbWFNCY2.Text) - commandCopy.ChangeDetectArea.Y;
+                                commandCopy.ChangeDetectDifference = (float)nudWFNCDetectPercent.Value / 100.0f;
+                                break;
+                            default:
+                                MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
+                                break;
+                        }
+                    else
+                        MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
                 }
                 else if (selectedTag is ActionActivity actionActivity)
                 {
@@ -881,6 +932,7 @@ namespace ScriptEditor
             switch (loadedFileType)
             {
                 case JsonHelper.ConfigFileType.GameConfig:
+                    SaveGameConfig();
                     //ToDo: Save GameConfig file
                     break;
                 case JsonHelper.ConfigFileType.ListConfig:
@@ -895,6 +947,122 @@ namespace ScriptEditor
             UnsavedChanges = false;
         }
 
+        /// <summary>
+        /// Saves a Game Config file from the content saved within the tvBotData tree view and it's Tags
+        /// </summary>
+        private void SaveGameConfig()
+        {
+            BOTConfig gameConfig = new BOTConfig();
+            gameConfig.FileId = loadedFileType.ToString();
+            gameConfig.findStrings = new Dictionary<string, FindString>();
+            gameConfig.systemActions = new Dictionary<string, BotEngineClient.Action>();
+            gameConfig.actions = new Dictionary<string, BotEngineClient.Action>();
+            foreach (TreeNode parent in tvBotData.Nodes)
+            {
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "findStrings")
+                {
+                    foreach (TreeNode child in parent.Nodes)
+                    {
+                        gameConfig.findStrings.Add(child.Name, (FindString)child.Tag);
+                    }
+                }
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "systemActions")
+                {
+                    foreach (TreeNode child in parent.Nodes)
+                    {
+                        BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
+                        BotEngineClient.Action newAction = new BotEngineClient.Action();
+                        newAction.ActionType = sourceAction.ActionType;
+                        newAction.AfterAction = sourceAction.AfterAction;
+                        newAction.BeforeAction = sourceAction.BeforeAction;
+                        if (child.Nodes.Count != 0)
+                        {
+                            int commandNumber = 10;
+                            List<Command> childCommands = new List<Command>();
+                            LoadCommandList(childCommands, child, ref commandNumber);
+                            newAction.Commands = childCommands;
+                        }
+                        newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
+                        newAction.Frequency = sourceAction.Frequency;
+                        gameConfig.systemActions.Add(child.Name, newAction);
+                    }
+                }
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "actions")
+                {
+                    foreach (TreeNode child in parent.Nodes)
+                    {
+                        BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
+                        BotEngineClient.Action newAction = new BotEngineClient.Action();
+                        newAction.ActionType = sourceAction.ActionType;
+                        newAction.AfterAction = sourceAction.AfterAction;
+                        newAction.BeforeAction = sourceAction.BeforeAction;
+                        if (child.Nodes.Count != 0)
+                        {
+                            int commandNumber = 10;
+                            List<Command> childCommands = new List<Command>();
+                            LoadCommandList(childCommands, child, ref commandNumber);
+                            newAction.Commands = childCommands;
+                        }
+                        newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
+                        newAction.Frequency = sourceAction.Frequency;
+                        gameConfig.actions.Add(child.Name, newAction);
+                    }
+                }
+            }
+            try
+            {
+                if (File.Exists(JsonFileName))
+                {
+                    if (File.Exists(JsonFileName + ".bak"))
+                    {
+                        File.Delete(JsonFileName + ".bak");
+                    }
+                    File.Copy(JsonFileName, JsonFileName + ".bak");
+                }
+                string jsonData = JsonSerializer.Serialize<BOTConfig>(gameConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
+                File.WriteAllText(JsonFileName, jsonData);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to save file with {0}", ex.Message), "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void LoadCommandList(List<Command> commands, TreeNode parent, ref int commandNumber)
+        {
+            foreach (TreeNode childNode in parent.Nodes)
+            {
+                Command childCommand = (Command) childNode.Tag;
+                Command newCommand = new Command(childCommand.CommandId);
+                newCommand.ActionName = childCommand.ActionName;
+                newCommand.Areas = childCommand.Areas;
+                newCommand.ChangeDetectArea = childCommand.ChangeDetectArea;
+                newCommand.ChangeDetectDifference = childCommand.ChangeDetectDifference;
+                newCommand.CommandNumber = commandNumber;
+                commandNumber += 10;
+                if (childNode.Nodes.Count != 0)
+                {
+                    List<Command> childCommands = new List<Command>();
+                    LoadCommandList(childCommands, childNode, ref commandNumber);
+                    newCommand.Commands = childCommands;
+                }
+                newCommand.Coordinates = childCommand.Coordinates;
+                newCommand.Delay = childCommand.Delay;
+                newCommand.IgnoreMissing = childCommand.IgnoreMissing;
+                newCommand.ImageName = childCommand.ImageName;
+                newCommand.ImageNames = childCommand.ImageNames;
+                newCommand.Location = childCommand.Location;
+                newCommand.Swipe = childCommand.Swipe;
+                newCommand.TimeOut = childCommand.TimeOut;
+                newCommand.Value = childCommand.Value;
+                commands.Add(newCommand);
+            }
+        }
+
+
+        /// <summary>
+        /// Saves a Device Config file from the content saved within the tvBotData tree view and it's Tags
+        /// </summary>
         private void SaveDeviceConfig()
         {
             BOTDeviceConfig deviceConfig = new BOTDeviceConfig();
@@ -931,7 +1099,7 @@ namespace ScriptEditor
 
         private void testToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            //ToDo: Implement Test of an Action Capability.
         }
 
         private void setupToolStripMenuItem_Click(object sender, EventArgs e)
@@ -975,7 +1143,45 @@ namespace ScriptEditor
 
         private void cbActionType_TextChanged(object sender, EventArgs e)
         {
-            //ToDo: Adjust Enabled fields, and update flags.
+            if (Enum.TryParse(cbActionType.Text, true, out ValidActionType validActionType))
+            {
+                switch (validActionType)
+                {
+                    case ValidActionType.Always:
+                        tbActionFrequency.Enabled = false;
+                        dtpActionTimeOfDay.Enabled = false;
+                        tbActionFrequency.Text = string.Empty;
+                        dtpActionTimeOfDay.Value = new DateTime(2001, 01, 01, 10, 00, 00);
+                        dtpActionTimeOfDay.Checked = false;
+                        break;
+                    case ValidActionType.Daily:
+                        tbActionFrequency.Enabled = false;
+                        dtpActionTimeOfDay.Enabled = true;
+                        tbActionFrequency.Text = string.Empty;
+                        dtpActionTimeOfDay.Checked = true;
+                        break;
+                    case ValidActionType.Scheduled:
+                        tbActionFrequency.Enabled = true;
+                        dtpActionTimeOfDay.Enabled = false;
+                        dtpActionTimeOfDay.Value = new DateTime(2001, 01, 01, 10, 00, 00);
+                        dtpActionTimeOfDay.Checked = false;
+                        break;
+                    case ValidActionType.System:
+                        tbActionFrequency.Enabled = false;
+                        dtpActionTimeOfDay.Enabled = false;
+                        tbActionFrequency.Text = string.Empty;
+                        dtpActionTimeOfDay.Value = new DateTime(2001, 01, 01, 10, 00, 00);
+                        dtpActionTimeOfDay.Checked = false;
+                        break;
+                    default:
+                        tbActionFrequency.Enabled = false;
+                        dtpActionTimeOfDay.Enabled = false;
+                        tbActionFrequency.Text = string.Empty;
+                        dtpActionTimeOfDay.Value = new DateTime(2001, 01, 01, 10, 00, 00);
+                        dtpActionTimeOfDay.Checked = false;
+                        break;
+                }
+            }
             setChangePending();
         }
 
@@ -1032,6 +1238,11 @@ namespace ScriptEditor
         {
             ChangePending = true;
             btnUpdate.Enabled = true;
+        }
+
+        private void btnPastFindText_Click(object sender, EventArgs e)
+        {
+            // ToDo: Implement FindText Paste.
         }
     }
 }

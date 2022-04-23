@@ -38,6 +38,35 @@ namespace BotEngineClient
             ADBError
         }
 
+        /// <summary>
+        /// Enum of all the Valid Command Ids that are supported.
+        /// </summary>
+        public enum ValidCommandIds
+        {
+            Click,
+            ClickWhenNotFoundInArea,
+            Drag,
+            Exit,
+            EnterLoopCoordinate,
+            FindClick,
+            FindClickAndWait,
+            IfExists,
+            IfNotExists,
+            LoopCoordinates,
+            LoopUntilFound,
+            LoopUntilNotFound,
+            Restart,
+            RunAction,
+            Sleep,
+            StartGame,
+            StopGame,
+            WaitFor,
+            WaitForThenClick,
+            WaitForChange,
+            WaitForNoChange
+        }
+
+
         public void ReloadFindStrings(Dictionary<string, FindString> findStrings)
         {
             FindStrings = findStrings;
@@ -792,7 +821,7 @@ namespace BotEngineClient
             {
                 List<string> imageNames = new List<string>();
                 _logger.LogDebug("Starting Command Execution");
-                switch (command.CommandId.ToLower())
+                switch (command.CommandId.ToLower())  // ToDo: Refactor to use Enum ValidCommandIds
                 {
                     case "click":
                         if (command.Location == null)

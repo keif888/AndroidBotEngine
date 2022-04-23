@@ -98,6 +98,7 @@ namespace ScriptEditor
             this.label16 = new System.Windows.Forms.Label();
             this.tbWFNCX2 = new System.Windows.Forms.MaskedTextBox();
             this.gbFindText = new System.Windows.Forms.GroupBox();
+            this.btnPastFindText = new System.Windows.Forms.Button();
             this.label13 = new System.Windows.Forms.Label();
             this.tbFindTextBackTolerance = new System.Windows.Forms.MaskedTextBox();
             this.tbFindTextTextTolerance = new System.Windows.Forms.MaskedTextBox();
@@ -550,6 +551,7 @@ namespace ScriptEditor
             this.dtpActionOverrideLastRun.Name = "dtpActionOverrideLastRun";
             this.dtpActionOverrideLastRun.Size = new System.Drawing.Size(154, 23);
             this.dtpActionOverrideLastRun.TabIndex = 3;
+            this.dtpActionOverrideLastRun.ValueChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // tbActionOverrideEnabled
             // 
@@ -569,9 +571,11 @@ namespace ScriptEditor
             this.dtptbActionOverrideTimeOfDay.Location = new System.Drawing.Point(94, 126);
             this.dtptbActionOverrideTimeOfDay.Name = "dtptbActionOverrideTimeOfDay";
             this.dtptbActionOverrideTimeOfDay.ShowCheckBox = true;
+            this.dtptbActionOverrideTimeOfDay.ShowUpDown = true;
             this.dtptbActionOverrideTimeOfDay.Size = new System.Drawing.Size(109, 23);
             this.dtptbActionOverrideTimeOfDay.TabIndex = 8;
             this.dtptbActionOverrideTimeOfDay.Value = new System.DateTime(2022, 4, 12, 10, 0, 0, 0);
+            this.dtptbActionOverrideTimeOfDay.ValueChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label26
             // 
@@ -779,6 +783,7 @@ namespace ScriptEditor
             this.nudWFNCDetectPercent.Name = "nudWFNCDetectPercent";
             this.nudWFNCDetectPercent.Size = new System.Drawing.Size(47, 23);
             this.nudWFNCDetectPercent.TabIndex = 7;
+            this.nudWFNCDetectPercent.ValueChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label18
             // 
@@ -868,6 +873,7 @@ namespace ScriptEditor
             // 
             // gbFindText
             // 
+            this.gbFindText.Controls.Add(this.btnPastFindText);
             this.gbFindText.Controls.Add(this.label13);
             this.gbFindText.Controls.Add(this.tbFindTextBackTolerance);
             this.gbFindText.Controls.Add(this.tbFindTextTextTolerance);
@@ -890,6 +896,17 @@ namespace ScriptEditor
             this.gbFindText.TabStop = false;
             this.gbFindText.Text = "FindText";
             this.gbFindText.Visible = false;
+            // 
+            // btnPastFindText
+            // 
+            this.btnPastFindText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnPastFindText.Location = new System.Drawing.Point(426, 137);
+            this.btnPastFindText.Name = "btnPastFindText";
+            this.btnPastFindText.Size = new System.Drawing.Size(75, 23);
+            this.btnPastFindText.TabIndex = 14;
+            this.btnPastFindText.Text = "Paste";
+            this.btnPastFindText.UseVisualStyleBackColor = true;
+            this.btnPastFindText.Click += new System.EventHandler(this.btnPastFindText_Click);
             // 
             // label13
             // 
@@ -1069,9 +1086,11 @@ namespace ScriptEditor
             this.dtpActionTimeOfDay.Location = new System.Drawing.Point(91, 105);
             this.dtpActionTimeOfDay.Name = "dtpActionTimeOfDay";
             this.dtpActionTimeOfDay.ShowCheckBox = true;
+            this.dtpActionTimeOfDay.ShowUpDown = true;
             this.dtpActionTimeOfDay.Size = new System.Drawing.Size(109, 23);
             this.dtpActionTimeOfDay.TabIndex = 7;
             this.dtpActionTimeOfDay.Value = new System.DateTime(2022, 4, 12, 10, 0, 0, 0);
+            this.dtpActionTimeOfDay.ValueChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label21
             // 
@@ -1107,6 +1126,7 @@ namespace ScriptEditor
             this.tbActionFrequency.Size = new System.Drawing.Size(71, 23);
             this.tbActionFrequency.TabIndex = 5;
             this.tbActionFrequency.ValidatingType = typeof(int);
+            this.tbActionFrequency.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // label7
             // 
@@ -1321,6 +1341,7 @@ namespace ScriptEditor
             this.rbLoopCoordY.TabStop = true;
             this.rbLoopCoordY.Text = "Y";
             this.rbLoopCoordY.UseVisualStyleBackColor = true;
+            this.rbLoopCoordY.CheckedChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // rbLoopCoordX
             // 
@@ -1332,6 +1353,7 @@ namespace ScriptEditor
             this.rbLoopCoordX.TabStop = true;
             this.rbLoopCoordX.Text = "X";
             this.rbLoopCoordX.UseVisualStyleBackColor = true;
+            this.rbLoopCoordX.CheckedChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // gbDrag
             // 
@@ -1637,6 +1659,7 @@ namespace ScriptEditor
         private System.Windows.Forms.GroupBox gbList;
         private System.Windows.Forms.TextBox tbListName;
         private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.Button btnPastFindText;
     }
 }
 

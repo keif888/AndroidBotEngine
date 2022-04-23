@@ -85,7 +85,6 @@ namespace TestBotEngineClient
 
             Assert.IsFalse(jsonHelper.ValidateGameConfigStructure(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
-            // ToDo: Reinstate this when all the tests are completed.
             Assert.AreEqual<int>(57, jsonHelper.Errors.Count);
             
             CollectionAssert.Contains(jsonHelper.Errors, "findStrings list item \"BadFindString\" at path $.findStrings.BadFindString.findString is of the wrong type.  Was expecting String but found System.Text.Json.Nodes.JsonArray");

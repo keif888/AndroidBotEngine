@@ -32,6 +32,7 @@ namespace BotEngineClient
         public ConfigFileType getFileType(string jsonFileName)
         {
             int startErrorCount = Errors.Count;
+            ConfigFileType returnValue = ConfigFileType.Error;
             JsonDocumentOptions documentOptions = new JsonDocumentOptions
             {
                 AllowTrailingCommas = true,
@@ -61,18 +62,22 @@ namespace BotEngineClient
                             if (value.ValueKind == JsonValueKind.String)
                             {
                                 string fileId = value.GetString();
-                                switch (fileId.ToLower())
+                                if (Enum.TryParse(fileId, true, out returnValue))
                                 {
-                                    case "gameconfig":
-                                        return ConfigFileType.GameConfig;
-                                    case "listconfig":
-                                        return ConfigFileType.ListConfig;
-                                    case "deviceconfig":
-                                        return ConfigFileType.DeviceConfig;
-                                    default:
-                                        Errors.Add(string.Format("\"FileId\" indicates that this is not \"DeviceConfig\", \"GameConfig\", or \"ListConfig\" but {0}", fileId));
-                                        break;
+                                    switch (returnValue)
+                                    {
+                                        case ConfigFileType.GameConfig:
+                                        case ConfigFileType.ListConfig:
+                                        case ConfigFileType.DeviceConfig:
+                                            return returnValue;
+                                        case ConfigFileType.Error:
+                                        default:
+                                            Errors.Add(string.Format("\"FileId\" indicates that this is not \"DeviceConfig\", \"GameConfig\", or \"ListConfig\" but {0}", fileId));
+                                            break;
+                                    }
                                 }
+                                else
+                                    Errors.Add(string.Format("\"FileId\" indicates that this is not \"DeviceConfig\", \"GameConfig\", or \"ListConfig\" but {0}", fileId));
                             }
                             else
                             {
@@ -90,7 +95,7 @@ namespace BotEngineClient
             {
                 Errors.Add(string.Format("File {0} is not well formed JSON.  Error {1} captured.", jsonFileName, ex.Message));
             }
-            return ConfigFileType.Error;
+            return returnValue;
         }
 
         /// <summary>
@@ -131,10 +136,14 @@ namespace BotEngineClient
                             if (value.ValueKind == JsonValueKind.String)
                             {
                                 string fileId = value.GetString();
-                                if (fileId.ToLower() != "gameconfig")
+                                ConfigFileType configFileType;
+                                if (Enum.TryParse(fileId, true, out configFileType))
                                 {
-                                    Errors.Add(string.Format("\"FileId\" indicates that this is not \"GameConfig\" but {0}", fileId));
+                                    if (configFileType != ConfigFileType.GameConfig)
+                                        Errors.Add(string.Format("\"FileId\" indicates that this is not \"GameConfig\" but {0}", fileId));
                                 }
+                                else
+                                    Errors.Add(string.Format("\"FileId\" indicates that this is not \"GameConfig\" but {0}", fileId));
                             }
                             else
                             {
@@ -355,6 +364,8 @@ namespace BotEngineClient
         private void ValidateCommands(string location, string listItemName, JsonArray commandsJsonArray)
         {
             string Key;
+            BotEngine.ValidCommandIds validCommandIds = BotEngine.ValidCommandIds.Exit;
+
             foreach (JsonNode commandsItem in commandsJsonArray)
             {
                 if (!(commandsItem is JsonObject commandsObject))
@@ -366,6 +377,7 @@ namespace BotEngineClient
                 }
                 else
                 {
+                    ValidateJsonValue(location, listItemName, "CommandNumber", commandsObject, JsonValueKind.Number);
                     string CommandId = string.Empty;
                     Key = "CommandId";
                     if (!commandsObject.ContainsKey(Key))
@@ -385,46 +397,24 @@ namespace BotEngineClient
                                 Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting String but found {3}", location, listItemName, commandsObject[Key].GetPath(), itemNode.ValueKind));
                             else
                             {
-                                switch (itemNode.GetString().ToLower())
+                                if (Enum.TryParse(itemNode.GetString(), true, out validCommandIds))
                                 {
-                                    case "click":
-                                    case "clickwhennotfoundinarea":
-                                    case "drag":
-                                    case "exit":
-                                    case "enterloopcoordinate":
-                                    case "findclick":
-                                    case "findclickandwait":
-                                    case "ifexists":
-                                    case "ifnotexists":
-                                    case "loopcoordinates":
-                                    case "loopuntilfound":
-                                    case "loopuntilnotfound":
-                                    case "restart":
-                                    case "runaction":
-                                    case "sleep":
-                                    case "startgame":
-                                    case "stopgame":
-                                    case "waitfor":
-                                    case "waitforthenclick":
-                                    case "waitforchange":
-                                    case "waitfornochange":
-                                        CommandId = itemNode.GetString().ToLower();
-                                        break;
-                                    default:
-                                        Errors.Add(string.Format("{0} list item \"{1}\" at path {2} with value \"{3}\" is not valid.  Was expecting a Command like one of the following \"WaitFor\", \"Click\", \"IfExists\", \"FindClickAndWait\"", location, listItemName, commandsObject[Key].GetPath(), itemNode.GetString()));
-                                        break;
+                                    CommandId = itemNode.GetString();
+                                }
+                                else
+                                {
+                                    CommandId = string.Empty;
+                                    Errors.Add(string.Format("{0} list item \"{1}\" at path {2} with value \"{3}\" is not valid.  Was expecting a Command like one of the following \"WaitFor\", \"Click\", \"IfExists\", \"FindClickAndWait\"", location, listItemName, commandsObject[Key].GetPath(), itemNode.GetString()));
                                 }
                             }
                         }
                     }
 
-                    ValidateJsonValue(location, listItemName, "CommandNumber", commandsObject, JsonValueKind.Number);
-
                     if (!string.IsNullOrEmpty(CommandId))
                     {
-                        switch (CommandId)
+                        switch (validCommandIds)
                         {
-                            case "click":
+                            case BotEngine.ValidCommandIds.Click:
                                 Key = "Location";
                                 if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonObject", "with X/Y"))
                                 {
@@ -435,7 +425,7 @@ namespace BotEngineClient
                                     }
                                 }
                                 break;
-                            case "clickwhennotfoundinarea":
+                            case BotEngine.ValidCommandIds.ClickWhenNotFoundInArea:
                                 ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
                                 Key = "Areas";
                                 if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonArray", "with X/Y/width/height objects"))
@@ -445,15 +435,15 @@ namespace BotEngineClient
                                         if (ValidateJsonValue(location, listItemName, areasItem, "JsonObject", "with X/Y/width/height objects"))
                                         {
                                             JsonObject areasObject = (JsonObject)areasItem;
-                                            ValidateJsonValue(location, listItemName, "X",  areasObject, JsonValueKind.Number);
-                                            ValidateJsonValue(location, listItemName, "Y",  areasObject, JsonValueKind.Number);
-                                            ValidateJsonValue(location, listItemName, "width",  areasObject, JsonValueKind.Number);
-                                            ValidateJsonValue(location, listItemName, "height",  areasObject, JsonValueKind.Number);
+                                            ValidateJsonValue(location, listItemName, "X", areasObject, JsonValueKind.Number);
+                                            ValidateJsonValue(location, listItemName, "Y", areasObject, JsonValueKind.Number);
+                                            ValidateJsonValue(location, listItemName, "width", areasObject, JsonValueKind.Number);
+                                            ValidateJsonValue(location, listItemName, "height", areasObject, JsonValueKind.Number);
                                         }
                                     }
                                 }
                                 break;
-                            case "drag":
+                            case BotEngine.ValidCommandIds.Drag:
                                 ValidateJsonValue(location, listItemName, "Delay", commandsObject, JsonValueKind.Number);
                                 Key = "Swipe";
                                 if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonObject", "with X1/Y1/X2/Y2 objects"))
@@ -464,19 +454,22 @@ namespace BotEngineClient
                                     ValidateJsonValue(location, listItemName, "Y2", commandsObject[Key].AsObject(), JsonValueKind.Number);
                                 }
                                 break;
-                            case "exit":
+                            case BotEngine.ValidCommandIds.Exit:
                                 break;
-                            case "enterloopcoordinate":
+                            case BotEngine.ValidCommandIds.EnterLoopCoordinate:
                                 ValidateJsonValue(location, listItemName, "Value", commandsObject, JsonValueKind.String);
                                 break;
-                            case "findclick":
+                            case BotEngine.ValidCommandIds.FindClick:
+                                ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
+                                if (commandsObject.ContainsKey("IgnoreMissing"))
+                                    ValidateJsonValue(location, listItemName, "IgnoreMissing", commandsObject, JsonValueKind.True);
                                 break;
-                            case "findclickandwait":
+                            case BotEngine.ValidCommandIds.FindClickAndWait:
                                 ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
                                 ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
                                 break;
-                            case "ifexists":
-                            case "ifnotexists":
+                            case BotEngine.ValidCommandIds.IfExists:
+                            case BotEngine.ValidCommandIds.IfNotExists:
                                 ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
                                 Key = "Commands";
                                 if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonArray", "with one or more Command objects"))
@@ -484,7 +477,7 @@ namespace BotEngineClient
                                     ValidateCommands(location, listItemName, commandsObject[Key].AsArray());
                                 }
                                 break;
-                            case "loopcoordinates":
+                            case BotEngine.ValidCommandIds.LoopCoordinates:
                                 ValidateJsonValue(location, listItemName, "Coordinates", commandsObject, JsonValueKind.String);
                                 Key = "Commands";
                                 if (ValidateJsonValue(location, listItemName, Key, commandsObject, "JsonArray", "with one or more Command objects"))
@@ -492,13 +485,16 @@ namespace BotEngineClient
                                     ValidateCommands(location, listItemName, commandsObject[Key].AsArray());
                                 }
                                 break;
-                            case "loopuntilfound":
-                            case "loopuntilnotfound":
+                            case BotEngine.ValidCommandIds.LoopUntilFound:
+                            case BotEngine.ValidCommandIds.LoopUntilNotFound:
                                 if (commandsObject.ContainsKey("ImageNames"))
                                 {
                                     if (ValidateJsonValue(location, listItemName, "ImageNames", commandsObject, "JsonArray", "with one or more Strings"))
                                     {
-                                        //ToDo: Validate that the array contains strings.
+                                        foreach (JsonNode imageItem in commandsObject["ImageNames"].AsArray())
+                                        {
+                                            ValidateJsonValue(location, listItemName, imageItem, "JsonValueKind.String", string.Empty);
+                                        }
                                     }
                                 }
                                 else
@@ -510,26 +506,26 @@ namespace BotEngineClient
                                     ValidateCommands(location, listItemName, commandsObject[Key].AsArray());
                                 }
                                 break;
-                            case "restart":
+                            case BotEngine.ValidCommandIds.Restart:
                                 break;
-                            case "runaction":
+                            case BotEngine.ValidCommandIds.RunAction:
                                 ValidateJsonValue(location, listItemName, "ActionName", commandsObject, JsonValueKind.String);
                                 break;
-                            case "sleep":
+                            case BotEngine.ValidCommandIds.Sleep:
                                 ValidateJsonValue(location, listItemName, "Delay", commandsObject, JsonValueKind.Number);
                                 break;
-                            case "startgame":
-                            case "stopgame":
+                            case BotEngine.ValidCommandIds.StartGame:
+                            case BotEngine.ValidCommandIds.StopGame:
                                 ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
                                 ValidateJsonValue(location, listItemName, "Value", commandsObject, JsonValueKind.String);
                                 break;
-                            case "waitfor":
-                            case "waitforthenclick":
+                            case BotEngine.ValidCommandIds.WaitFor:
+                            case BotEngine.ValidCommandIds.WaitForThenClick:
                                 ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
                                 ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
                                 break;
-                            case "waitforchange":
-                            case "waitfornochange":
+                            case BotEngine.ValidCommandIds.WaitForChange:
+                            case BotEngine.ValidCommandIds.WaitForNoChange:
                                 ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
                                 ValidateJsonValue(location, listItemName, "ChangeDetectDifference", commandsObject, JsonValueKind.Number);
                                 Key = "ChangeDetectArea";
@@ -637,6 +633,16 @@ namespace BotEngineClient
         /// <returns></returns>
         private bool ValidateJsonValue(string location, string listItemName, JsonNode jsonNode, string jsonType, string jsonTypeExtraInfo)
         {
+            if (jsonNode is JsonValue && jsonType.StartsWith("JsonValueKind"))
+            {
+                JsonElement itemNode = jsonNode.GetValue<JsonElement>();
+                if (!jsonType.ToLower().EndsWith(itemNode.ValueKind.ToString().ToLower()))
+                {
+                    Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting {3} {4} but found {5}", location, listItemName, jsonNode.GetPath(), jsonType, jsonTypeExtraInfo, itemNode.ValueKind));
+                    return false;
+                }
+            }
+            else
             if (!jsonNode.GetType().ToString().EndsWith(jsonType))
             {
                 if (!(jsonNode is JsonValue))
@@ -692,10 +698,14 @@ namespace BotEngineClient
                             if (value.ValueKind == JsonValueKind.String)
                             {
                                 string fileId = value.GetString();
-                                if (fileId.ToLower() != "listconfig")
+                                ConfigFileType configFileType;
+                                if (Enum.TryParse(fileId, true, out configFileType))
                                 {
-                                    Errors.Add(string.Format("\"FileId\" indicates that this is not \"ListConfig\" but {0}", fileId));
+                                    if (configFileType != ConfigFileType.ListConfig)
+                                        Errors.Add(string.Format("\"FileId\" indicates that this is not \"ListConfig\" but {0}", fileId));
                                 }
+                                else
+                                    Errors.Add(string.Format("\"FileId\" indicates that this is not \"ListConfig\" but {0}", fileId));
                             }
                             else
                             {
@@ -820,10 +830,14 @@ namespace BotEngineClient
                             if (value.ValueKind == JsonValueKind.String)
                             {
                                 string fileId = value.GetString();
-                                if (fileId.ToLower() != "deviceconfig")
+                                ConfigFileType configFileType;
+                                if (Enum.TryParse(fileId, true, out configFileType))
                                 {
-                                    Errors.Add(string.Format("\"FileId\" indicates that this is not \"DeviceConfig\" but {0}", fileId));
+                                    if (configFileType != ConfigFileType.DeviceConfig)
+                                        Errors.Add(string.Format("\"FileId\" indicates that this is not \"DeviceConfig\" but {0}", fileId));
                                 }
+                                else
+                                    Errors.Add(string.Format("\"FileId\" indicates that this is not \"DeviceConfig\" but {0}", fileId));
                             }
                             else
                             {

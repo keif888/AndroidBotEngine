@@ -153,6 +153,7 @@ namespace ScriptEditor
             cbImageNameWithWait.Items.Clear();
             cbImageNamesForList.Items.Clear();
             cbPickActionAction.Items.Clear();
+            cbImageAreasImage.Items.Clear();
             TreeNode findStringsNode = tvBotData.Nodes.Add("findStrings");
             findStringsNode.Name = "findStrings";
             foreach (KeyValuePair<string, BotEngineClient.FindString> item in gameConfig.findStrings)
@@ -167,6 +168,7 @@ namespace ScriptEditor
                 cbImageNameNoWait.Items.Add(item.Key);
                 cbImageNameWithWait.Items.Add(item.Key);
                 cbImageNamesForList.Items.Add(item.Key);
+                cbImageAreasImage.Items.Add(item.Key);
             }
             TreeNode systemActionsNode = tvBotData.Nodes.Add("systemActions");
             systemActionsNode.Name = "systemActions";
@@ -610,6 +612,61 @@ namespace ScriptEditor
             {
                 MessageBox.Show(string.Format("Unable to save file with {0}", ex.Message), "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        #endregion
+
+        #region Create Files
+        /// <summary>
+        /// Gets the file name and type for the new json file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FileTypeSelect fileTypeSelect = new FileTypeSelect();
+
+            if (fileTypeSelect.ShowDialog() == DialogResult.OK)
+                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    loadedFileType = fileTypeSelect.ConfigFileType;
+                    JsonFileName = saveFileDialog1.FileName;
+                    tvBotData.SuspendLayout();
+                    tvBotData.Nodes.Clear();
+                    cbImageNameNoWait.Items.Clear();
+                    cbImageNameWithWait.Items.Clear();
+                    cbImageNamesForList.Items.Clear();
+                    cbImageAreasImage.Items.Clear();
+                    cbPickActionAction.Items.Clear();
+
+                    switch (loadedFileType)
+                    {
+                        case JsonHelper.ConfigFileType.GameConfig:
+                            TreeNode findStringsNode = tvBotData.Nodes.Add("findStrings");
+                            findStringsNode.Name = "findStrings";
+                            TreeNode systemActionsNode = tvBotData.Nodes.Add("systemActions");
+                            systemActionsNode.Name = "systemActions";
+                            TreeNode actionsNode = tvBotData.Nodes.Add("actions");
+                            actionsNode.Name = "actions";
+                            break;
+                        case JsonHelper.ConfigFileType.ListConfig:
+                            TreeNode coordinatesNode = tvBotData.Nodes.Add("Coordinates");
+                            coordinatesNode.Name = "Coordinates";
+                            break;
+                        case JsonHelper.ConfigFileType.DeviceConfig:
+                            TreeNode lastActionNode = tvBotData.Nodes.Add("LastActionTaken");
+                            lastActionNode.Name = "LastActionTaken";
+                            break;
+                        default:
+                            break;
+                    }
+
+
+                    tvBotData.ResumeLayout();
+                    ChangePending = false;
+                    UnsavedChanges = false;
+                    saveToolStripMenuItem.Enabled = false;
+                }
         }
 
         #endregion
@@ -1380,5 +1437,7 @@ namespace ScriptEditor
                 }
             }
         }
+
+
     }
 }

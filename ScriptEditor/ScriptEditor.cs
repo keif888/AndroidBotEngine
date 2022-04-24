@@ -1285,5 +1285,16 @@ namespace ScriptEditor
             else
                 MessageBox.Show("Clipboard content not recognised.");
         }
+
+        private void ScriptEditor_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (ChangePending || UnsavedChanges)
+            {
+                if (MessageBox.Show("There are Unsaved or Pending Changes, Exit?", "Exit?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
     }
 }

@@ -1,23 +1,22 @@
-﻿using System;
+﻿#region Usings
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.Json;
 using BotEngineClient;
 using SharpAdbClient;
 using static BotEngineClient.BotEngine;
 using System.Text.Json.Nodes;
+#endregion
 
 namespace ScriptEditor
 {
     public partial class ScriptEditor : Form
     {
+        #region Privates
         private BOTConfig gameConfig;
         private BOTDeviceConfig deviceConfig;
         private BOTListConfig listConfig;
@@ -27,7 +26,11 @@ namespace ScriptEditor
         private JsonHelper.ConfigFileType loadedFileType;
         private string JsonFileName;
         private TreeNode ActiveTreeNode;
+        #endregion
 
+        /// <summary>
+        /// Class constructor to default all privates.
+        /// </summary>
         public ScriptEditor()
         {
             InitializeComponent();
@@ -75,6 +78,7 @@ namespace ScriptEditor
             item.Visible = false;
         }
 
+        #region Load Files
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
@@ -127,6 +131,10 @@ namespace ScriptEditor
             }
         }
 
+        /// <summary>
+        /// Loads a game config file into tvBotData and it's Tags.
+        /// </summary>
+        /// <param name="fileName">The file name and path of a game config file</param>
         private void LoadGameConfigFile(string fileName)
         {
             string jsonString = File.ReadAllText(fileName);
@@ -182,6 +190,10 @@ namespace ScriptEditor
             loadedFileType = JsonHelper.ConfigFileType.GameConfig;
         }
 
+        /// <summary>
+        /// Loads a device config file into tvBotData and it's Tags.
+        /// </summary>
+        /// <param name="fileName">The file name and path of a device config file</param>
         private void LoadDeviceConfigFile(string fileName)
         {
             string jsonString = File.ReadAllText(fileName);
@@ -220,6 +232,10 @@ namespace ScriptEditor
             loadedFileType = JsonHelper.ConfigFileType.DeviceConfig;
         }
 
+        /// <summary>
+        /// Loads a game config file into tvBotData and it's Tags.
+        /// </summary>
+        /// <param name="fileName">The file name and path of a game config file</param>
         private void LoadListConfigFile(string fileName)
         {
             string jsonString = File.ReadAllText(fileName);
@@ -269,6 +285,11 @@ namespace ScriptEditor
             loadedFileType = JsonHelper.ConfigFileType.DeviceConfig;
         }
 
+        /// <summary>
+        /// Add new children to nodes in the tvBotData with optional Command information
+        /// </summary>
+        /// <param name="parent">The Node in tvBotData which this child is to added to</param>
+        /// <param name="item">The information on what to add</param>
         private void LoadActionTreeNode(TreeNode parent, KeyValuePair<string, BotEngineClient.Action> item)
         {
             TreeNode child = new TreeNode
@@ -285,6 +306,11 @@ namespace ScriptEditor
             parent.Nodes.Add(child);
         }
 
+        /// <summary>
+        /// Add new children to nodes in the tvBotData with Command information
+        /// </summary>
+        /// <param name="parent">The Node in tvBotData which this child is to added to</param>
+        /// <param name="commands">The commands to load as new children of the parent</param>
         private void LoadActionTreeNode(TreeNode parent, List<BotEngineClient.Command> commands)
         {
             foreach (BotEngineClient.Command command in commands)
@@ -366,6 +392,228 @@ namespace ScriptEditor
                 parent.Nodes.Add(child);
             }
         }
+        #endregion
+
+        #region Save Files
+
+        /// <summary>
+        /// Saves the data in tvBotData into the json file that it came from.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            switch (loadedFileType)
+            {
+                case JsonHelper.ConfigFileType.GameConfig:
+                    SaveGameConfig();
+                    break;
+                case JsonHelper.ConfigFileType.ListConfig:
+                    SaveListConfig();
+                    break;
+                case JsonHelper.ConfigFileType.DeviceConfig:
+                    SaveDeviceConfig();
+                    break;
+                default:
+                    break;
+            }
+            UnsavedChanges = false;
+        }
+
+        /// <summary>
+        /// Saves a List Config gile from the content saved within the tvBotData tree view and it's Tags
+        /// </summary>
+        private void SaveListConfig()
+        {
+            BOTListConfig listConfig = new BOTListConfig();
+            listConfig.FileId = loadedFileType.ToString();
+            listConfig.Coordinates = new Dictionary<string, List<XYCoords>>();
+            foreach (TreeNode parent in tvBotData.Nodes)
+            {
+                List<XYCoords> coords = new List<XYCoords>();
+                foreach (TreeNode child in parent.Nodes)
+                {
+                    coords.Add((XYCoords)child.Tag);
+                }
+                listConfig.Coordinates.Add(parent.Name, coords);
+            }
+            try
+            {
+                if (File.Exists(JsonFileName))
+                {
+                    if (File.Exists(JsonFileName + ".bak"))
+                    {
+                        File.Delete(JsonFileName + ".bak");
+                    }
+                    File.Copy(JsonFileName, JsonFileName + ".bak");
+                }
+                string jsonData = JsonSerializer.Serialize<BOTListConfig>(listConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
+                File.WriteAllText(JsonFileName, jsonData);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to save file with {0}", ex.Message), "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Saves a Game Config file from the content saved within the tvBotData tree view and it's Tags
+        /// </summary>
+        private void SaveGameConfig()
+        {
+            BOTConfig gameConfig = new BOTConfig();
+            gameConfig.FileId = loadedFileType.ToString();
+            gameConfig.findStrings = new Dictionary<string, FindString>();
+            gameConfig.systemActions = new Dictionary<string, BotEngineClient.Action>();
+            gameConfig.actions = new Dictionary<string, BotEngineClient.Action>();
+            foreach (TreeNode parent in tvBotData.Nodes)
+            {
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "findStrings")
+                {
+                    foreach (TreeNode child in parent.Nodes)
+                    {
+                        gameConfig.findStrings.Add(child.Name, (FindString)child.Tag);
+                    }
+                }
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "systemActions")
+                {
+                    foreach (TreeNode child in parent.Nodes)
+                    {
+                        BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
+                        BotEngineClient.Action newAction = new BotEngineClient.Action();
+                        newAction.ActionType = sourceAction.ActionType;
+                        newAction.AfterAction = sourceAction.AfterAction;
+                        newAction.BeforeAction = sourceAction.BeforeAction;
+                        if (child.Nodes.Count != 0)
+                        {
+                            int commandNumber = 10;
+                            List<Command> childCommands = new List<Command>();
+                            LoadCommandList(childCommands, child, ref commandNumber);
+                            newAction.Commands = childCommands;
+                        }
+                        newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
+                        newAction.Frequency = sourceAction.Frequency;
+                        gameConfig.systemActions.Add(child.Name, newAction);
+                    }
+                }
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "actions")
+                {
+                    foreach (TreeNode child in parent.Nodes)
+                    {
+                        BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
+                        BotEngineClient.Action newAction = new BotEngineClient.Action();
+                        newAction.ActionType = sourceAction.ActionType;
+                        newAction.AfterAction = sourceAction.AfterAction;
+                        newAction.BeforeAction = sourceAction.BeforeAction;
+                        if (child.Nodes.Count != 0)
+                        {
+                            int commandNumber = 10;
+                            List<Command> childCommands = new List<Command>();
+                            LoadCommandList(childCommands, child, ref commandNumber);
+                            newAction.Commands = childCommands;
+                        }
+                        newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
+                        newAction.Frequency = sourceAction.Frequency;
+                        gameConfig.actions.Add(child.Name, newAction);
+                    }
+                }
+            }
+            try
+            {
+                if (File.Exists(JsonFileName))
+                {
+                    if (File.Exists(JsonFileName + ".bak"))
+                    {
+                        File.Delete(JsonFileName + ".bak");
+                    }
+                    File.Copy(JsonFileName, JsonFileName + ".bak");
+                }
+                string jsonData = JsonSerializer.Serialize<BOTConfig>(gameConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
+                File.WriteAllText(JsonFileName, jsonData);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to save file with {0}", ex.Message), "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Takes the data from the tvBotData, and loads it into the appropriate objects
+        /// </summary>
+        /// <param name="commands">The list that is being added to</param>
+        /// <param name="parent">The parent Tree Node to get all the children from</param>
+        /// <param name="commandNumber">The current command number</param>
+        private void LoadCommandList(List<Command> commands, TreeNode parent, ref int commandNumber)
+        {
+            foreach (TreeNode childNode in parent.Nodes)
+            {
+                Command childCommand = (Command)childNode.Tag;
+                Command newCommand = new Command(childCommand.CommandId);
+                newCommand.ActionName = childCommand.ActionName;
+                newCommand.Areas = childCommand.Areas;
+                newCommand.ChangeDetectArea = childCommand.ChangeDetectArea;
+                newCommand.ChangeDetectDifference = childCommand.ChangeDetectDifference;
+                newCommand.CommandNumber = commandNumber;
+                commandNumber += 10;
+                if (childNode.Nodes.Count != 0)
+                {
+                    List<Command> childCommands = new List<Command>();
+                    LoadCommandList(childCommands, childNode, ref commandNumber);
+                    newCommand.Commands = childCommands;
+                }
+                newCommand.Coordinates = childCommand.Coordinates;
+                newCommand.Delay = childCommand.Delay;
+                newCommand.IgnoreMissing = childCommand.IgnoreMissing;
+                newCommand.ImageName = childCommand.ImageName;
+                newCommand.ImageNames = childCommand.ImageNames;
+                newCommand.Location = childCommand.Location;
+                newCommand.Swipe = childCommand.Swipe;
+                newCommand.TimeOut = childCommand.TimeOut;
+                newCommand.Value = childCommand.Value;
+                commands.Add(newCommand);
+            }
+        }
+
+
+        /// <summary>
+        /// Saves a Device Config file from the content saved within the tvBotData tree view and it's Tags
+        /// </summary>
+        private void SaveDeviceConfig()
+        {
+            BOTDeviceConfig deviceConfig = new BOTDeviceConfig();
+            deviceConfig.FileId = loadedFileType.ToString();
+            deviceConfig.LastActionTaken = new Dictionary<string, ActionActivity>();
+            foreach (TreeNode parent in tvBotData.Nodes)
+            {
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "LastActionTaken")
+                {
+                    foreach (TreeNode child in parent.Nodes)
+                    {
+                        deviceConfig.LastActionTaken.Add(child.Name, (ActionActivity)child.Tag);
+                    }
+                }
+            }
+            try
+            {
+                if (File.Exists(JsonFileName))
+                {
+                    if (File.Exists(JsonFileName + ".bak"))
+                    {
+                        File.Delete(JsonFileName + ".bak");
+                    }
+                    File.Copy(JsonFileName, JsonFileName + ".bak");
+                }
+                string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(deviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
+                File.WriteAllText(JsonFileName, jsonData);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to save file with {0}", ex.Message), "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        #endregion
+
 
         private void TvBotData_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -739,6 +987,11 @@ namespace ScriptEditor
             }
         }
 
+        /// <summary>
+        /// Takes data on the form, and updates the tvBotData's names, and Tag with data from the form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BtnUpdate_Click(object sender, EventArgs e)
         {
             var selectedTag = ActiveTreeNode.Tag;
@@ -928,175 +1181,6 @@ namespace ScriptEditor
             }
         }
 
-        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            switch (loadedFileType)
-            {
-                case JsonHelper.ConfigFileType.GameConfig:
-                    SaveGameConfig();
-                    //ToDo: Save GameConfig file
-                    break;
-                case JsonHelper.ConfigFileType.ListConfig:
-                    // ToDo: Save ListConfig file
-                    break;
-                case JsonHelper.ConfigFileType.DeviceConfig:
-                    SaveDeviceConfig();
-                    break;
-                default:
-                    break;
-            }
-            UnsavedChanges = false;
-        }
-
-        /// <summary>
-        /// Saves a Game Config file from the content saved within the tvBotData tree view and it's Tags
-        /// </summary>
-        private void SaveGameConfig()
-        {
-            BOTConfig gameConfig = new BOTConfig();
-            gameConfig.FileId = loadedFileType.ToString();
-            gameConfig.findStrings = new Dictionary<string, FindString>();
-            gameConfig.systemActions = new Dictionary<string, BotEngineClient.Action>();
-            gameConfig.actions = new Dictionary<string, BotEngineClient.Action>();
-            foreach (TreeNode parent in tvBotData.Nodes)
-            {
-                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "findStrings")
-                {
-                    foreach (TreeNode child in parent.Nodes)
-                    {
-                        gameConfig.findStrings.Add(child.Name, (FindString)child.Tag);
-                    }
-                }
-                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "systemActions")
-                {
-                    foreach (TreeNode child in parent.Nodes)
-                    {
-                        BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
-                        BotEngineClient.Action newAction = new BotEngineClient.Action();
-                        newAction.ActionType = sourceAction.ActionType;
-                        newAction.AfterAction = sourceAction.AfterAction;
-                        newAction.BeforeAction = sourceAction.BeforeAction;
-                        if (child.Nodes.Count != 0)
-                        {
-                            int commandNumber = 10;
-                            List<Command> childCommands = new List<Command>();
-                            LoadCommandList(childCommands, child, ref commandNumber);
-                            newAction.Commands = childCommands;
-                        }
-                        newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
-                        newAction.Frequency = sourceAction.Frequency;
-                        gameConfig.systemActions.Add(child.Name, newAction);
-                    }
-                }
-                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "actions")
-                {
-                    foreach (TreeNode child in parent.Nodes)
-                    {
-                        BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
-                        BotEngineClient.Action newAction = new BotEngineClient.Action();
-                        newAction.ActionType = sourceAction.ActionType;
-                        newAction.AfterAction = sourceAction.AfterAction;
-                        newAction.BeforeAction = sourceAction.BeforeAction;
-                        if (child.Nodes.Count != 0)
-                        {
-                            int commandNumber = 10;
-                            List<Command> childCommands = new List<Command>();
-                            LoadCommandList(childCommands, child, ref commandNumber);
-                            newAction.Commands = childCommands;
-                        }
-                        newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
-                        newAction.Frequency = sourceAction.Frequency;
-                        gameConfig.actions.Add(child.Name, newAction);
-                    }
-                }
-            }
-            try
-            {
-                if (File.Exists(JsonFileName))
-                {
-                    if (File.Exists(JsonFileName + ".bak"))
-                    {
-                        File.Delete(JsonFileName + ".bak");
-                    }
-                    File.Copy(JsonFileName, JsonFileName + ".bak");
-                }
-                string jsonData = JsonSerializer.Serialize<BOTConfig>(gameConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
-                File.WriteAllText(JsonFileName, jsonData);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(string.Format("Unable to save file with {0}", ex.Message), "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void LoadCommandList(List<Command> commands, TreeNode parent, ref int commandNumber)
-        {
-            foreach (TreeNode childNode in parent.Nodes)
-            {
-                Command childCommand = (Command) childNode.Tag;
-                Command newCommand = new Command(childCommand.CommandId);
-                newCommand.ActionName = childCommand.ActionName;
-                newCommand.Areas = childCommand.Areas;
-                newCommand.ChangeDetectArea = childCommand.ChangeDetectArea;
-                newCommand.ChangeDetectDifference = childCommand.ChangeDetectDifference;
-                newCommand.CommandNumber = commandNumber;
-                commandNumber += 10;
-                if (childNode.Nodes.Count != 0)
-                {
-                    List<Command> childCommands = new List<Command>();
-                    LoadCommandList(childCommands, childNode, ref commandNumber);
-                    newCommand.Commands = childCommands;
-                }
-                newCommand.Coordinates = childCommand.Coordinates;
-                newCommand.Delay = childCommand.Delay;
-                newCommand.IgnoreMissing = childCommand.IgnoreMissing;
-                newCommand.ImageName = childCommand.ImageName;
-                newCommand.ImageNames = childCommand.ImageNames;
-                newCommand.Location = childCommand.Location;
-                newCommand.Swipe = childCommand.Swipe;
-                newCommand.TimeOut = childCommand.TimeOut;
-                newCommand.Value = childCommand.Value;
-                commands.Add(newCommand);
-            }
-        }
-
-
-        /// <summary>
-        /// Saves a Device Config file from the content saved within the tvBotData tree view and it's Tags
-        /// </summary>
-        private void SaveDeviceConfig()
-        {
-            BOTDeviceConfig deviceConfig = new BOTDeviceConfig();
-            deviceConfig.FileId = loadedFileType.ToString();
-            deviceConfig.LastActionTaken = new Dictionary<string, ActionActivity>();
-            foreach (TreeNode parent in tvBotData.Nodes)
-            {
-                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "LastActionTaken")
-                {
-                    foreach (TreeNode child in parent.Nodes)
-                    {
-                        deviceConfig.LastActionTaken.Add(child.Name, (ActionActivity)child.Tag);
-                    }
-                }
-            }
-            try
-            {
-                if (File.Exists(JsonFileName))
-                {
-                    if (File.Exists(JsonFileName + ".bak"))
-                    {
-                        File.Delete(JsonFileName + ".bak");
-                    }
-                    File.Copy(JsonFileName, JsonFileName + ".bak");
-                }
-                string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(deviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
-                File.WriteAllText(JsonFileName, jsonData);
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(string.Format("Unable to save file with {0}", ex.Message), "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
         private void testToolStripMenuItem_Click(object sender, EventArgs e)
         {

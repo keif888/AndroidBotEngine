@@ -127,6 +127,7 @@ namespace ScriptEditor
                 else
                 {
                     JsonFileName = fileName;
+                    ResetEditFormItems();
                 }
             }
         }
@@ -638,6 +639,7 @@ namespace ScriptEditor
                     cbImageNamesForList.Items.Clear();
                     cbImageAreasImage.Items.Clear();
                     cbPickActionAction.Items.Clear();
+                    ResetEditFormItems();
 
                     switch (loadedFileType)
                     {
@@ -674,44 +676,35 @@ namespace ScriptEditor
 
         private void TvBotData_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            gbClick.Enabled = false;
-            gbClick.Visible = false;
-            gbDrag.Enabled = false;
-            gbDrag.Visible = false;
-            gbImageName.Enabled = false;
-            gbImageName.Visible = false;
-            gbImageNameAndWait.Enabled = false;
-            gbImageNameAndWait.Visible = false;
-            gbImageNames.Enabled = false;
-            gbImageNames.Visible = false;
-            gbLoopCoordinate.Visible = false;
-            gbLoopCoordinate.Enabled = false;
-            gbSleep.Enabled = false;
-            gbSleep.Visible = false;
-            gbAction.Visible = false;
-            gbAction.Enabled = false;
-            gbFindText.Visible = false;
-            gbFindText.Enabled = false;
-            gbWFNC.Visible = false;
-            gbWFNC.Enabled = false;
-            gbAppControl.Visible = false;
-            gbAppControl.Enabled = false;
-            gbAppName.Visible = false;
-            gbAppName.Enabled = false;
-            gbActionOverride.Visible = false;
-            gbActionOverride.Enabled = false;
-            gbPickAction.Enabled = false;
-            gbPickAction.Visible = false;
-            gbImageArea.Enabled = false;
-            gbImageArea.Visible = false;
-            gbList.Enabled = false;
-            gbList.Visible = false;
-            btnUpdate.Enabled = false;
+            ResetEditFormItems();
 
             if (e.Node != null)
                 ActiveTreeNode = e.Node;
-
-            if ((e.Node.Tag != null) && (e.Node.Tag is Command command))
+            if (e.Node.Tag == null)
+            {
+                switch (e.Node.Name)
+                {
+                    case "systemActions":
+                    case "actions":
+                        addFindStringtoolStripMenuItem.Enabled = false;
+                        addActionToolStripMenuItem.Enabled = true;
+                        addCoordinatestoolStripMenuItem.Enabled = false;
+                        break;
+                    case "findStrings":
+                        addFindStringtoolStripMenuItem.Enabled = true;
+                        addActionToolStripMenuItem.Enabled = false;
+                        addCoordinatestoolStripMenuItem.Enabled = false;
+                        break;
+                    case "Coordinates":
+                        addFindStringtoolStripMenuItem.Enabled = false;
+                        addActionToolStripMenuItem.Enabled = false;
+                        addCoordinatestoolStripMenuItem.Enabled = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if ((e.Node.Tag != null) && (e.Node.Tag is Command command))
             {
                 Command commandCopy = command;
                 if (Enum.TryParse(commandCopy.CommandId, true, out ValidCommandIds validCommandIds))
@@ -1031,6 +1024,46 @@ namespace ScriptEditor
             btnUpdate.Enabled = false;
         }
 
+        private void ResetEditFormItems()
+        {
+            addFindStringtoolStripMenuItem.Enabled = false;
+            addActionToolStripMenuItem.Enabled = false;
+            addCoordinatestoolStripMenuItem.Enabled = false;
+            gbClick.Enabled = false;
+            gbClick.Visible = false;
+            gbDrag.Enabled = false;
+            gbDrag.Visible = false;
+            gbImageName.Enabled = false;
+            gbImageName.Visible = false;
+            gbImageNameAndWait.Enabled = false;
+            gbImageNameAndWait.Visible = false;
+            gbImageNames.Enabled = false;
+            gbImageNames.Visible = false;
+            gbLoopCoordinate.Visible = false;
+            gbLoopCoordinate.Enabled = false;
+            gbSleep.Enabled = false;
+            gbSleep.Visible = false;
+            gbAction.Visible = false;
+            gbAction.Enabled = false;
+            gbFindText.Visible = false;
+            gbFindText.Enabled = false;
+            gbWFNC.Visible = false;
+            gbWFNC.Enabled = false;
+            gbAppControl.Visible = false;
+            gbAppControl.Enabled = false;
+            gbAppName.Visible = false;
+            gbAppName.Enabled = false;
+            gbActionOverride.Visible = false;
+            gbActionOverride.Enabled = false;
+            gbPickAction.Enabled = false;
+            gbPickAction.Visible = false;
+            gbImageArea.Enabled = false;
+            gbImageArea.Visible = false;
+            gbList.Enabled = false;
+            gbList.Visible = false;
+            btnUpdate.Enabled = false;
+        }
+
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (UnsavedChanges)
@@ -1054,24 +1087,34 @@ namespace ScriptEditor
             var selectedTag = ActiveTreeNode.Tag;
             if (selectedTag != null)
             {
-                UnsavedChanges = true;
-                ChangePending = false;
-                btnUpdate.Enabled = false;
-                saveToolStripMenuItem.Enabled = true;
                 if (selectedTag is FindString findTag)
                 {
                     ActiveTreeNode.Name = tbFindTextName.Text;
-                    findTag.backgroundTolerance = float.Parse(tbFindTextBackTolerance.Text);
-                    findTag.textTolerance = float.Parse(tbFindTextTextTolerance.Text);
-                    findTag.findString = tbFindTextSearch.Text;
-                    findTag.searchArea.X = int.Parse(tbFindTextSearchX1.Text);
-                    findTag.searchArea.Y = int.Parse(tbFindTextSearchY1.Text);
-                    findTag.searchArea.width = int.Parse(tbFindTextSearchX2.Text) - findTag.searchArea.X;
-                    findTag.searchArea.height = int.Parse(tbFindTextSearchY2.Text) - findTag.searchArea.Y;
+                    if (tbFindTextBackTolerance.Text.Length == 0 || tbFindTextTextTolerance.Text.Length == 0
+                        || tbFindTextSearchY2.Text.Length == 0 || tbFindTextSearch.Text.Length == 0
+                        || tbFindTextSearchX1.Text.Length == 0 || tbFindTextSearchY1.Text.Length == 0
+                        || tbFindTextSearchX2.Text.Length == 0)
+                    {
+                        MessageBox.Show("Required fields aren't populated.");
+                        return;
+                    }
+                    else
+                    {
+                        ActiveTreeNode.Name = tbFindTextName.Text;
+                        ActiveTreeNode.Text = tbFindTextName.Text;
+                        findTag.backgroundTolerance = float.Parse(tbFindTextBackTolerance.Text);
+                        findTag.textTolerance = float.Parse(tbFindTextTextTolerance.Text);
+                        findTag.findString = tbFindTextSearch.Text;
+                        findTag.searchArea.X = int.Parse(tbFindTextSearchX1.Text);
+                        findTag.searchArea.Y = int.Parse(tbFindTextSearchY1.Text);
+                        findTag.searchArea.width = int.Parse(tbFindTextSearchX2.Text) - findTag.searchArea.X;
+                        findTag.searchArea.height = int.Parse(tbFindTextSearchY2.Text) - findTag.searchArea.Y;
+                    }
                 }
                 else if (selectedTag is BotEngineClient.Action botAction)
                 {
                     ActiveTreeNode.Name = tbActionName.Text;
+                    ActiveTreeNode.Text = tbActionName.Text;
 
                     botAction.ActionType = cbActionType.Text;
                     botAction.Frequency = null;
@@ -1085,7 +1128,14 @@ namespace ScriptEditor
                                 botAction.DailyScheduledTime = dtpActionTimeOfDay.Value;
                                 break;
                             case ValidActionType.Scheduled:
-                                botAction.Frequency = int.Parse(tbActionFrequency.Text);
+                                if (tbActionFrequency.Text.Length > 0)
+                                    botAction.Frequency = int.Parse(tbActionFrequency.Text);
+                                else
+                                {
+                                    MessageBox.Show("Frequency is required when Scheduled is selected.");
+                                    botAction.Frequency = null;
+                                    return;
+                                }
                                 botAction.DailyScheduledTime = null;
                                 break;
                             default:
@@ -1102,6 +1152,11 @@ namespace ScriptEditor
                                 if (commandCopy.Location == null)
                                 {
                                     commandCopy.Location = new XYCoords();
+                                }
+                                if (tbPointX.Text.Length == 0 || tbPointY.Text.Length == 0)
+                                {
+                                    MessageBox.Show("Required fields aren't populated.");
+                                    return;
                                 }
                                 commandCopy.Location.X = int.Parse(tbPointX.Text);
                                 commandCopy.Location.Y = int.Parse(tbPointY.Text);
@@ -1123,6 +1178,12 @@ namespace ScriptEditor
                                 }
                                 break;
                             case ValidCommandIds.Drag:
+                                if (tbDragX1.Text.Length == 0 || tbDragX2.Text.Length == 0
+                                    || tbDragY1.Text.Length == 0 || tbDragY2.Text.Length == 0)
+                                {
+                                    MessageBox.Show("Required fields aren't populated.");
+                                    return;
+                                }
                                 if (commandCopy.Swipe == null)
                                 {
                                     commandCopy.Swipe = new SwipeCoords();
@@ -1157,6 +1218,11 @@ namespace ScriptEditor
                                 break;
                             case ValidCommandIds.LoopUntilFound:
                             case ValidCommandIds.LoopUntilNotFound:
+                                if (tbImageNamesWait.Text.Length == 0)
+                                {
+                                    MessageBox.Show("Required fields aren't populated.");
+                                    return;
+                                }
                                 if (lbImageNames.Items.Count == 0)
                                 {
                                     commandCopy.ImageName = null;
@@ -1186,23 +1252,49 @@ namespace ScriptEditor
                                 ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ActionName);
                                 break;
                             case ValidCommandIds.Sleep:
+                                if (tbDelay.Text.Length == 0)
+                                {
+                                    MessageBox.Show("Required fields aren't populated.");
+                                    return;
+                                }
+
                                 commandCopy.Delay = int.Parse(tbDelay.Text);
                                 ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.Delay);
                                 break;
                             case ValidCommandIds.StartGame:
                             case ValidCommandIds.StopGame:
+                                if (tbAppNameTimeout.Text.Length == 0)
+                                {
+                                    MessageBox.Show("Required fields aren't populated.");
+                                    return;
+                                }
+
                                 commandCopy.Value = tbAppNameAppId.Text;
                                 commandCopy.TimeOut = int.Parse(tbAppNameTimeout.Text);
                                 break;
                             case ValidCommandIds.FindClickAndWait:
                             case ValidCommandIds.WaitFor:
                             case ValidCommandIds.WaitForThenClick:
+                                if (tbTimeout.Text.Length == 0)
+                                {
+                                    MessageBox.Show("Required fields aren't populated.");
+                                    return;
+                                }
+
                                 commandCopy.ImageName = (string)cbImageNameWithWait.SelectedItem;
                                 commandCopy.TimeOut = int.Parse(tbTimeout.Text);
                                 ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ImageName);
                                 break;
                             case ValidCommandIds.WaitForChange:
                             case ValidCommandIds.WaitForNoChange:
+                                if (tbWFNCWait.Text.Length == 0 
+                                    || tbWFNCX1.Text.Length == 0 || tbWFNCX2.Text.Length == 0 
+                                    || tbWFNCY1.Text.Length == 0 || tbWFNCY2.Text.Length == 0)
+                                {
+                                    MessageBox.Show("Required fields aren't populated.");
+                                    return;
+                                }
+
                                 commandCopy.TimeOut = int.Parse(tbWFNCWait.Text);
                                 if (commandCopy.ChangeDetectArea == null)
                                 {
@@ -1228,14 +1320,24 @@ namespace ScriptEditor
                     if (tbActionOverrideFrequency.Text == string.Empty)
                         actionActivity.Frequency = null;
                     else
-                        actionActivity.Frequency = int.Parse(tbActionOverrideFrequency.Text);
+                    {
+                        if (tbActionOverrideFrequency.Text.Length == 0)
+                            actionActivity.Frequency = 4800;
+                        else
+                            actionActivity.Frequency = int.Parse(tbActionOverrideFrequency.Text);
+                    }
                     if (dtptbActionOverrideTimeOfDay.Checked)
                         actionActivity.DailyScheduledTime = dtptbActionOverrideTimeOfDay.Value;
                     else
                         actionActivity.DailyScheduledTime = null;
                     ActiveTreeNode.Text = string.Format("{0} - {1}", tbActionOverrideName.Text, actionActivity.ActionEnabled ? "Enabled" : "Disabled");
                 }
+            // ToDo: Add Coordinates in here
             }
+            UnsavedChanges = true;
+            ChangePending = false;
+            btnUpdate.Enabled = false;
+            saveToolStripMenuItem.Enabled = true;
         }
 
 
@@ -1384,7 +1486,7 @@ namespace ScriptEditor
             btnUpdate.Enabled = true;
         }
 
-        private void btnPastFindText_Click(object sender, EventArgs e)
+        private void btnPasteFindText_Click(object sender, EventArgs e)
         {
             // ToDo: Implement FindText Paste.
             if (Clipboard.ContainsText())
@@ -1438,6 +1540,58 @@ namespace ScriptEditor
             }
         }
 
+        private void addActionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ResetEditFormItems();
+            if (tvBotData.SelectedNode.Nodes.ContainsKey("New Action"))
+            {
+                TreeNode selectedNode = tvBotData.SelectedNode.Nodes["New Action"];
+                tvBotData.SelectedNode = selectedNode;
+                MessageBox.Show("Rename this Action to allow new actions to be added");
+            }
+            else
+            {
+                BotEngineClient.Action newAction = new BotEngineClient.Action();
+                if (tvBotData.SelectedNode.Name == "actions")
+                    newAction.ActionType = ValidActionType.Scheduled.ToString();
+                else
+                    newAction.ActionType = ValidActionType.System.ToString();
 
+                TreeNode newNode = new TreeNode
+                {
+                    Text = "New Action",
+                    Name = "New Action",
+                    Tag = newAction
+                };
+
+                tvBotData.SelectedNode.Nodes.Add(newNode);
+                tvBotData.SelectedNode = newNode;
+            }
+        }
+
+        private void addFindStringtoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ResetEditFormItems();
+            if (tvBotData.SelectedNode.Nodes.ContainsKey("New FindString"))
+            {
+                TreeNode selectedNode = tvBotData.SelectedNode.Nodes["New FindString"];
+                tvBotData.SelectedNode = selectedNode;
+                MessageBox.Show("Rename this FindString to allow new find strings to be added");
+            }
+            else
+            {
+                FindString newFindString = new FindString();
+
+                TreeNode newNode = new TreeNode
+                {
+                    Text = "New FindString",
+                    Name = "New FindString",
+                    Tag = newFindString
+                };
+
+                tvBotData.SelectedNode.Nodes.Add(newNode);
+                tvBotData.SelectedNode = newNode;
+            }
+        }
     }
 }

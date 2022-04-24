@@ -192,6 +192,13 @@ namespace BotEngineClient
         public float backgroundTolerance { get; set; }
         public int? offsetX { get => offsetX1 == null ? 20 : offsetX1; set => offsetX1 = value; }
         public int? offsetY { get => offsetY1 == null ? 10 : offsetY1; set => offsetY1 = value; }
+        public FindString()
+        {
+            this.findString = string.Empty;
+            this.searchArea = new SearchArea();
+            this.textTolerance = 0;
+            this.backgroundTolerance = 0;
+        }
 
         public FindString(string findString, SearchArea searchArea, float textTolerance, float backgroundTolerance)
         {

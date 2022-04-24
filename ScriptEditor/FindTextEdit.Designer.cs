@@ -102,6 +102,7 @@ namespace ScriptEditor
             this.btnCancel = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.btnCopy = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvImage)).BeginInit();
             this.panel2.SuspendLayout();
@@ -158,6 +159,7 @@ namespace ScriptEditor
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.btnCopy);
             this.panel2.Controls.Add(this.btnLoadText);
             this.panel2.Controls.Add(this.btnADB);
             this.panel2.Controls.Add(this.btnLoadPic);
@@ -918,6 +920,16 @@ namespace ScriptEditor
             this.openFileDialog1.Filter = "BMP files|*.bmp|PNG files|*.png|All files|*.*";
             this.openFileDialog1.Title = "Image File";
             // 
+            // btnCopy
+            // 
+            this.btnCopy.Location = new System.Drawing.Point(163, 155);
+            this.btnCopy.Name = "btnCopy";
+            this.btnCopy.Size = new System.Drawing.Size(75, 23);
+            this.btnCopy.TabIndex = 43;
+            this.btnCopy.Text = "Copy Text";
+            this.btnCopy.UseVisualStyleBackColor = true;
+            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            // 
             // FindTextEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1030,5 +1042,6 @@ namespace ScriptEditor
         private System.Windows.Forms.NumericUpDown tbGrayDifference;
         private System.Windows.Forms.NumericUpDown tbColourSimilarity;
         private System.Windows.Forms.NumericUpDown tbColourPosSimilarity;
+        private System.Windows.Forms.Button btnCopy;
     }
 }

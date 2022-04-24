@@ -994,6 +994,12 @@ namespace ScriptEditor
             }
         }
 
+        private void btnCopy_Click(object sender, EventArgs e)
+        {
+            string clipboard = string.Format("{{\"findString\":\"{0}\", \"searchArea\":{{\"X\":{1}, \"Y\":{2}, \"width\":{3}, \"height\":{4}}}}}", SearchText, SearchRectangle.X, SearchRectangle.Y, SearchRectangle.Width, SearchRectangle.Height);
+            Clipboard.SetText(clipboard);
+        }
+
         private void clearUI()
         {
             lastSelected = Point.Empty;

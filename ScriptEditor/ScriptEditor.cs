@@ -12,6 +12,7 @@ using System.Text.Json;
 using BotEngineClient;
 using SharpAdbClient;
 using static BotEngineClient.BotEngine;
+using System.Text.Json.Nodes;
 
 namespace ScriptEditor
 {
@@ -1107,8 +1108,10 @@ namespace ScriptEditor
             FindTextEdit fte = new FindTextEdit();
             if (fte.ShowDialog() == DialogResult.OK)
             {
-                string searchText = fte.SearchText;
-                Rectangle searchArea = fte.SearchRectangle;
+                //string searchText = fte.SearchText;
+                //Rectangle searchArea = fte.SearchRectangle;
+                //string clipboard = string.Format("{{\"findString\":\"{0}\", \"searchArea\":{{\"X\":{1}, \"Y\":{2}, \"width\":{3}, \"height\":{4}}}}}", searchText, searchArea.X, searchArea.Y, searchArea.Width, searchArea.Height);
+                //Clipboard.SetText(clipboard);
             }
         }
 
@@ -1243,6 +1246,44 @@ namespace ScriptEditor
         private void btnPastFindText_Click(object sender, EventArgs e)
         {
             // ToDo: Implement FindText Paste.
+            if (Clipboard.ContainsText())
+            {
+                string clipboard = Clipboard.GetText();
+                try
+                {
+                    JsonDocumentOptions documentOptions = new JsonDocumentOptions
+                    {
+                        AllowTrailingCommas = true,
+                        CommentHandling = JsonCommentHandling.Skip
+                    };
+                    JsonNodeOptions nodeOptions = new JsonNodeOptions
+                    {
+                        PropertyNameCaseInsensitive = false
+                    };
+                    JsonNode jsonClipboard = JsonNode.Parse(clipboard, nodeOptions, documentOptions);
+                    //                    {"findString":"{0}", "searchArea":{"X":{1}, "Y":{2}, "width":{3}, "height":{4} } }
+                    if (jsonClipboard is JsonObject jsonObject)
+                    {
+                        if (jsonObject.ContainsKey("findString"))
+                        {
+                            tbFindTextSearch.Text = jsonObject["findString"].GetValue<JsonElement>().GetString();
+                        }
+                        if (jsonObject.ContainsKey("searchArea"))
+                        {
+                            tbFindTextSearchX1.Text = jsonObject["searchArea"].AsObject()["X"].GetValue<JsonElement>().GetInt32().ToString();
+                            tbFindTextSearchY1.Text = jsonObject["searchArea"].AsObject()["Y"].GetValue<JsonElement>().GetInt32().ToString();
+                            tbFindTextSearchX2.Text = (jsonObject["searchArea"].AsObject()["width"].GetValue<JsonElement>().GetInt32() + int.Parse(tbFindTextSearchX1.Text)).ToString();
+                            tbFindTextSearchY2.Text = (jsonObject["searchArea"].AsObject()["height"].GetValue<JsonElement>().GetInt32() + int.Parse(tbFindTextSearchY1.Text)).ToString();
+                        }
+                    }
+                }
+                catch
+                {
+                    MessageBox.Show("Clipboard content not recognised.");
+                }
+            }
+            else
+                MessageBox.Show("Clipboard content not recognised.");
         }
     }
 }

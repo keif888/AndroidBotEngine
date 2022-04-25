@@ -41,7 +41,6 @@ namespace ScriptEditor
             this.addActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addCoordinatestoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.aboveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.belowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
@@ -257,7 +256,6 @@ namespace ScriptEditor
             this.addActionToolStripMenuItem,
             this.addCoordinatestoolStripMenuItem,
             this.toolStripMenuItem5,
-            this.toolStripMenuItem2,
             this.aboveToolStripMenuItem,
             this.belowToolStripMenuItem,
             this.toolStripMenuItem3,
@@ -274,45 +272,41 @@ namespace ScriptEditor
             // 
             this.addFindStringtoolStripMenuItem.Name = "addFindStringtoolStripMenuItem";
             this.addFindStringtoolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.addFindStringtoolStripMenuItem.Text = "Add FindString";
+            this.addFindStringtoolStripMenuItem.Text = "Add &FindString";
             this.addFindStringtoolStripMenuItem.Click += new System.EventHandler(this.addFindStringtoolStripMenuItem_Click);
             // 
             // addActionToolStripMenuItem
             // 
             this.addActionToolStripMenuItem.Name = "addActionToolStripMenuItem";
             this.addActionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.addActionToolStripMenuItem.Text = "Add Action";
+            this.addActionToolStripMenuItem.Text = "Add Ac&tion";
             this.addActionToolStripMenuItem.Click += new System.EventHandler(this.addActionToolStripMenuItem_Click);
             // 
             // addCoordinatestoolStripMenuItem
             // 
             this.addCoordinatestoolStripMenuItem.Name = "addCoordinatestoolStripMenuItem";
             this.addCoordinatestoolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.addCoordinatestoolStripMenuItem.Text = "Add Coordinates";
+            this.addCoordinatestoolStripMenuItem.Text = "Add &Coordinates";
+            this.addCoordinatestoolStripMenuItem.Click += new System.EventHandler(this.addCoordinatestoolStripMenuItem_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
             this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
             // 
-            // toolStripMenuItem2
-            // 
-            this.toolStripMenuItem2.Enabled = false;
-            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
-            this.toolStripMenuItem2.Text = "Insert Command";
-            // 
             // aboveToolStripMenuItem
             // 
             this.aboveToolStripMenuItem.Name = "aboveToolStripMenuItem";
             this.aboveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.aboveToolStripMenuItem.Text = "&Above";
+            this.aboveToolStripMenuItem.Text = "Insert &Above";
+            this.aboveToolStripMenuItem.Click += new System.EventHandler(this.aboveToolStripMenuItem_Click);
             // 
             // belowToolStripMenuItem
             // 
             this.belowToolStripMenuItem.Name = "belowToolStripMenuItem";
             this.belowToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.belowToolStripMenuItem.Text = "&Below";
+            this.belowToolStripMenuItem.Text = "Insert &Below";
+            this.belowToolStripMenuItem.Click += new System.EventHandler(this.belowToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
@@ -1757,7 +1751,6 @@ namespace ScriptEditor
         private System.Windows.Forms.TextBox tbListName;
         private System.Windows.Forms.Label label34;
         private System.Windows.Forms.Button btnPastFindText;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
         private System.Windows.Forms.ToolStripMenuItem moveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem upToolStripMenuItem;

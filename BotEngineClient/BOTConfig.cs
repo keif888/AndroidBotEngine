@@ -216,6 +216,77 @@ namespace BotEngineClient
             CommandId = commandId;
         }
 
+        public Command(BotEngine.ValidCommandIds selectedCommand)
+        {
+            CommandId = selectedCommand.ToString();
+            switch (selectedCommand)
+            {
+                case BotEngine.ValidCommandIds.Click:
+                    Location = new XYCoords(0, 0);
+                    break;
+                case BotEngine.ValidCommandIds.ClickWhenNotFoundInArea:
+                    ImageName = String.Empty;
+                    Areas = new List<SearchArea>();
+                    break;
+                case BotEngine.ValidCommandIds.Drag:
+                    Delay = 150;
+                    Swipe = new SwipeCoords();
+                    break;
+                case BotEngine.ValidCommandIds.Exit:
+                    break;
+                case BotEngine.ValidCommandIds.EnterLoopCoordinate:
+                    Value = string.Empty;
+                    break;
+                case BotEngine.ValidCommandIds.FindClick:
+                    ImageName = String.Empty;
+                    IgnoreMissing = false;
+                    break;
+                case BotEngine.ValidCommandIds.FindClickAndWait:
+                    ImageName = String.Empty;
+                    TimeOut = 150;
+                    break;
+                case BotEngine.ValidCommandIds.IfExists:
+                case BotEngine.ValidCommandIds.IfNotExists:
+                    ImageName = String.Empty;
+                    Commands = new List<Command>();
+                    break;
+                case BotEngine.ValidCommandIds.LoopCoordinates:
+                    Coordinates = string.Empty;
+                    Commands = new List<Command>();
+                    break;
+                case BotEngine.ValidCommandIds.LoopUntilFound:
+                case BotEngine.ValidCommandIds.LoopUntilNotFound:
+                    ImageName = String.Empty;
+                    Commands = new List<Command>();
+                    break;
+                case BotEngine.ValidCommandIds.Restart:
+                    break;
+                case BotEngine.ValidCommandIds.RunAction:
+                    ActionName = string.Empty;
+                    break;
+                case BotEngine.ValidCommandIds.Sleep:
+                    Delay = 150;
+                    break;
+                case BotEngine.ValidCommandIds.StartGame:
+                case BotEngine.ValidCommandIds.StopGame:
+                    TimeOut = 150;
+                    Value = string.Empty;
+                    break;
+                case BotEngine.ValidCommandIds.WaitFor:
+                case BotEngine.ValidCommandIds.WaitForThenClick:
+                    ImageName = string.Empty;
+                    TimeOut = 150;
+                    break;
+                case BotEngine.ValidCommandIds.WaitForChange:
+                case BotEngine.ValidCommandIds.WaitForNoChange:
+                    TimeOut = 150;
+                    ChangeDetectDifference = 0;
+                    ChangeDetectArea = new SearchArea();
+                    break;
+                default:
+                    break;
+            }
+        }
 
         public string CommandId { get; set; }
         public int? CommandNumber { get; set; }

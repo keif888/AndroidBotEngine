@@ -318,62 +318,8 @@ namespace ScriptEditor
         {
             foreach (BotEngineClient.Command command in commands)
             {
-                string childText = string.Format("{0}", command.CommandId);
-                childText = command.CommandId;
-                if (Enum.TryParse(command.CommandId, true, out ValidCommandIds validCommandIds))
-                    switch (validCommandIds)
-                    {
-                        case ValidCommandIds.Click:
-                            if (command.Location != null)
-                                childText = string.Format("{0} ({1},{2})", command.CommandId, command.Location.X, command.Location.Y);
-                            break;
-                        case ValidCommandIds.Drag:
-                            if (command.Swipe != null)
-                                childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.Swipe.X1, command.Swipe.Y1, command.Swipe.X2, command.Swipe.Y2);
-                            break;
-                        case ValidCommandIds.EnterLoopCoordinate:
-                            if (command.Value != null)
-                                childText = string.Format("{0} ({1})", command.CommandId, command.Value);
-                            break;
-                        case ValidCommandIds.LoopCoordinates:
-                            if (command.Coordinates != null)
-                                childText = string.Format("{0} ({1})", command.CommandId, command.Coordinates);
-                            break;
-                        case ValidCommandIds.RunAction:
-                            if (command.ActionName != null)
-                                childText = string.Format("{0} ({1})", command.CommandId, command.ActionName);
-                            break;
-                        case ValidCommandIds.Sleep:
-                            childText = string.Format("{0} ({1})", command.CommandId, command.Delay);
-                            break;
-                        case ValidCommandIds.IfExists:
-                        case ValidCommandIds.IfNotExists:
-                        case ValidCommandIds.FindClick:
-                        case ValidCommandIds.FindClickAndWait:
-                        case ValidCommandIds.LoopUntilFound:
-                        case ValidCommandIds.LoopUntilNotFound:
-                        case ValidCommandIds.WaitFor:
-                        case ValidCommandIds.WaitForThenClick:
-                            if (command.ImageName != null)
-                                childText = string.Format("{0} ({1})", command.CommandId, command.ImageName);
-                            else
-                                childText = string.Format("{0} (list)", command.CommandId);
-                            break;
-                        case ValidCommandIds.WaitForChange:
-                        case ValidCommandIds.WaitForNoChange:
-                            if (command.ChangeDetectArea != null)
-                                childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.ChangeDetectArea.X, command.ChangeDetectArea.Y, command.ChangeDetectArea.X + command.ChangeDetectArea.width, command.ChangeDetectArea.Y + command.ChangeDetectArea.height);
-                            break;
-                        case ValidCommandIds.ClickWhenNotFoundInArea:
-                        case ValidCommandIds.Exit:
-                        case ValidCommandIds.Restart:
-                        case ValidCommandIds.StartGame:
-                        case ValidCommandIds.StopGame:
-                        default:
-                            childText = command.CommandId;
-                            break;
-                    }
 
+                string childText = GetCommandIdDisplayText(command);
                 // Create a copy of the command, to put in the Tag, as we don't want the Commands.
                 // They will be recomposed from the TreeNodes.
                 BotEngineClient.Command commandCopy = command.DeepCopy();
@@ -384,7 +330,7 @@ namespace ScriptEditor
                 }
                 TreeNode child = new TreeNode
                 {
-                    Name = command.CommandNumber.ToString(),
+                    Name = command.CommandNumber.ToString(),  //ToDo: Check if this could be childText
                     Tag = commandCopy,
                     Text = childText
                 };
@@ -673,6 +619,65 @@ namespace ScriptEditor
 
         #endregion
 
+
+        private string GetCommandIdDisplayText(Command command)
+        {
+            string childText = command.CommandId;
+            if (Enum.TryParse(command.CommandId, true, out ValidCommandIds validCommandIds))
+                switch (validCommandIds)
+                {
+                    case ValidCommandIds.Click:
+                        if (command.Location != null)
+                            childText = string.Format("{0} ({1},{2})", command.CommandId, command.Location.X, command.Location.Y);
+                        break;
+                    case ValidCommandIds.Drag:
+                        if (command.Swipe != null)
+                            childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.Swipe.X1, command.Swipe.Y1, command.Swipe.X2, command.Swipe.Y2);
+                        break;
+                    case ValidCommandIds.EnterLoopCoordinate:
+                        if (command.Value != null)
+                            childText = string.Format("{0} ({1})", command.CommandId, command.Value);
+                        break;
+                    case ValidCommandIds.LoopCoordinates:
+                        if (command.Coordinates != null)
+                            childText = string.Format("{0} ({1})", command.CommandId, command.Coordinates);
+                        break;
+                    case ValidCommandIds.RunAction:
+                        if (command.ActionName != null)
+                            childText = string.Format("{0} ({1})", command.CommandId, command.ActionName);
+                        break;
+                    case ValidCommandIds.Sleep:
+                        childText = string.Format("{0} ({1})", command.CommandId, command.Delay);
+                        break;
+                    case ValidCommandIds.IfExists:
+                    case ValidCommandIds.IfNotExists:
+                    case ValidCommandIds.FindClick:
+                    case ValidCommandIds.FindClickAndWait:
+                    case ValidCommandIds.LoopUntilFound:
+                    case ValidCommandIds.LoopUntilNotFound:
+                    case ValidCommandIds.WaitFor:
+                    case ValidCommandIds.WaitForThenClick:
+                        if (command.ImageName != null)
+                            childText = string.Format("{0} ({1})", command.CommandId, command.ImageName);
+                        else
+                            childText = string.Format("{0} (list)", command.CommandId);
+                        break;
+                    case ValidCommandIds.WaitForChange:
+                    case ValidCommandIds.WaitForNoChange:
+                        if (command.ChangeDetectArea != null)
+                            childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.ChangeDetectArea.X, command.ChangeDetectArea.Y, command.ChangeDetectArea.X + command.ChangeDetectArea.width, command.ChangeDetectArea.Y + command.ChangeDetectArea.height);
+                        break;
+                    case ValidCommandIds.ClickWhenNotFoundInArea:
+                    case ValidCommandIds.Exit:
+                    case ValidCommandIds.Restart:
+                    case ValidCommandIds.StartGame:
+                    case ValidCommandIds.StopGame:
+                    default:
+                        childText = command.CommandId;
+                        break;
+                }
+            return childText;
+        }
 
         private void TvBotData_AfterSelect(object sender, TreeViewEventArgs e)
         {
@@ -1064,17 +1069,14 @@ namespace ScriptEditor
             btnUpdate.Enabled = false;
         }
 
+        /// <summary>
+        /// Exit command from the Menu.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (UnsavedChanges)
-            {
-                if (MessageBox.Show("You have pending changes, exit?", "Pending Changes", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    this.Close();
-            }
-            else
-            {
-                this.Close();
-            }
+            this.Close();
         }
 
         /// <summary>
@@ -1100,6 +1102,18 @@ namespace ScriptEditor
                     }
                     else
                     {
+                        if (cbImageNameNoWait.Items.Contains(ActiveTreeNode.Name))
+                        {
+                            cbImageNameNoWait.Items.Remove(ActiveTreeNode.Name);
+                            cbImageNameWithWait.Items.Remove(ActiveTreeNode.Name);
+                            cbImageNamesForList.Items.Remove(ActiveTreeNode.Name);
+                            cbImageAreasImage.Items.Remove(ActiveTreeNode.Name);
+                        }
+                        cbImageNameNoWait.Items.Add(tbFindTextName.Text);
+                        cbImageNameWithWait.Items.Add(tbFindTextName.Text);
+                        cbImageNamesForList.Items.Add(tbFindTextName.Text);
+                        cbImageAreasImage.Items.Add(tbFindTextName.Text);
+
                         ActiveTreeNode.Name = tbFindTextName.Text;
                         ActiveTreeNode.Text = tbFindTextName.Text;
                         findTag.backgroundTolerance = float.Parse(tbFindTextBackTolerance.Text);
@@ -1192,6 +1206,7 @@ namespace ScriptEditor
                                 commandCopy.Swipe.Y1 = int.Parse(tbDragY1.Text);
                                 commandCopy.Swipe.X2 = int.Parse(tbDragX2.Text);
                                 commandCopy.Swipe.Y2 = int.Parse(tbDragY2.Text);
+                                ActiveTreeNode.Text = string.Format("{0} ({1},{2}) - ({3},{4})", commandCopy.CommandId, commandCopy.Swipe.X1, commandCopy.Swipe.Y1, commandCopy.Swipe.X2, commandCopy.Swipe.Y2);
                                 break;
                             case ValidCommandIds.Exit:
                                 break;
@@ -1208,13 +1223,16 @@ namespace ScriptEditor
                             case ValidCommandIds.FindClick:
                                 commandCopy.ImageName = (string)cbImageNameNoWait.SelectedItem;
                                 // ToDo: Add IgnoreMissing
+                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ImageName);
                                 break;
                             case ValidCommandIds.IfExists:
                             case ValidCommandIds.IfNotExists:
                                 commandCopy.ImageName = (string)cbImageNameNoWait.SelectedItem;
+                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ImageName);
                                 break;
                             case ValidCommandIds.LoopCoordinates:
                                 commandCopy.Coordinates = tbListName.Text;
+                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.Coordinates);
                                 break;
                             case ValidCommandIds.LoopUntilFound:
                             case ValidCommandIds.LoopUntilNotFound:
@@ -1351,10 +1369,13 @@ namespace ScriptEditor
             FindTextEdit fte = new FindTextEdit();
             if (fte.ShowDialog() == DialogResult.OK)
             {
-                //string searchText = fte.SearchText;
-                //Rectangle searchArea = fte.SearchRectangle;
-                //string clipboard = string.Format("{{\"findString\":\"{0}\", \"searchArea\":{{\"X\":{1}, \"Y\":{2}, \"width\":{3}, \"height\":{4}}}}}", searchText, searchArea.X, searchArea.Y, searchArea.Width, searchArea.Height);
-                //Clipboard.SetText(clipboard);
+                if ((!Clipboard.ContainsText()) || (Clipboard.ContainsText() && !Clipboard.GetText().StartsWith("{")))
+                {
+                    string searchText = fte.SearchText;
+                    Rectangle searchArea = fte.SearchRectangle;
+                    string clipboard = string.Format("{{\"findString\":\"{0}\", \"searchArea\":{{\"X\":{1}, \"Y\":{2}, \"width\":{3}, \"height\":{4}}}}}", searchText, searchArea.X, searchArea.Y, searchArea.Width, searchArea.Height);
+                    Clipboard.SetText(clipboard);
+                }
             }
         }
 
@@ -1540,6 +1561,12 @@ namespace ScriptEditor
             }
         }
 
+        #region Add menu options
+        /// <summary>
+        /// Add a new Action into the tvBotData tree
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addActionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ResetEditFormItems();
@@ -1569,6 +1596,11 @@ namespace ScriptEditor
             }
         }
 
+        /// <summary>
+        /// Add a new FindString node into the tvBotData tree
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void addFindStringtoolStripMenuItem_Click(object sender, EventArgs e)
         {
             ResetEditFormItems();
@@ -1593,5 +1625,152 @@ namespace ScriptEditor
                 tvBotData.SelectedNode = newNode;
             }
         }
+
+        /// <summary>
+        /// Add a new Coordinates node into the tvBotData tree
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void addCoordinatestoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ResetEditFormItems();
+            if (tvBotData.SelectedNode.Nodes.ContainsKey("New Coordinates"))
+            {
+                TreeNode selectedNode = tvBotData.SelectedNode.Nodes["New Coordinates"];
+                tvBotData.SelectedNode = selectedNode;
+                MessageBox.Show("Rename this Coordinates to allow new coordinates to be added");
+            }
+            else
+            {
+                List<XYCoords> newCoordinates = new List<XYCoords>();
+
+                TreeNode newNode = new TreeNode
+                {
+                    Text = "New Coordinates",
+                    Name = "New Coordinates",
+                    Tag = newCoordinates
+                };
+
+                tvBotData.SelectedNode.Nodes.Add(newNode);
+                tvBotData.SelectedNode = newNode;
+            }
+        }
+        #endregion
+
+        #region Insert menu options
+        /// <summary>
+        /// Inserts a new node, before the current node into the tvBotData tree, and makes it active.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void aboveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            int currentNodeIndex = tvBotData.SelectedNode.Index;
+            TreeNode parent = tvBotData.SelectedNode.Parent;
+            if (currentNode.Tag != null)
+            {
+                if (currentNode.Tag is Command)
+                {
+                    CommandSelect commandSelect = new CommandSelect();
+                    if (commandSelect.ShowDialog() == DialogResult.OK)
+                    {
+                        string commandId = commandSelect.SelectedCommand.ToString();
+                        Command newCommand = new Command(commandSelect.SelectedCommand);
+                        string childText = GetCommandIdDisplayText(newCommand);
+                        TreeNode newNode = new TreeNode
+                        {
+                            Tag = newCommand,
+                            Name = commandId,
+                            Text = childText
+                        };
+                        parent.Nodes.Insert(currentNodeIndex, newNode);
+                        tvBotData.SelectedNode = newNode;
+                        UnsavedChanges = true;
+                    }
+                }
+                else if (currentNode.Tag is XYCoords)
+                {
+                    XYCoords newCoords = new XYCoords(0, 0);
+                    TreeNode newNode = new TreeNode
+                    {
+                        Name = "(0,0)",
+                        Tag = newCoords,
+                        Text = "(0,0)"
+                    };
+                    parent.Nodes.Insert(currentNodeIndex, newNode);
+                    setChangePending();
+                    UnsavedChanges = true;
+                    tvBotData.SelectedNode = newNode;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Inserts a new node, after the current node into the tvBotData tree, and makes it active.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void belowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            int currentNodeIndex = tvBotData.SelectedNode.Index;
+            TreeNode parent = tvBotData.SelectedNode.Parent;
+            if (currentNode.Tag != null)
+            {
+                if (currentNode.Tag is Command)
+                {
+                    CommandSelect commandSelect = new CommandSelect();
+                    if (commandSelect.ShowDialog() == DialogResult.OK)
+                    {
+                        string commandId = commandSelect.SelectedCommand.ToString();
+                        Command newCommand = new Command(commandSelect.SelectedCommand);
+                        string childText = GetCommandIdDisplayText(newCommand);
+                        TreeNode newNode = new TreeNode
+                        {
+                            Tag = newCommand,
+                            Name = commandId,
+                            Text = childText
+                        };
+                        parent.Nodes.Insert(currentNodeIndex + 1, newNode);
+                        tvBotData.SelectedNode = newNode;
+                        UnsavedChanges = true;
+                    }
+                }
+                else if (currentNode.Tag is BotEngineClient.Action)
+                {
+                    CommandSelect commandSelect = new CommandSelect();
+                    if (commandSelect.ShowDialog() == DialogResult.OK)
+                    {
+                        string commandId = commandSelect.SelectedCommand.ToString();
+                        Command newCommand = new Command(commandSelect.SelectedCommand);
+                        string childText = GetCommandIdDisplayText(newCommand);
+                        TreeNode newNode = new TreeNode
+                        {
+                            Tag = newCommand,
+                            Name = commandId,
+                            Text = childText
+                        };
+                        currentNode.Nodes.Add(newNode);
+                        tvBotData.SelectedNode = newNode;
+                        UnsavedChanges = true;
+                    }
+                }
+                else if (currentNode.Tag is XYCoords)
+                {
+                    XYCoords newCoords = new XYCoords(0, 0);
+                    TreeNode newNode = new TreeNode
+                    {
+                        Name = "(0,0)",
+                        Tag = newCoords,
+                        Text = "(0,0)"
+                    };
+                    parent.Nodes.Insert(currentNodeIndex + 1, newNode);
+                    tvBotData.SelectedNode = newNode;
+                    UnsavedChanges = true;
+                }
+            }
+        }
+        #endregion
     }
 }

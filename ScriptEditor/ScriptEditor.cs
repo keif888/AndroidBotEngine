@@ -79,6 +79,11 @@ namespace ScriptEditor
         }
 
         #region Load Files
+        /// <summary>
+        /// Menu method to allow the opening of a json file and then loading it into the tvBotData.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OpenToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
@@ -379,12 +384,18 @@ namespace ScriptEditor
             listConfig.Coordinates = new Dictionary<string, List<XYCoords>>();
             foreach (TreeNode parent in tvBotData.Nodes)
             {
-                List<XYCoords> coords = new List<XYCoords>();
-                foreach (TreeNode child in parent.Nodes)
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "Coordinates")
                 {
-                    coords.Add((XYCoords)child.Tag);
+                    foreach (TreeNode coordList in parent.Nodes)
+                    {
+                        List<XYCoords> coords = new List<XYCoords>();
+                        foreach (TreeNode child in coordList.Nodes)
+                        {
+                            coords.Add((XYCoords)child.Tag);
+                        }
+                        listConfig.Coordinates.Add(coordList.Name, coords);
+                    }
                 }
-                listConfig.Coordinates.Add(parent.Name, coords);
             }
             try
             {
@@ -619,7 +630,11 @@ namespace ScriptEditor
 
         #endregion
 
-
+        /// <summary>
+        /// Set the text to show on the tvBotData for commands.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
         private string GetCommandIdDisplayText(Command command)
         {
             string childText = command.CommandId;
@@ -679,6 +694,11 @@ namespace ScriptEditor
             return childText;
         }
 
+        /// <summary>
+        /// After selecting a node in the tvBotData, show the appropriate edit GroupBox.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TvBotData_AfterSelect(object sender, TreeViewEventArgs e)
         {
             ResetEditFormItems();
@@ -1024,6 +1044,12 @@ namespace ScriptEditor
                 gbActionOverride.Enabled = true;
                 gbActionOverride.Visible = true;
             }
+            else if ((e.Node.Tag != null) && (e.Node.Tag is List<XYCoords>))
+            {
+                tbListName.Text = ActiveTreeNode.Name;
+                gbList.Enabled = true;
+                gbList.Visible = true;
+            }
 
             ChangePending = false;
             btnUpdate.Enabled = false;
@@ -1367,6 +1393,11 @@ namespace ScriptEditor
                     coords.X = int.Parse(tbPointX.Text);
                     coords.Y = int.Parse(tbPointY.Text);
                     ActiveTreeNode.Text = string.Format("({0}, {1})", coords.X, coords.Y);
+                }
+                else if (selectedTag is List<XYCoords>)
+                {
+                    ActiveTreeNode.Text = tbListName.Text;
+                    ActiveTreeNode.Name = tbListName.Text;
                 }
             }
             UnsavedChanges = true;
@@ -1714,7 +1745,19 @@ namespace ScriptEditor
                         Text = "(0,0)"
                     };
                     parent.Nodes.Insert(currentNodeIndex, newNode);
-                    setChangePending();
+                    UnsavedChanges = true;
+                    tvBotData.SelectedNode = newNode;
+                }
+                else if (currentNode.Tag is List<XYCoords>)
+                {
+                    XYCoords newCoords = new XYCoords(0, 0);
+                    TreeNode newNode = new TreeNode
+                    {
+                        Name = "(0,0)",
+                        Tag = newCoords,
+                        Text = "(0,0)"
+                    };
+                    currentNode.Nodes.Add(newNode);
                     UnsavedChanges = true;
                     tvBotData.SelectedNode = newNode;
                 }
@@ -1783,6 +1826,19 @@ namespace ScriptEditor
                     parent.Nodes.Insert(currentNodeIndex + 1, newNode);
                     tvBotData.SelectedNode = newNode;
                     UnsavedChanges = true;
+                }
+                else if (currentNode.Tag is List<XYCoords>)
+                {
+                    XYCoords newCoords = new XYCoords(0, 0);
+                    TreeNode newNode = new TreeNode
+                    {
+                        Name = "(0,0)",
+                        Tag = newCoords,
+                        Text = "(0,0)"
+                    };
+                    currentNode.Nodes.Add(newNode);
+                    UnsavedChanges = true;
+                    tvBotData.SelectedNode = newNode;
                 }
             }
         }

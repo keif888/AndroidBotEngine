@@ -1029,6 +1029,9 @@ namespace ScriptEditor
             btnUpdate.Enabled = false;
         }
 
+        /// <summary>
+        /// Hides all the GUI elements, and disables menu items.
+        /// </summary>
         private void ResetEditFormItems()
         {
             addFindStringtoolStripMenuItem.Enabled = false;
@@ -1350,7 +1353,21 @@ namespace ScriptEditor
                         actionActivity.DailyScheduledTime = null;
                     ActiveTreeNode.Text = string.Format("{0} - {1}", tbActionOverrideName.Text, actionActivity.ActionEnabled ? "Enabled" : "Disabled");
                 }
-            // ToDo: Add Coordinates in here
+                else if (selectedTag is XYCoords coords)
+                {
+                    if (tbPointX.Text.Length == 0 || tbPointY.Text.Length == 0)
+                    {
+                        MessageBox.Show("Required fields aren't populated.");
+                        return;
+                    }
+                    if (coords == null)
+                    {
+                        coords = new XYCoords();
+                    }
+                    coords.X = int.Parse(tbPointX.Text);
+                    coords.Y = int.Parse(tbPointY.Text);
+                    ActiveTreeNode.Text = string.Format("({0}, {1})", coords.X, coords.Y);
+                }
             }
             UnsavedChanges = true;
             ChangePending = false;
@@ -1509,7 +1526,6 @@ namespace ScriptEditor
 
         private void btnPasteFindText_Click(object sender, EventArgs e)
         {
-            // ToDo: Implement FindText Paste.
             if (Clipboard.ContainsText())
             {
                 string clipboard = Clipboard.GetText();
@@ -1525,7 +1541,6 @@ namespace ScriptEditor
                         PropertyNameCaseInsensitive = false
                     };
                     JsonNode jsonClipboard = JsonNode.Parse(clipboard, nodeOptions, documentOptions);
-                    //                    {"findString":"{0}", "searchArea":{"X":{1}, "Y":{2}, "width":{3}, "height":{4} } }
                     if (jsonClipboard is JsonObject jsonObject)
                     {
                         if (jsonObject.ContainsKey("findString"))

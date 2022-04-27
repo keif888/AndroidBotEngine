@@ -705,24 +705,28 @@ namespace ScriptEditor
 
             if (e.Node != null)
                 ActiveTreeNode = e.Node;
+            if (e.Node.Parent != null)
+                if ((e.Node.Parent.Nodes.Count > 1) && !(e.Node.Tag is BotEngineClient.Action))
+                {
+                    upToolStripMenuItem.Enabled = true;
+                    downToolStripMenuItem.Enabled = true;
+                }
+            if (e.Node.Tag != null)
+            {
+                deleteToolStripMenuItem.Enabled = true;
+            }
             if (e.Node.Tag == null)
             {
                 switch (e.Node.Name)
                 {
                     case "systemActions":
                     case "actions":
-                        addFindStringtoolStripMenuItem.Enabled = false;
                         addActionToolStripMenuItem.Enabled = true;
-                        addCoordinatestoolStripMenuItem.Enabled = false;
                         break;
                     case "findStrings":
                         addFindStringtoolStripMenuItem.Enabled = true;
-                        addActionToolStripMenuItem.Enabled = false;
-                        addCoordinatestoolStripMenuItem.Enabled = false;
                         break;
                     case "Coordinates":
-                        addFindStringtoolStripMenuItem.Enabled = false;
-                        addActionToolStripMenuItem.Enabled = false;
                         addCoordinatestoolStripMenuItem.Enabled = true;
                         break;
                     default:
@@ -731,6 +735,8 @@ namespace ScriptEditor
             }
             else if ((e.Node.Tag != null) && (e.Node.Tag is Command command))
             {
+                aboveToolStripMenuItem.Enabled = true;
+                belowToolStripMenuItem.Enabled = true;
                 Command commandCopy = command;
                 if (Enum.TryParse(commandCopy.CommandId, true, out ValidCommandIds validCommandIds))
                     switch (validCommandIds)
@@ -806,21 +812,26 @@ namespace ScriptEditor
                             break;
                         case ValidCommandIds.FindClick:
                             // ToDo: Add IgnoreMissing
-                            if (commandCopy.ImageName != null)
+                            if (!string.IsNullOrEmpty(commandCopy.ImageName))
                                 cbImageNameNoWait.SelectedItem = commandCopy.ImageName;
                             else
+                            {
                                 cbImageNameNoWait.SelectedIndex = -1;
+                                cbImageNameNoWait.Text = "";
+                            }
                             gbImageName.Enabled = true;
                             gbImageName.Visible = true;
                             break;
                         case ValidCommandIds.IfExists:
                         case ValidCommandIds.IfNotExists:
-                            if (commandCopy.ImageName != null)
+                            if (!string.IsNullOrEmpty(commandCopy.ImageName))
                                 cbImageNameNoWait.SelectedItem = commandCopy.ImageName;
                             else
                                 cbImageNameNoWait.SelectedIndex = -1;
                             gbImageName.Enabled = true;
-                            gbImageName.Visible = true; break;
+                            gbImageName.Visible = true;
+                            addCommandToolStripMenuItem.Enabled = true;
+                            break;
                         case ValidCommandIds.LoopCoordinates:
                             if (commandCopy.Coordinates != null)
                                 tbListName.Text = commandCopy.Coordinates;
@@ -828,8 +839,24 @@ namespace ScriptEditor
                                 tbListName.Text = string.Empty;
                             gbList.Enabled = true;
                             gbList.Visible = true;
+                            addCommandToolStripMenuItem.Enabled = true;
                             break;
                         case ValidCommandIds.FindClickAndWait:
+                            lbImageNames.Items.Clear();
+                            if (commandCopy.ImageNames != null)
+                                foreach (string item in commandCopy.ImageNames)
+                                {
+                                    lbImageNames.Items.Add(item);
+                                }
+                            if (!string.IsNullOrEmpty(commandCopy.ImageName))
+                                lbImageNames.Items.Add(commandCopy.ImageName);
+                            if (commandCopy.TimeOut != null)
+                                tbImageNamesWait.Text = commandCopy.TimeOut.ToString();
+                            else
+                                tbImageNamesWait.Text = "";
+                            gbImageNames.Enabled = true;
+                            gbImageNames.Visible = true;
+                            break;
                         case ValidCommandIds.LoopUntilFound:
                         case ValidCommandIds.LoopUntilNotFound:
                             lbImageNames.Items.Clear();
@@ -838,7 +865,7 @@ namespace ScriptEditor
                                 {
                                     lbImageNames.Items.Add(item);
                                 }
-                            if (commandCopy.ImageName != null)
+                            if (!string.IsNullOrEmpty(commandCopy.ImageName))
                                 lbImageNames.Items.Add(commandCopy.ImageName);
                             if (commandCopy.TimeOut != null)
                                 tbImageNamesWait.Text = commandCopy.TimeOut.ToString();
@@ -846,6 +873,7 @@ namespace ScriptEditor
                                 tbImageNamesWait.Text = "";
                             gbImageNames.Enabled = true;
                             gbImageNames.Visible = true;
+                            addCommandToolStripMenuItem.Enabled = true;
                             break;
                         case ValidCommandIds.Restart:
                             // Nothing to do here, no UI element.
@@ -887,7 +915,7 @@ namespace ScriptEditor
                             break;
                         case ValidCommandIds.WaitFor:
                         case ValidCommandIds.WaitForThenClick:
-                            if (commandCopy.ImageName != null)
+                            if (!string.IsNullOrEmpty(commandCopy.ImageName))
                                 cbImageNameWithWait.SelectedItem = commandCopy.ImageName;
                             else
                                 cbImageNameWithWait.SelectedIndex = -1;
@@ -924,7 +952,8 @@ namespace ScriptEditor
                                 nudWFNCDetectPercent.Value = 30;
                             }
                             gbWFNC.Enabled = true;
-                            gbWFNC.Visible = true; break;
+                            gbWFNC.Visible = true;
+                            break;
                         default:
                             MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
                             break;
@@ -936,6 +965,7 @@ namespace ScriptEditor
             {
                 gbAction.Enabled = true;
                 gbAction.Visible = true;
+                addCommandToolStripMenuItem.Enabled = true;
                 BotEngineClient.Action actionCopy = action;
                 tbActionName.Text = e.Node.Name;
                 cbActionType.Text = actionCopy.ActionType;
@@ -985,15 +1015,14 @@ namespace ScriptEditor
             {
                 gbFindText.Enabled = true;
                 gbFindText.Visible = true;
-                FindString findStringCopy = findString;
-                tbFindTextBackTolerance.Text = findStringCopy.backgroundTolerance.ToString();
-                tbFindTextTextTolerance.Text = findStringCopy.textTolerance.ToString();
+                tbFindTextBackTolerance.Text = findString.backgroundTolerance.ToString();
+                tbFindTextTextTolerance.Text = findString.textTolerance.ToString();
                 tbFindTextName.Text = e.Node.Name;
-                tbFindTextSearch.Text = findStringCopy.findString;
-                tbFindTextSearchX1.Text = findStringCopy.searchArea.X.ToString();
-                tbFindTextSearchY1.Text = findStringCopy.searchArea.Y.ToString();
-                tbFindTextSearchX2.Text = (findStringCopy.searchArea.X + findStringCopy.searchArea.width).ToString();
-                tbFindTextSearchY2.Text = (findStringCopy.searchArea.Y + findStringCopy.searchArea.height).ToString();
+                tbFindTextSearch.Text = findString.findString;
+                tbFindTextSearchX1.Text = findString.searchArea.X.ToString();
+                tbFindTextSearchY1.Text = findString.searchArea.Y.ToString();
+                tbFindTextSearchX2.Text = (findString.searchArea.X + findString.searchArea.width).ToString();
+                tbFindTextSearchY2.Text = (findString.searchArea.Y + findString.searchArea.height).ToString();
             }
             else if ((e.Node.Tag != null) && (e.Node.Tag is XYCoords coords))
             {
@@ -1063,6 +1092,12 @@ namespace ScriptEditor
             addFindStringtoolStripMenuItem.Enabled = false;
             addActionToolStripMenuItem.Enabled = false;
             addCoordinatestoolStripMenuItem.Enabled = false;
+            addCommandToolStripMenuItem.Enabled = false;
+            aboveToolStripMenuItem.Enabled = false;
+            belowToolStripMenuItem.Enabled = false;
+            upToolStripMenuItem.Enabled = false;
+            downToolStripMenuItem.Enabled = false;
+            deleteToolStripMenuItem.Enabled = false;
             gbClick.Enabled = false;
             gbClick.Visible = false;
             gbDrag.Enabled = false;
@@ -1701,6 +1736,41 @@ namespace ScriptEditor
                 tvBotData.SelectedNode = newNode;
             }
         }
+
+        /// <summary>
+        /// Add a command to a selected tvBotData item that is allowed to have them added.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void addCommandToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            int currentNodeIndex = tvBotData.SelectedNode.Index;
+            TreeNode parent = tvBotData.SelectedNode.Parent;
+            if (currentNode.Tag != null)
+            {
+                if (currentNode.Tag is Command || currentNode.Tag is BotEngineClient.Action)
+                {
+                    CommandSelect commandSelect = new CommandSelect();
+                    if (commandSelect.ShowDialog() == DialogResult.OK)
+                    {
+                        string commandId = commandSelect.SelectedCommand.ToString();
+                        Command newCommand = new Command(commandSelect.SelectedCommand);
+                        string childText = GetCommandIdDisplayText(newCommand);
+                        TreeNode newNode = new TreeNode
+                        {
+                            Tag = newCommand,
+                            Name = commandId,
+                            Text = childText
+                        };
+                        currentNode.Nodes.Add(newNode);
+                        tvBotData.SelectedNode = newNode;
+                        UnsavedChanges = true;
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Insert menu options
@@ -1843,5 +1913,18 @@ namespace ScriptEditor
             }
         }
         #endregion
+
+        private void btnFindTextGenerate_Click(object sender, EventArgs e)
+        {
+            FindTextEdit fte = new FindTextEdit();
+            if (fte.ShowDialog() == DialogResult.OK)
+            {
+                tbFindTextSearch.Text = fte.SearchText;
+                tbFindTextSearchX1.Text = fte.SearchRectangle.X.ToString();
+                tbFindTextSearchY1.Text = fte.SearchRectangle.Y.ToString();
+                tbFindTextSearchX2.Text = (fte.SearchRectangle.X + fte.SearchRectangle.Width).ToString();
+                tbFindTextSearchY2.Text = (fte.SearchRectangle.Y + fte.SearchRectangle.Height).ToString();
+            }
+        }
     }
 }

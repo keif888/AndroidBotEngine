@@ -41,6 +41,7 @@ namespace ScriptEditor
             this.addActionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.addCoordinatestoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
+            this.addCommandToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.belowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
@@ -108,6 +109,7 @@ namespace ScriptEditor
             this.label16 = new System.Windows.Forms.Label();
             this.tbWFNCX2 = new System.Windows.Forms.MaskedTextBox();
             this.gbFindText = new System.Windows.Forms.GroupBox();
+            this.btnFindTextGenerate = new System.Windows.Forms.Button();
             this.btnPastFindText = new System.Windows.Forms.Button();
             this.label13 = new System.Windows.Forms.Label();
             this.tbFindTextBackTolerance = new System.Windows.Forms.MaskedTextBox();
@@ -256,6 +258,7 @@ namespace ScriptEditor
             this.addActionToolStripMenuItem,
             this.addCoordinatestoolStripMenuItem,
             this.toolStripMenuItem5,
+            this.addCommandToolStripMenuItem,
             this.aboveToolStripMenuItem,
             this.belowToolStripMenuItem,
             this.toolStripMenuItem3,
@@ -271,77 +274,84 @@ namespace ScriptEditor
             // addFindStringtoolStripMenuItem
             // 
             this.addFindStringtoolStripMenuItem.Name = "addFindStringtoolStripMenuItem";
-            this.addFindStringtoolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addFindStringtoolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addFindStringtoolStripMenuItem.Text = "Add &FindString";
             this.addFindStringtoolStripMenuItem.Click += new System.EventHandler(this.addFindStringtoolStripMenuItem_Click);
             // 
             // addActionToolStripMenuItem
             // 
             this.addActionToolStripMenuItem.Name = "addActionToolStripMenuItem";
-            this.addActionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addActionToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addActionToolStripMenuItem.Text = "Add Ac&tion";
             this.addActionToolStripMenuItem.Click += new System.EventHandler(this.addActionToolStripMenuItem_Click);
             // 
             // addCoordinatestoolStripMenuItem
             // 
             this.addCoordinatestoolStripMenuItem.Name = "addCoordinatestoolStripMenuItem";
-            this.addCoordinatestoolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addCoordinatestoolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addCoordinatestoolStripMenuItem.Text = "Add &Coordinates";
             this.addCoordinatestoolStripMenuItem.Click += new System.EventHandler(this.addCoordinatestoolStripMenuItem_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(160, 6);
+            // 
+            // addCommandToolStripMenuItem
+            // 
+            this.addCommandToolStripMenuItem.Name = "addCommandToolStripMenuItem";
+            this.addCommandToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.addCommandToolStripMenuItem.Text = "Add C&ommand";
+            this.addCommandToolStripMenuItem.Click += new System.EventHandler(this.addCommandToolStripMenuItem_Click);
             // 
             // aboveToolStripMenuItem
             // 
             this.aboveToolStripMenuItem.Name = "aboveToolStripMenuItem";
-            this.aboveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboveToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.aboveToolStripMenuItem.Text = "Insert &Above";
             this.aboveToolStripMenuItem.Click += new System.EventHandler(this.aboveToolStripMenuItem_Click);
             // 
             // belowToolStripMenuItem
             // 
             this.belowToolStripMenuItem.Name = "belowToolStripMenuItem";
-            this.belowToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.belowToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.belowToolStripMenuItem.Text = "Insert &Below";
             this.belowToolStripMenuItem.Click += new System.EventHandler(this.belowToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(160, 6);
             // 
             // moveToolStripMenuItem
             // 
             this.moveToolStripMenuItem.Enabled = false;
             this.moveToolStripMenuItem.Name = "moveToolStripMenuItem";
-            this.moveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.moveToolStripMenuItem.Text = "Move";
             // 
             // upToolStripMenuItem
             // 
             this.upToolStripMenuItem.Name = "upToolStripMenuItem";
-            this.upToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.upToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.upToolStripMenuItem.Text = "&Up";
             // 
             // downToolStripMenuItem
             // 
             this.downToolStripMenuItem.Name = "downToolStripMenuItem";
-            this.downToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.downToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.downToolStripMenuItem.Text = "&Down";
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(160, 6);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.ShortcutKeyDisplayString = "Del";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             // 
             // textToolStripMenuItem
@@ -958,6 +968,7 @@ namespace ScriptEditor
             // 
             // gbFindText
             // 
+            this.gbFindText.Controls.Add(this.btnFindTextGenerate);
             this.gbFindText.Controls.Add(this.btnPastFindText);
             this.gbFindText.Controls.Add(this.label13);
             this.gbFindText.Controls.Add(this.tbFindTextBackTolerance);
@@ -981,6 +992,17 @@ namespace ScriptEditor
             this.gbFindText.TabStop = false;
             this.gbFindText.Text = "FindText";
             this.gbFindText.Visible = false;
+            // 
+            // btnFindTextGenerate
+            // 
+            this.btnFindTextGenerate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFindTextGenerate.Location = new System.Drawing.Point(344, 137);
+            this.btnFindTextGenerate.Name = "btnFindTextGenerate";
+            this.btnFindTextGenerate.Size = new System.Drawing.Size(75, 23);
+            this.btnFindTextGenerate.TabIndex = 15;
+            this.btnFindTextGenerate.Text = "Generate";
+            this.btnFindTextGenerate.UseVisualStyleBackColor = true;
+            this.btnFindTextGenerate.Click += new System.EventHandler(this.btnFindTextGenerate_Click);
             // 
             // btnPastFindText
             // 
@@ -1761,6 +1783,8 @@ namespace ScriptEditor
         private System.Windows.Forms.ToolStripMenuItem addActionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addFindStringtoolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem addCoordinatestoolStripMenuItem;
+        private System.Windows.Forms.Button btnFindTextGenerate;
+        private System.Windows.Forms.ToolStripMenuItem addCommandToolStripMenuItem;
     }
 }
 

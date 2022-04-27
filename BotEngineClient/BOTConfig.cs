@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace BotEngineClient
 {
@@ -196,8 +197,8 @@ namespace BotEngineClient
         {
             this.findString = string.Empty;
             this.searchArea = new SearchArea();
-            this.textTolerance = 0;
-            this.backgroundTolerance = 0;
+            this.textTolerance = 0.2f;
+            this.backgroundTolerance = 0.2f;
         }
 
         public FindString(string findString, SearchArea searchArea, float textTolerance, float backgroundTolerance)
@@ -211,6 +212,11 @@ namespace BotEngineClient
 
     public class Command
     {
+        [JsonConstructorAttribute]
+        public Command()
+        {
+
+        }
         public Command(string commandId)
         {
             CommandId = commandId;

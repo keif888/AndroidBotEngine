@@ -1224,6 +1224,7 @@ namespace ScriptEditor
                 else if (selectedTag is Command commandCopy)
                 {
                     if (Enum.TryParse(commandCopy.CommandId, true, out ValidCommandIds validCommandIds))
+                    {
                         switch (validCommandIds)
                         {
                             case ValidCommandIds.Click:
@@ -1238,7 +1239,6 @@ namespace ScriptEditor
                                 }
                                 commandCopy.Location.X = int.Parse(tbPointX.Text);
                                 commandCopy.Location.Y = int.Parse(tbPointY.Text);
-                                ActiveTreeNode.Text = string.Format("{0} ({1},{2})", commandCopy.CommandId, commandCopy.Location.X, commandCopy.Location.Y);
                                 break;
                             case ValidCommandIds.ClickWhenNotFoundInArea:
                                 commandCopy.ImageName = cbImageAreasImage.Text;
@@ -1270,7 +1270,6 @@ namespace ScriptEditor
                                 commandCopy.Swipe.Y1 = int.Parse(tbDragY1.Text);
                                 commandCopy.Swipe.X2 = int.Parse(tbDragX2.Text);
                                 commandCopy.Swipe.Y2 = int.Parse(tbDragY2.Text);
-                                ActiveTreeNode.Text = string.Format("{0} ({1},{2}) - ({3},{4})", commandCopy.CommandId, commandCopy.Swipe.X1, commandCopy.Swipe.Y1, commandCopy.Swipe.X2, commandCopy.Swipe.Y2);
                                 break;
                             case ValidCommandIds.Exit:
                                 break;
@@ -1287,16 +1286,13 @@ namespace ScriptEditor
                             case ValidCommandIds.FindClick:
                                 commandCopy.ImageName = (string)cbImageNameNoWait.SelectedItem;
                                 // ToDo: Add IgnoreMissing
-                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ImageName);
                                 break;
                             case ValidCommandIds.IfExists:
                             case ValidCommandIds.IfNotExists:
                                 commandCopy.ImageName = (string)cbImageNameNoWait.SelectedItem;
-                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ImageName);
                                 break;
                             case ValidCommandIds.LoopCoordinates:
                                 commandCopy.Coordinates = tbListName.Text;
-                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.Coordinates);
                                 break;
                             case ValidCommandIds.LoopUntilFound:
                             case ValidCommandIds.LoopUntilNotFound:
@@ -1314,7 +1310,6 @@ namespace ScriptEditor
                                 {
                                     commandCopy.ImageName = (string)lbImageNames.Items[0];
                                     commandCopy.ImageNames = null;
-                                    ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ImageName);
                                 }
                                 else
                                 {
@@ -1323,7 +1318,6 @@ namespace ScriptEditor
                                     {
                                         commandCopy.ImageNames.Add(item);
                                     }
-                                    ActiveTreeNode.Text = string.Format("{0} (list)", validCommandIds);
                                 }
                                 commandCopy.TimeOut = int.Parse(tbImageNamesWait.Text);
                                 break;
@@ -1331,7 +1325,6 @@ namespace ScriptEditor
                                 break;
                             case ValidCommandIds.RunAction:
                                 commandCopy.ActionName = cbPickActionAction.Text;
-                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ActionName);
                                 break;
                             case ValidCommandIds.Sleep:
                                 if (tbDelay.Text.Length == 0)
@@ -1341,7 +1334,6 @@ namespace ScriptEditor
                                 }
 
                                 commandCopy.Delay = int.Parse(tbDelay.Text);
-                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.Delay);
                                 break;
                             case ValidCommandIds.StartGame:
                             case ValidCommandIds.StopGame:
@@ -1365,12 +1357,11 @@ namespace ScriptEditor
 
                                 commandCopy.ImageName = (string)cbImageNameWithWait.SelectedItem;
                                 commandCopy.TimeOut = int.Parse(tbTimeout.Text);
-                                ActiveTreeNode.Text = string.Format("{0} ({1})", validCommandIds, commandCopy.ImageName);
                                 break;
                             case ValidCommandIds.WaitForChange:
                             case ValidCommandIds.WaitForNoChange:
-                                if (tbWFNCWait.Text.Length == 0 
-                                    || tbWFNCX1.Text.Length == 0 || tbWFNCX2.Text.Length == 0 
+                                if (tbWFNCWait.Text.Length == 0
+                                    || tbWFNCX1.Text.Length == 0 || tbWFNCX2.Text.Length == 0
                                     || tbWFNCY1.Text.Length == 0 || tbWFNCY2.Text.Length == 0)
                                 {
                                     MessageBox.Show("Required fields aren't populated.");
@@ -1392,6 +1383,8 @@ namespace ScriptEditor
                                 MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
                                 break;
                         }
+                        ActiveTreeNode.Text = GetCommandIdDisplayText(commandCopy);
+                    }
                     else
                         MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
                 }

@@ -335,12 +335,14 @@ namespace ScriptEditor
             this.upToolStripMenuItem.Name = "upToolStripMenuItem";
             this.upToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.upToolStripMenuItem.Text = "&Up";
+            this.upToolStripMenuItem.Click += new System.EventHandler(this.upToolStripMenuItem_Click);
             // 
             // downToolStripMenuItem
             // 
             this.downToolStripMenuItem.Name = "downToolStripMenuItem";
             this.downToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.downToolStripMenuItem.Text = "&Down";
+            this.downToolStripMenuItem.Click += new System.EventHandler(this.downToolStripMenuItem_Click);
             // 
             // toolStripMenuItem4
             // 

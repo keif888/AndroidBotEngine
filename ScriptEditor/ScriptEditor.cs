@@ -1935,9 +1935,56 @@ namespace ScriptEditor
         private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode currentNode = tvBotData.SelectedNode;
-            tvBotData.Nodes.Remove(currentNode);
-            UnsavedChanges = true;
-            ChangePending = false;
+            if (currentNode != null)
+            {
+                tvBotData.Nodes.Remove(currentNode);
+                UnsavedChanges = true;
+                ChangePending = false;
+            }
+        }
+
+        /// <summary>
+        /// Moves the selected tvBotNode node up one spot, if it can be moved.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void upToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            if (currentNode != null && currentNode.Parent != null)
+            {
+                TreeNode parentNode = currentNode.Parent;
+                int treeIndex = parentNode.Nodes.IndexOf(currentNode);
+                if (treeIndex > 0)
+                {
+                    parentNode.Nodes.RemoveAt(treeIndex);
+                    parentNode.Nodes.Insert(treeIndex - 1, currentNode);
+                    tvBotData.SelectedNode = currentNode;
+                    UnsavedChanges = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Moves the selected tvBotNode node down one spot, if it can be moved.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void downToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            if (currentNode != null && currentNode.Parent != null)
+            {
+                TreeNode parentNode = currentNode.Parent;
+                int treeIndex = parentNode.Nodes.IndexOf(currentNode);
+                if (treeIndex < parentNode.Nodes.Count - 1)
+                {
+                    parentNode.Nodes.RemoveAt(treeIndex);
+                    parentNode.Nodes.Insert(treeIndex + 1, currentNode);
+                    tvBotData.SelectedNode = currentNode;
+                    UnsavedChanges = true;
+                }
+            }
         }
     }
 }

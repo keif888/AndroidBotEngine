@@ -1926,5 +1926,18 @@ namespace ScriptEditor
                 tbFindTextSearchY2.Text = (fte.SearchRectangle.Y + fte.SearchRectangle.Height).ToString();
             }
         }
+
+        /// <summary>
+        /// Delete the seleted node from tvBotData
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            tvBotData.Nodes.Remove(currentNode);
+            UnsavedChanges = true;
+            ChangePending = false;
+        }
     }
 }

@@ -133,6 +133,7 @@ namespace ScriptEditor
                 {
                     JsonFileName = fileName;
                     ResetEditFormItems();
+                    tvBotData.Nodes[0].EnsureVisible(); // Scroll to Top
                 }
             }
         }
@@ -176,6 +177,7 @@ namespace ScriptEditor
                 cbImageNamesForList.Items.Add(item.Key);
                 cbImageAreasImage.Items.Add(item.Key);
             }
+            findStringsNode.Expand();
             TreeNode systemActionsNode = tvBotData.Nodes.Add("systemActions");
             systemActionsNode.Name = "systemActions";
             foreach (KeyValuePair<string, BotEngineClient.Action> item in gameConfig.systemActions)
@@ -183,6 +185,7 @@ namespace ScriptEditor
                 LoadActionTreeNode(systemActionsNode, item);
                 cbPickActionAction.Items.Add(item.Key);
             }
+            systemActionsNode.Expand();
             TreeNode actionsNode = tvBotData.Nodes.Add("actions");
             actionsNode.Name = "actions";
             foreach (KeyValuePair<string, BotEngineClient.Action> item in gameConfig.actions)
@@ -190,6 +193,7 @@ namespace ScriptEditor
                 LoadActionTreeNode(actionsNode, item);
                 cbPickActionAction.Items.Add(item.Key);
             }
+            actionsNode.Expand();
 
             tvBotData.ResumeLayout();
             ChangePending = false;
@@ -232,6 +236,7 @@ namespace ScriptEditor
                 };
                 lastActionNode.Nodes.Add(treeNode);
             }
+            lastActionNode.Expand();
 
             tvBotData.ResumeLayout();
             ChangePending = false;
@@ -285,6 +290,7 @@ namespace ScriptEditor
                 }
                 coordinatesNode.Nodes.Add(treeNode);
             }
+            coordinatesNode.Expand();
 
             tvBotData.ResumeLayout();
             ChangePending = false;

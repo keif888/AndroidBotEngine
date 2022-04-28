@@ -609,6 +609,7 @@ namespace ScriptEditor
             this.cbImageAreasImage.Location = new System.Drawing.Point(75, 23);
             this.cbImageAreasImage.Name = "cbImageAreasImage";
             this.cbImageAreasImage.Size = new System.Drawing.Size(224, 23);
+            this.cbImageAreasImage.Sorted = true;
             this.cbImageAreasImage.TabIndex = 1;
             this.cbImageAreasImage.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
@@ -791,6 +792,7 @@ namespace ScriptEditor
             this.cbPickActionAction.Location = new System.Drawing.Point(55, 21);
             this.cbPickActionAction.Name = "cbPickActionAction";
             this.cbPickActionAction.Size = new System.Drawing.Size(232, 23);
+            this.cbPickActionAction.Sorted = true;
             this.cbPickActionAction.TabIndex = 1;
             this.cbPickActionAction.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
@@ -1352,6 +1354,7 @@ namespace ScriptEditor
             this.cbImageNamesForList.Location = new System.Drawing.Point(3, 164);
             this.cbImageNamesForList.Name = "cbImageNamesForList";
             this.cbImageNamesForList.Size = new System.Drawing.Size(191, 23);
+            this.cbImageNamesForList.Sorted = true;
             this.cbImageNamesForList.TabIndex = 1;
             // 
             // lbImageNames
@@ -1385,6 +1388,7 @@ namespace ScriptEditor
             this.cbImageNameWithWait.Location = new System.Drawing.Point(8, 23);
             this.cbImageNameWithWait.Name = "cbImageNameWithWait";
             this.cbImageNameWithWait.Size = new System.Drawing.Size(230, 23);
+            this.cbImageNameWithWait.Sorted = true;
             this.cbImageNameWithWait.TabIndex = 0;
             this.cbImageNameWithWait.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
@@ -1425,6 +1429,7 @@ namespace ScriptEditor
             this.cbImageNameNoWait.Location = new System.Drawing.Point(8, 23);
             this.cbImageNameNoWait.Name = "cbImageNameNoWait";
             this.cbImageNameNoWait.Size = new System.Drawing.Size(230, 23);
+            this.cbImageNameNoWait.Sorted = true;
             this.cbImageNameNoWait.TabIndex = 0;
             this.cbImageNameNoWait.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 

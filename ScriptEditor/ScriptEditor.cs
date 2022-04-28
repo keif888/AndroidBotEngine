@@ -177,6 +177,9 @@ namespace ScriptEditor
                 cbImageNamesForList.Items.Add(item.Key);
                 cbImageAreasImage.Items.Add(item.Key);
             }
+            tvBotData.Sort();  // Do not do this again after loading the findStrings, as it will stuff every thing up.
+            tvBotData.Sorted = false;
+
             findStringsNode.Expand();
             TreeNode systemActionsNode = tvBotData.Nodes.Add("systemActions");
             systemActionsNode.Name = "systemActions";
@@ -1021,6 +1024,7 @@ namespace ScriptEditor
             {
                 gbFindText.Enabled = true;
                 gbFindText.Visible = true;
+                addFindStringtoolStripMenuItem.Enabled = true;
                 tbFindTextBackTolerance.Text = findString.backgroundTolerance.ToString();
                 tbFindTextTextTolerance.Text = findString.textTolerance.ToString();
                 tbFindTextName.Text = e.Node.Name;

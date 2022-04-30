@@ -304,17 +304,8 @@ namespace BotEngineClient
                                                 Errors.Add(string.Format("actions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", actionsItem.Key, actionJsonObject["ActionType"].GetPath(), itemNode.ValueKind));
                                             else
                                             {
-                                                switch (itemNode.GetString().ToLower())
-                                                {
-                                                    case "system":
-                                                    case "scheduled":
-                                                    case "daily":
-                                                    case "always":
-                                                        break;
-                                                    default:
-                                                        Errors.Add(string.Format("actions list item \"{0}\" at path {1} with value \"{2}\" is not valid.  Was expecting one of the following \"System\", \"Scheduled\", \"Daily\", \"Always\"", actionsItem.Key, actionJsonObject["ActionType"].GetPath(), itemNode.GetString()));
-                                                        break;
-                                                }
+                                                if (!Enum.TryParse(itemNode.GetString(), true, out ValidActionType validActionType))
+                                                    Errors.Add(string.Format("actions list item \"{0}\" at path {1} with value \"{2}\" is not valid.  Was expecting one of the following \"System\", \"Scheduled\", \"Daily\", \"Adhoc\", \"Always\"", actionsItem.Key, actionJsonObject["ActionType"].GetPath(), itemNode.GetString()));
                                             }
                                         }
                                     }

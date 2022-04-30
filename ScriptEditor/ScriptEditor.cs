@@ -1500,6 +1500,7 @@ namespace ScriptEditor
             {
                 switch (validActionType)
                 {
+                    case ValidActionType.Adhoc:
                     case ValidActionType.Always:
                         tbActionFrequency.Enabled = false;
                         dtpActionTimeOfDay.Enabled = false;

@@ -367,48 +367,54 @@ namespace BotEngine
                                 _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
                                 if (cancelRequested || paused)
                                     break;
-                                if (((item.Value.ActionType.ToLower() == "scheduled") && (botDeviceConfig.LastActionTaken[item.Key].ActionEnabled))
-                                    ||((item.Value.ActionType.ToLower() == "daily") && (botDeviceConfig.LastActionTaken[item.Key].ActionEnabled))
-                                    )
+                                if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType validActionType))
                                 {
-                                    if (item.Value.ExecuteDue(botDeviceConfig.LastActionTaken[item.Key]))
+                                    if (   ((validActionType == ValidActionType.Scheduled) && (botDeviceConfig.LastActionTaken[item.Key].ActionEnabled))
+                                        || ((validActionType == ValidActionType.Daily) && (botDeviceConfig.LastActionTaken[item.Key].ActionEnabled))
+                                        || ((validActionType == ValidActionType.Adhoc) && (botDeviceConfig.LastActionTaken[item.Key].ActionEnabled))
+                                        )
                                     {
-                                        if (item.Value.BeforeAction != null)
+                                        if (item.Value.ExecuteDue(botDeviceConfig.LastActionTaken[item.Key]))
                                         {
+                                            if (item.Value.BeforeAction != null)
+                                            {
+                                                // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
+                                                cr = bot.ExecuteAction(item.Value.BeforeAction);
+                                                if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                                    break;
+                                            }
+                                            _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
+                                            if (cancelRequested || paused)
+                                                break;
                                             // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                            cr = bot.ExecuteAction(item.Value.BeforeAction);
+                                            cr = bot.ExecuteAction(item.Key);
+                                            _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
+                                            if (cancelRequested || paused)
+                                                break;
                                             if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
                                                 break;
-                                        }
-                                        _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
-                                        if (cancelRequested || paused)
-                                            break;
-                                        // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                        cr = bot.ExecuteAction(item.Key);
-                                        _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
-                                        if (cancelRequested || paused)
-                                            break;
-                                        if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
-                                            break;
-                                        if (cr == BotEngineClient.BotEngine.CommandResults.Ok)
-                                        {
-                                            botDeviceConfig.LastActionTaken[item.Key].MarkExecuted();
-                                        }
-                                        if (item.Value.AfterAction != null)
-                                        {
-                                            // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                            cr = bot.ExecuteAction(item.Value.AfterAction);
-                                            if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
-                                                break;
+                                            if (cr == BotEngineClient.BotEngine.CommandResults.Ok)
+                                            {
+                                                botDeviceConfig.LastActionTaken[item.Key].MarkExecuted();
+                                                if (validActionType == ValidActionType.Adhoc)
+                                                    botDeviceConfig.LastActionTaken[item.Key].MarkDisabled();
+                                            }
+                                            if (item.Value.AfterAction != null)
+                                            {
+                                                // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
+                                                cr = bot.ExecuteAction(item.Value.AfterAction);
+                                                if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                                    break;
+                                            }
                                         }
                                     }
-                                }
-                                else if (item.Value.ActionType.ToLower() == "always")
-                                {
-                                    // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                    cr = bot.ExecuteAction(item.Key);
-                                    if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
-                                        break;
+                                    else if (validActionType == ValidActionType.Always)
+                                    {
+                                        // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
+                                        cr = bot.ExecuteAction(item.Key);
+                                        if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                            break;
+                                    }
                                 }
                             }
                         }

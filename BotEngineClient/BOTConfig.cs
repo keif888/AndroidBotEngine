@@ -44,6 +44,7 @@ namespace BotEngineClient
     /// </summary>
     public enum ValidActionType
     {
+        Adhoc,
         Always,
         Daily,
         Scheduled,
@@ -65,6 +66,7 @@ namespace BotEngineClient
         /// Scheduled = Runs every Frequency Minutes
         /// Daily = Runs once after DailyScheduledTime
         /// Always = Means that it runs every loop.
+        /// Adhoc = Runs ONCE, when set to Enabled in the Device Config
         /// System = Indicates that it is a System action, and is not scheduled, but called from other Actions.
         /// </summary>
         public string ActionType { get; set; }
@@ -401,6 +403,14 @@ namespace BotEngineClient
         public void SetLastExecuted(DateTime lastRun)
         {
             LastRun = lastRun;
+        }
+
+        /// <summary>
+        /// Used when an Adhoc task has been run successfully.
+        /// </summary>
+        public void MarkDisabled()
+        {
+            ActionEnabled = false;
         }
     }
 

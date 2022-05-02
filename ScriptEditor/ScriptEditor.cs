@@ -820,7 +820,6 @@ namespace ScriptEditor
                             gbLoopCoordinate.Visible = true;
                             break;
                         case ValidCommandIds.FindClick:
-                            // ToDo: Add IgnoreMissing
                             if (!string.IsNullOrEmpty(commandCopy.ImageName))
                                 cbImageNameNoWait.SelectedItem = commandCopy.ImageName;
                             else
@@ -828,6 +827,17 @@ namespace ScriptEditor
                                 cbImageNameNoWait.SelectedIndex = -1;
                                 cbImageNameNoWait.Text = "";
                             }
+                            if (commandCopy.IgnoreMissing != null)
+                            {
+                                cbIgnoreMissing.Checked = (bool)command.IgnoreMissing;
+                            }
+                            else
+                            {
+                                // Default to False
+                                cbIgnoreMissing.Checked = false;
+                            }
+                            cbIgnoreMissing.Enabled = true;
+                            cbIgnoreMissing.Visible = true;
                             gbImageName.Enabled = true;
                             gbImageName.Visible = true;
                             break;
@@ -1114,6 +1124,8 @@ namespace ScriptEditor
             gbDrag.Visible = false;
             gbImageName.Enabled = false;
             gbImageName.Visible = false;
+            cbIgnoreMissing.Enabled = false;
+            cbIgnoreMissing.Visible = false;
             gbImageNameAndWait.Enabled = false;
             gbImageNameAndWait.Visible = false;
             gbImageNames.Enabled = false;
@@ -1295,7 +1307,7 @@ namespace ScriptEditor
                                 break;
                             case ValidCommandIds.FindClick:
                                 commandCopy.ImageName = (string)cbImageNameNoWait.SelectedItem;
-                                // ToDo: Add IgnoreMissing
+                                commandCopy.IgnoreMissing = cbIgnoreMissing.Checked;
                                 break;
                             case ValidCommandIds.IfExists:
                             case ValidCommandIds.IfNotExists:

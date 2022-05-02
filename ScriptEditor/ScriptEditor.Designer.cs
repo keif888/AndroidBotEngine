@@ -167,6 +167,7 @@ namespace ScriptEditor
             this.tbPointY = new System.Windows.Forms.MaskedTextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.cbIgnoreMissing = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -274,86 +275,86 @@ namespace ScriptEditor
             // addFindStringtoolStripMenuItem
             // 
             this.addFindStringtoolStripMenuItem.Name = "addFindStringtoolStripMenuItem";
-            this.addFindStringtoolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addFindStringtoolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addFindStringtoolStripMenuItem.Text = "Add &FindString";
             this.addFindStringtoolStripMenuItem.Click += new System.EventHandler(this.addFindStringtoolStripMenuItem_Click);
             // 
             // addActionToolStripMenuItem
             // 
             this.addActionToolStripMenuItem.Name = "addActionToolStripMenuItem";
-            this.addActionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addActionToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addActionToolStripMenuItem.Text = "Add Ac&tion";
             this.addActionToolStripMenuItem.Click += new System.EventHandler(this.addActionToolStripMenuItem_Click);
             // 
             // addCoordinatestoolStripMenuItem
             // 
             this.addCoordinatestoolStripMenuItem.Name = "addCoordinatestoolStripMenuItem";
-            this.addCoordinatestoolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addCoordinatestoolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addCoordinatestoolStripMenuItem.Text = "Add &Coordinates";
             this.addCoordinatestoolStripMenuItem.Click += new System.EventHandler(this.addCoordinatestoolStripMenuItem_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(160, 6);
             // 
             // addCommandToolStripMenuItem
             // 
             this.addCommandToolStripMenuItem.Name = "addCommandToolStripMenuItem";
-            this.addCommandToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addCommandToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addCommandToolStripMenuItem.Text = "Add C&ommand";
             this.addCommandToolStripMenuItem.Click += new System.EventHandler(this.addCommandToolStripMenuItem_Click);
             // 
             // aboveToolStripMenuItem
             // 
             this.aboveToolStripMenuItem.Name = "aboveToolStripMenuItem";
-            this.aboveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboveToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.aboveToolStripMenuItem.Text = "Insert &Above";
             this.aboveToolStripMenuItem.Click += new System.EventHandler(this.aboveToolStripMenuItem_Click);
             // 
             // belowToolStripMenuItem
             // 
             this.belowToolStripMenuItem.Name = "belowToolStripMenuItem";
-            this.belowToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.belowToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.belowToolStripMenuItem.Text = "Insert &Below";
             this.belowToolStripMenuItem.Click += new System.EventHandler(this.belowToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(160, 6);
             // 
             // moveToolStripMenuItem
             // 
             this.moveToolStripMenuItem.Enabled = false;
             this.moveToolStripMenuItem.Name = "moveToolStripMenuItem";
-            this.moveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.moveToolStripMenuItem.Text = "Move";
             // 
             // upToolStripMenuItem
             // 
             this.upToolStripMenuItem.Name = "upToolStripMenuItem";
-            this.upToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.upToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.upToolStripMenuItem.Text = "&Up";
             this.upToolStripMenuItem.Click += new System.EventHandler(this.upToolStripMenuItem_Click);
             // 
             // downToolStripMenuItem
             // 
             this.downToolStripMenuItem.Name = "downToolStripMenuItem";
-            this.downToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.downToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.downToolStripMenuItem.Text = "&Down";
             this.downToolStripMenuItem.Click += new System.EventHandler(this.downToolStripMenuItem_Click);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(160, 6);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.ShortcutKeyDisplayString = "Del";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
             // 
@@ -1414,11 +1415,12 @@ namespace ScriptEditor
             // 
             // gbImageName
             // 
+            this.gbImageName.Controls.Add(this.cbIgnoreMissing);
             this.gbImageName.Controls.Add(this.cbImageNameNoWait);
             this.gbImageName.Enabled = false;
-            this.gbImageName.Location = new System.Drawing.Point(4, 207);
+            this.gbImageName.Location = new System.Drawing.Point(895, 421);
             this.gbImageName.Name = "gbImageName";
-            this.gbImageName.Size = new System.Drawing.Size(244, 57);
+            this.gbImageName.Size = new System.Drawing.Size(244, 90);
             this.gbImageName.TabIndex = 12;
             this.gbImageName.TabStop = false;
             this.gbImageName.Text = "Image Name";
@@ -1600,6 +1602,17 @@ namespace ScriptEditor
             this.saveFileDialog1.DefaultExt = "json";
             this.saveFileDialog1.Filter = "json files|*.json|All files|*.*";
             // 
+            // cbIgnoreMissing
+            // 
+            this.cbIgnoreMissing.AutoSize = true;
+            this.cbIgnoreMissing.Location = new System.Drawing.Point(8, 53);
+            this.cbIgnoreMissing.Name = "cbIgnoreMissing";
+            this.cbIgnoreMissing.Size = new System.Drawing.Size(90, 19);
+            this.cbIgnoreMissing.TabIndex = 1;
+            this.cbIgnoreMissing.Text = "Missing Ok?";
+            this.cbIgnoreMissing.UseVisualStyleBackColor = true;
+            this.cbIgnoreMissing.Visible = false;
+            // 
             // ScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1643,6 +1656,7 @@ namespace ScriptEditor
             this.gbImageNameAndWait.ResumeLayout(false);
             this.gbImageNameAndWait.PerformLayout();
             this.gbImageName.ResumeLayout(false);
+            this.gbImageName.PerformLayout();
             this.gbLoopCoordinate.ResumeLayout(false);
             this.gbLoopCoordinate.PerformLayout();
             this.gbDrag.ResumeLayout(false);
@@ -1794,6 +1808,7 @@ namespace ScriptEditor
         private System.Windows.Forms.ToolStripMenuItem addCoordinatestoolStripMenuItem;
         private System.Windows.Forms.Button btnFindTextGenerate;
         private System.Windows.Forms.ToolStripMenuItem addCommandToolStripMenuItem;
+        private System.Windows.Forms.CheckBox cbIgnoreMissing;
     }
 }
 

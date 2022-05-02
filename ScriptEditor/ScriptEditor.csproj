@@ -5,6 +5,14 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>annotations</Nullable>
+    <Authors>Keif888</Authors>
+    <Description>Editor for the three json files that AndroidBot uses.
+Uses SharpAdbClient from https://github.com/quamotion/madb, licensed under the Apache License Version 2.0.
+Uses code derived from FindText 8.5 sourced from https://autohotkey.com/boards/viewtopic.php?f=6&amp;t=17834.</Description>
+    <Copyright>Keif888 2022</Copyright>
+    <PackageProjectUrl>https://github.com/keif888/AndroidBotEngine</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/keif888/AndroidBotEngine</RepositoryUrl>
+    <Version>0.3.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

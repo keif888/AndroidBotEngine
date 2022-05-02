@@ -96,18 +96,24 @@ namespace ScriptEditor
                         if (jsonHelper.ValidateDeviceConfigStructure(fileName))
                         {
                             LoadDeviceConfigFile(fileName);
+                            setupToolStripMenuItem.Enabled = false;
+                            testToolStripMenuItem.Enabled = false;
                         }
                         break;
                     case JsonHelper.ConfigFileType.GameConfig:
                         if (jsonHelper.ValidateGameConfigStructure(fileName))
                         {
                             LoadGameConfigFile(fileName);
+                            setupToolStripMenuItem.Enabled = true;
+                            testToolStripMenuItem.Enabled = false;
                         }
                         break;
                     case JsonHelper.ConfigFileType.ListConfig:
                         if (jsonHelper.ValidateListConfigStructure(fileName))
                         {
                             LoadListConfigFile(fileName);
+                            setupToolStripMenuItem.Enabled = false;
+                            testToolStripMenuItem.Enabled = false;
                         }
                         break;
                     default:
@@ -2001,6 +2007,12 @@ namespace ScriptEditor
                     UnsavedChanges = true;
                 }
             }
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            HelpAboutBox about = new HelpAboutBox();
+            about.ShowDialog();
         }
     }
 }

@@ -13,19 +13,19 @@ namespace BotEngineClient
     {
         private readonly ILogger _logger;
 
-        private AdbServer adbServer;
-        private Image? savedImage;
-        private AdbClient adbClient;
-        private DeviceData adbDevice;
+        private readonly AdbServer adbServer;
+        private readonly Image? savedImage;
+        private readonly AdbClient adbClient;
+        private readonly DeviceData adbDevice;
         private ConsoleOutputReceiver adbReceiver;
-        private FindText findText;
+        private readonly FindText findText;
         private Rectangle adbScreenSize;
-        private Framebuffer adbFrameBuffer;
+        private readonly Framebuffer adbFrameBuffer;
         private Dictionary<string, FindString> FindStrings;
         private Dictionary<string, Action> NormalActions;
         private Dictionary<string, Action> SystemActions;
         private BOTListConfig ListConfig;
-        private string EmulatorName;
+        private readonly string EmulatorName;
 
         public enum CommandResults
         {
@@ -200,9 +200,9 @@ namespace BotEngineClient
                     Thread.Sleep(1500);
                     AdbClientExtensions.ExecuteRemoteCommand(adbClient, string.Format("dumpsys window windows", gameString), adbDevice, adbReceiver);
                     string cmdResult = adbReceiver.ToString();
-                    string currentFocus = cmdResult.Substring(cmdResult.IndexOf("mCurrentFocus"));
+                    string currentFocus = cmdResult[cmdResult.IndexOf("mCurrentFocus")..];
                     currentFocus = currentFocus.Substring(0, currentFocus.IndexOf("\n"));
-                    string focusedApp = cmdResult.Substring(cmdResult.IndexOf("mFocusedApp"));
+                    string focusedApp = cmdResult[cmdResult.IndexOf("mFocusedApp")..];
                     focusedApp = focusedApp.Substring(0, focusedApp.IndexOf("\n"));
                     if (currentFocus.ToLower().Contains(gameString.ToLower()))
                     {
@@ -238,9 +238,9 @@ namespace BotEngineClient
                     Thread.Sleep(500);
                     AdbClientExtensions.ExecuteRemoteCommand(adbClient, string.Format("dumpsys window windows", gameString), adbDevice, adbReceiver);
                     string cmdResult = adbReceiver.ToString();
-                    string currentFocus = cmdResult.Substring(cmdResult.IndexOf("mCurrentFocus"));
+                    string currentFocus = cmdResult[cmdResult.IndexOf("mCurrentFocus")..];
                     currentFocus = currentFocus.Substring(0, currentFocus.IndexOf("\n"));
-                    string focusedApp = cmdResult.Substring(cmdResult.IndexOf("mFocusedApp"));
+                    string focusedApp = cmdResult[cmdResult.IndexOf("mFocusedApp")..];
                     focusedApp = focusedApp.Substring(0, focusedApp.IndexOf("\n"));
                     if (currentFocus.ToLower().Contains(gameString.ToLower()))
                     {
@@ -277,7 +277,7 @@ namespace BotEngineClient
                         findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                     }
 
-                    List<SearchResult>? dataresult = findText.SearchText(searchString.searchArea.X, searchString.searchArea.Y, searchString.searchArea.X+searchString.searchArea.width, searchString.searchArea.Y+searchString.searchArea.height, searchString.backgroundTolerance, searchString.textTolerance, searchString.findString, false, false, false, searchString.offsetX, searchString.offsetY);
+                    List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X+searchString.SearchArea.Width, searchString.SearchArea.Y+searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
                     if (dataresult != null)
                     {
                         result = CommandResults.Ok;
@@ -312,7 +312,7 @@ namespace BotEngineClient
                         findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                     }
 
-                    List<SearchResult>? dataresult = findText.SearchText(searchString.searchArea.X, searchString.searchArea.Y, searchString.searchArea.X + searchString.searchArea.width, searchString.searchArea.Y + searchString.searchArea.height, searchString.backgroundTolerance, searchString.textTolerance, searchString.findString, false, false, false, searchString.offsetX, searchString.offsetY);
+                    List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X + searchString.SearchArea.Width, searchString.SearchArea.Y + searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
                     if (dataresult != null)
                     {
                         _logger.LogDebug("Initial Search Successful, found {0} whilst looking for {1}, Clicking", dataresult[0].Id, searchName);
@@ -345,7 +345,7 @@ namespace BotEngineClient
                     findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                 }
 
-                List<SearchResult>? dataresult = findText.SearchText(findString.searchArea.X, findString.searchArea.Y, findString.searchArea.X+findString.searchArea.width, findString.searchArea.Y+findString.searchArea.height, findString.backgroundTolerance, findString.textTolerance, findString.findString, false, false, false, findString.offsetX, findString.offsetY);
+                List<SearchResult>? dataresult = findText.SearchText(findString.SearchArea.X, findString.SearchArea.Y, findString.SearchArea.X+findString.SearchArea.Width, findString.SearchArea.Y+findString.SearchArea.Height, findString.BackgroundTolerance, findString.TextTolerance, findString.SearchString, false, false, false, findString.OffsetX, findString.OffsetY);
                 if (dataresult != null)
                 {
                     _logger.LogDebug("Search Successful, found {0} whilst looking for {1}", dataresult[0].Id, searchName);
@@ -380,7 +380,7 @@ namespace BotEngineClient
                     findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                 }
 
-                List<SearchResult>? dataresult = findText.SearchText(findString.searchArea.X, findString.searchArea.Y, findString.searchArea.X + findString.searchArea.width, findString.searchArea.Y + findString.searchArea.height, findString.backgroundTolerance, findString.textTolerance, findString.findString, false, false, false, findString.offsetX, findString.offsetY);
+                List<SearchResult>? dataresult = findText.SearchText(findString.SearchArea.X, findString.SearchArea.Y, findString.SearchArea.X + findString.SearchArea.Width, findString.SearchArea.Y + findString.SearchArea.Height, findString.BackgroundTolerance, findString.TextTolerance, findString.SearchString, false, false, false, findString.OffsetX, findString.OffsetY);
                 if (dataresult != null)
                 {
                     _logger.LogDebug("Search Successful, found {0} whilst looking for {1}", dataresult[0].Id, searchName);
@@ -414,7 +414,7 @@ namespace BotEngineClient
                     findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                 }
 
-                List<SearchResult>? dataresult = findText.SearchText(searchString.searchArea.X, searchString.searchArea.Y, searchString.searchArea.X + searchString.searchArea.width, searchString.searchArea.Y + searchString.searchArea.height, searchString.backgroundTolerance, searchString.textTolerance, searchString.findString, false, false, false, searchString.offsetX, searchString.offsetY);
+                List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X + searchString.SearchArea.Width, searchString.SearchArea.Y + searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
                 if (dataresult != null)
                 {
                     _logger.LogDebug("Initial Search Successful, found {0} whilst looking for {1}, Clicking", dataresult[0].Id, searchName);
@@ -455,7 +455,7 @@ namespace BotEngineClient
                         findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                     }
 
-                    List<SearchResult>? dataresult = findText.SearchText(searchString.searchArea.X, searchString.searchArea.Y, searchString.searchArea.X+searchString.searchArea.width, searchString.searchArea.Y+searchString.searchArea.height, searchString.backgroundTolerance, searchString.textTolerance, searchString.findString, false, false, false, searchString.offsetX, searchString.offsetY);
+                    List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X+searchString.SearchArea.Width, searchString.SearchArea.Y+searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
                     if (dataresult != null)
                     {
                         if (!found)
@@ -520,16 +520,16 @@ namespace BotEngineClient
                     {
                         x1 = Math.Min(x1, area.X);
                         y1 = Math.Min(y1, area.Y);
-                        x2 = Math.Max(x2, area.X + area.width);
-                        y2 = Math.Max(y2, area.Y + area.height);
+                        x2 = Math.Max(x2, area.X + area.Width);
+                        y2 = Math.Max(y2, area.Y + area.Height);
                     }
 
-                    List<SearchResult>? dataresults = findText.SearchText(x1, y1, x2, y2, searchString.backgroundTolerance, searchString.textTolerance, searchString.findString, false, true, false, searchString.offsetX, searchString.offsetY);
+                    List<SearchResult>? dataresults = findText.SearchText(x1, y1, x2, y2, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, true, false, searchString.OffsetX, searchString.OffsetY);
                     if (dataresults == null)
                     {
                         _logger.LogDebug("Search Unsuccessful, found nothing at {0} whilst looking for {1}, Clicking", areas[0].ToString(), searchName);
-                        int x = areas[0].X + (areas[0].width / 2);
-                        int y = areas[0].Y + (areas[0].height / 2);
+                        int x = areas[0].X + (areas[0].Width / 2);
+                        int y = areas[0].Y + (areas[0].Height / 2);
                         ADBClick(x, y);
                         result = CommandResults.Ok;
                     }
@@ -541,8 +541,8 @@ namespace BotEngineClient
                             found = false;
                             foreach (SearchResult dataresult in dataresults)
                             {
-                                if ((dataresult.X > area.X) && (dataresult.X < area.X + area.width)
-                                    && (dataresult.Y > area.Y) && (dataresult.Y < area.Y + area.height))
+                                if ((dataresult.X > area.X) && (dataresult.X < area.X + area.Width)
+                                    && (dataresult.Y > area.Y) && (dataresult.Y < area.Y + area.Height))
                                 {
                                     found = true;
                                     _logger.LogDebug("Partial Search Successful, whilst looking for {0} at {1}", searchName, area.ToString());
@@ -552,8 +552,8 @@ namespace BotEngineClient
                             if (!found)
                             {
                                 _logger.LogDebug("Partial Search Unsuccessful, Clicking, whilst looking for {0} at {1}", searchName, area.ToString());
-                                int x = area.X + (area.width / 2);
-                                int y = area.Y + (area.height / 2);
+                                int x = area.X + (area.Width / 2);
+                                int y = area.Y + (area.Height / 2);
                                 ADBClick(x, y);
                                 result = CommandResults.Ok;
                                 break;
@@ -613,13 +613,13 @@ namespace BotEngineClient
                     }
                     _logger.LogDebug("Searching for {0}", item);
                     FindString findString = FindStrings[item];
-                    searchString += findString.findString;
-                    searchX = Math.Min(searchX, findString.searchArea.X);
-                    searchY = Math.Min(searchY, findString.searchArea.Y);
-                    searchW = Math.Max(searchW, findString.searchArea.X+findString.searchArea.width);
-                    searchH = Math.Max(searchH, findString.searchArea.Y+findString.searchArea.height);
-                    textFactor = Math.Max(textFactor, findString.textTolerance);
-                    backFactor = Math.Max(backFactor, findString.backgroundTolerance);
+                    searchString += findString.SearchString;
+                    searchX = Math.Min(searchX, findString.SearchArea.X);
+                    searchY = Math.Min(searchY, findString.SearchArea.Y);
+                    searchW = Math.Max(searchW, findString.SearchArea.X+findString.SearchArea.Width);
+                    searchH = Math.Max(searchH, findString.SearchArea.Y+findString.SearchArea.Height);
+                    textFactor = Math.Max(textFactor, findString.TextTolerance);
+                    backFactor = Math.Max(backFactor, findString.BackgroundTolerance);
                 }
 
                 List<SearchResult>? dataresult;
@@ -682,13 +682,13 @@ namespace BotEngineClient
                         return CommandResults.InputError;
                     }
                     FindString findString = FindStrings[item];
-                    searchString += findString.findString;
-                    searchX = Math.Min(searchX, findString.searchArea.X);
-                    searchY = Math.Min(searchY, findString.searchArea.Y);
-                    searchW = Math.Max(searchW, findString.searchArea.X + findString.searchArea.width);
-                    searchH = Math.Max(searchH, findString.searchArea.Y + findString.searchArea.height);
-                    textFactor = Math.Max(textFactor, findString.textTolerance);
-                    backFactor = Math.Max(backFactor, findString.backgroundTolerance);
+                    searchString += findString.SearchString;
+                    searchX = Math.Min(searchX, findString.SearchArea.X);
+                    searchY = Math.Min(searchY, findString.SearchArea.Y);
+                    searchW = Math.Max(searchW, findString.SearchArea.X + findString.SearchArea.Width);
+                    searchH = Math.Max(searchH, findString.SearchArea.Y + findString.SearchArea.Height);
+                    textFactor = Math.Max(textFactor, findString.TextTolerance);
+                    backFactor = Math.Max(backFactor, findString.BackgroundTolerance);
                 }
                 List<SearchResult>? dataresult;
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
@@ -737,7 +737,7 @@ namespace BotEngineClient
                 adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
                 using (Bitmap savedImage = (Bitmap)adbFrameBuffer.ToImage())
                 {
-                    Rectangle srcRect = new Rectangle(changeDetectArea.X, changeDetectArea.Y, changeDetectArea.width, changeDetectArea.height);
+                    Rectangle srcRect = new Rectangle(changeDetectArea.X, changeDetectArea.Y, changeDetectArea.Width, changeDetectArea.Height);
                     using (Bitmap savedPart = savedImage.Clone(srcRect, savedImage.PixelFormat))
                     {
                         System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
@@ -782,7 +782,7 @@ namespace BotEngineClient
                 adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
                 using (Bitmap savedImage = (Bitmap)adbFrameBuffer.ToImage())
                 {
-                    Rectangle srcRect = new Rectangle(changeDetectArea.X, changeDetectArea.Y, changeDetectArea.width, changeDetectArea.height);
+                    Rectangle srcRect = new Rectangle(changeDetectArea.X, changeDetectArea.Y, changeDetectArea.Width, changeDetectArea.Height);
                     using (Bitmap savedPart = savedImage.Clone(srcRect, savedImage.PixelFormat))
                     {
                         System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();

@@ -60,9 +60,9 @@ namespace ScriptEditor
             tcColourTabs.SelectedTab = tpGray;
         }
 
-        private void btnLoadPic_Click(object sender, EventArgs e)
+        private void BtnLoadPic_Click(object sender, EventArgs e)
         {
-            clearUI();
+            ClearUI();
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 try
@@ -80,7 +80,7 @@ namespace ScriptEditor
                 return;
         }
 
-        private void dgvImage_CellClick(object sender, DataGridViewCellEventArgs e)
+        private void DgvImage_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             ColourGridTag? tag;
             if (dgvImage.Rows[e.RowIndex].Cells[e.ColumnIndex] != null)
@@ -112,7 +112,7 @@ namespace ScriptEditor
                         }
                         if (MultiColour)
                         {
-                            string cellColour = string.Format("{0}/{1}/{2}", e.ColumnIndex, e.RowIndex, tag.ColourString.Substring(2));
+                            string cellColour = string.Format("{0}/{1}/{2}", e.ColumnIndex, e.RowIndex, tag.ColourString[2..]);
                             if (tbOutputText.Text.Length > 0)
                             {
                                 tbOutputText.Text = string.Format("{0},{1}", tbOutputText.Text, cellColour);
@@ -179,14 +179,14 @@ namespace ScriptEditor
             }
         }
 
-        private void btnGray2Two_Click(object sender, EventArgs e)
+        private void BtnGray2Two_Click(object sender, EventArgs e)
         {
             dgvImage.SuspendLayout();
-            int Threshold = 0;
             if (!HasBeenGrayed)
             {
                 HasBeenGrayed = true;
             }
+            int Threshold;
             if (tbGrayThreshold.Text == string.Empty)
             {
                 int[] pp = new int[256];
@@ -200,7 +200,7 @@ namespace ScriptEditor
                 for (int i = 0; i < dgvImage.Columns.Count; i++)
                     for (int j = 0; j < dgvImage.Rows.Count; j++)
                     {
-                        ColourGridTag? tag = (ColourGridTag) dgvImage.Rows[j].Cells[i].Tag;
+                        ColourGridTag? tag = (ColourGridTag)dgvImage.Rows[j].Cells[i].Tag;
                         if (tag != null)
                             pp[tag.Gray]++;
                     }
@@ -211,10 +211,9 @@ namespace ScriptEditor
                     IS += pp[i];
                 }
                 Threshold = IP / IS;
-                int lastThreshold = 0;
                 for (int i = 0; i < 20; i++)
                 {
-                    lastThreshold = Threshold;
+                    int lastThreshold = Threshold;
                     int IP1 = 0, IS1 = 0;
                     for (int k = 0; k < lastThreshold + 1; k++)
                     {
@@ -253,7 +252,7 @@ namespace ScriptEditor
             dgvImage.ResumeLayout();
         }
 
-        private void btnGrayDiff2Two_Click(object sender, EventArgs e)
+        private void BtnGrayDiff2Two_Click(object sender, EventArgs e)
         {
             int GrayDiff = (int)tbGrayDifference.Value;
             colourString = string.Format("**{0}", GrayDiff);
@@ -287,7 +286,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnColour2Two_Click(object sender, EventArgs e)
+        private void BtnColour2Two_Click(object sender, EventArgs e)
         {
             //GuiControlGet, c,, SelColor
             //if (c="")
@@ -310,7 +309,7 @@ namespace ScriptEditor
             colourString = string.Format("{0}@{1}", colourSelected, colourSimilarity);
             //, n:=Floor(512*9*255*255*(1-n)*(1-n)), k:=i:=0
             colourSimilarity = Math.Floor(512m * 9m * 255m * 255m * (1m - colourSimilarity) * (1m - colourSimilarity));
-            uint colour = Convert.ToUInt32(tbColour.Text.Substring(2), 16);
+            uint colour = Convert.ToUInt32(tbColour.Text[2..], 16);
             //, rr:=(c>>16)&0xFF, gg:=(c>>8)&0xFF, bb:=c&0xFF
             int rr = (int)((colour >> 16) & 0xFF);
             int gg = (int)((colour >> 8) & 0xFF);
@@ -335,7 +334,7 @@ namespace ScriptEditor
                     ColourGridTag? tag = (ColourGridTag)dgvImage.Rows[j].Cells[i].Tag;
                     if (tag != null)
                     {
-                        colour = Convert.ToUInt32(tag.ColourString.Substring(2), 16);
+                        colour = Convert.ToUInt32(tag.ColourString[2..], 16);
                         int r = (int)tag.Red - rr;
                         int g = (int)tag.Green - gg;
                         int b = (int)tag.Blue - bb;
@@ -362,7 +361,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnColourPos2Two_Click(object sender, EventArgs e)
+        private void BtnColourPos2Two_Click(object sender, EventArgs e)
         {
             if (tbColour.Text == "")
             {
@@ -374,7 +373,7 @@ namespace ScriptEditor
             decimal colourSimilarity = Math.Round(tbColourPosSimilarity.Value / 100.0m, 2);
             colourString = string.Format("{0}@{1}", colourSelected, colourSimilarity);
             colourSimilarity = Math.Floor(512m * 9m * 255m * 255m * (1m - colourSimilarity) * (1m - colourSimilarity));
-            uint colour = Convert.ToUInt32(tbColour.Text.Substring(2), 16);
+            uint colour = Convert.ToUInt32(tbColour.Text[2..], 16);
             int rr = (int)((colour >> 16) & 0xFF);
             int gg = (int)((colour >> 8) & 0xFF);
             int bb = (int)(colour & 0xFF);
@@ -388,7 +387,7 @@ namespace ScriptEditor
                     ColourGridTag? tag = (ColourGridTag)dgvImage.Rows[j].Cells[i].Tag;
                     if (tag != null)
                     {
-                        colour = Convert.ToUInt32(tag.ColourString.Substring(2), 16);
+                        colour = Convert.ToUInt32(tag.ColourString[2..], 16);
                         int r = (int)tag.Red - rr;
                         int g = (int)tag.Green - gg;
                         int b = (int)tag.Blue - bb;
@@ -415,19 +414,19 @@ namespace ScriptEditor
             }
         }
 
-        private void btnColourDiff2Two_Click(object sender, EventArgs e)
+        private void BtnColourDiff2Two_Click(object sender, EventArgs e)
         {
             if (tbColour.Text == "")
             {
                 MessageBox.Show("Select a core colour square on the grid to select the colour to be similar to.", "Select Colour", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            uint colour = Convert.ToUInt32(tbColour.Text.Substring(2), 16);
+            uint colour = Convert.ToUInt32(tbColour.Text[2..], 16);
             int rr = (int)((colour >> 16) & 0xFF);
             int gg = (int)((colour >> 8) & 0xFF);
             int bb = (int)(colour & 0xFF);
             uint newColour = (uint)nudRed.Value << 16 | (uint)nudGreen.Value << 8 | (uint)nudBlue.Value;
-            colourString = string.Format("{0}-{1:X6}", tbColour.Text.Substring(2), newColour);
+            colourString = string.Format("{0}-{1:X6}", tbColour.Text[2..], newColour);
 
             findMode = FindText.FindMode.greyDifferenceMode;
             dgvImage.SuspendLayout();
@@ -437,7 +436,7 @@ namespace ScriptEditor
                     ColourGridTag? tag = (ColourGridTag)dgvImage.Rows[j].Cells[i].Tag;
                     if (tag != null)
                     {
-                        colour = Convert.ToUInt32(tag.ColourString.Substring(2), 16);
+                        colour = Convert.ToUInt32(tag.ColourString[2..], 16);
                         int r = (int)tag.Red;
                         int g = (int)tag.Green;
                         int b = (int)tag.Blue;
@@ -465,11 +464,11 @@ namespace ScriptEditor
         }
 
 
-        private void btnReset_Click(object sender, EventArgs e)
+        private void BtnReset_Click(object sender, EventArgs e)
         {
             if (savedRows.Count > 0)
             {
-                clearUI();
+                ClearUI();
                 dgvImage.SuspendLayout();
                 dgvImage.Columns.Clear();
                 int colourARGB = Color.Gray.ToArgb();
@@ -502,7 +501,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropTop_Click(object sender, EventArgs e)
+        private void BtnCropTop_Click(object sender, EventArgs e)
         {
             if (dgvImage.Rows.Count > 0)
             {
@@ -513,7 +512,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropTop3_Click(object sender, EventArgs e)
+        private void BtnCropTop3_Click(object sender, EventArgs e)
         {
 
             if (dgvImage.Rows.Count > 3)
@@ -527,7 +526,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropBottom_Click(object sender, EventArgs e)
+        private void BtnCropBottom_Click(object sender, EventArgs e)
         {
             if (dgvImage.Rows.Count > 1)
             {
@@ -539,7 +538,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropBottom3_Click(object sender, EventArgs e)
+        private void BtnCropBottom3_Click(object sender, EventArgs e)
         {
             if (dgvImage.Rows.Count > 3)
             {
@@ -553,7 +552,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropRight_Click(object sender, EventArgs e)
+        private void BtnCropRight_Click(object sender, EventArgs e)
         {
             if (dgvImage.Columns.Count > 1)
             {
@@ -565,7 +564,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropRight3_Click(object sender, EventArgs e)
+        private void BtnCropRight3_Click(object sender, EventArgs e)
         {
             if (dgvImage.Columns.Count > 3)
             {
@@ -579,7 +578,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropLeft_Click(object sender, EventArgs e)
+        private void BtnCropLeft_Click(object sender, EventArgs e)
         {
             if (dgvImage.Columns.Count > 1)
             {
@@ -590,7 +589,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropLeft3_Click(object sender, EventArgs e)
+        private void BtnCropLeft3_Click(object sender, EventArgs e)
         {
             if (dgvImage.Columns.Count > 3)
             {
@@ -603,7 +602,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropTopNegative_Click(object sender, EventArgs e)
+        private void BtnCropTopNegative_Click(object sender, EventArgs e)
         {
             if (removedTop > 0)
             {
@@ -626,7 +625,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropBottomNegative_Click(object sender, EventArgs e)
+        private void BtnCropBottomNegative_Click(object sender, EventArgs e)
         {
             if (removedBottom > 0)
             {
@@ -650,7 +649,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropLeftNegative_Click(object sender, EventArgs e)
+        private void BtnCropLeftNegative_Click(object sender, EventArgs e)
         {
             if (removedLeft > 0)
             {
@@ -677,7 +676,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCropRightNegative_Click(object sender, EventArgs e)
+        private void BtnCropRightNegative_Click(object sender, EventArgs e)
         {
             if (removedRight > 0)
             {
@@ -704,7 +703,7 @@ namespace ScriptEditor
             }
         }
 
-        private void tbOutputText_KeyDown(object sender, KeyEventArgs e)
+        private void TbOutputText_KeyDown(object sender, KeyEventArgs e)
         {
             if ((e.KeyCode == Keys.A) && Control.ModifierKeys == Keys.Control)
             {
@@ -722,14 +721,14 @@ namespace ScriptEditor
         private bool LoadGrabAndGrid(ref Image image)
         {
             GrabViewer grabViewer = new GrabViewer();
-            grabViewer.setImage(image);
+            grabViewer.SetImage(image);
             if (grabViewer.ShowDialog() == DialogResult.OK)
             {
-                SearchRectangle = grabViewer.getCaptureBox();
+                SearchRectangle = grabViewer.GetCaptureBox();
                 dgvImage.SuspendLayout();
                 dgvImage.Columns.Clear();
                 savedRows.Clear();
-                Rectangle grabArea = grabViewer.getCaptureBox();
+                Rectangle grabArea = grabViewer.GetCaptureBox();
                 Bitmap loadedBitmap = new Bitmap(image);
 
                 int colourARGB = Color.Gray.ToArgb();
@@ -765,10 +764,10 @@ namespace ScriptEditor
                     savedRows.Add(cells);
                 }
                 
-                int x = 0; int y = 0;
+                int x = 0;
                 for (int i = grabArea.X; i < grabArea.X + grabArea.Width; i++)
                 {
-                    y = 0;
+                    int y = 0;
                     for (int j = grabArea.Y; j < grabArea.Y + grabArea.Height; j++)
                     {
                         colourARGB = loadedBitmap.GetPixel(i, j).ToArgb();
@@ -797,7 +796,7 @@ namespace ScriptEditor
             return false;
         }
 
-        private void btnLoadText_Click(object sender, EventArgs e)
+        private void BtnLoadText_Click(object sender, EventArgs e)
         {
             string v = tbOutputText.Text;
             Regex regexComment = new Regex(@"<([^>]*)>");
@@ -854,7 +853,7 @@ namespace ScriptEditor
                 v = FindText.Base64tobit(rv[1]);
                 int h = v.Length / w;
 
-                clearUI();
+                ClearUI();
                 dgvImage.SuspendLayout();
                 dgvImage.Columns.Clear();
                 savedRows.Clear();
@@ -927,17 +926,17 @@ namespace ScriptEditor
             }
         }
 
-        private void btnOK_Click(object sender, EventArgs e)
+        private void BtnOK_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void BtnCancel_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
-        private void tcColourTabs_SelectedIndexChanged(object sender, EventArgs e)
+        private void TcColourTabs_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (tcColourTabs.SelectedTab != tpMultiColour)
             {
@@ -945,7 +944,7 @@ namespace ScriptEditor
             }
         }
 
-        private void cbFindMultiColour_CheckedChanged(object sender, EventArgs e)
+        private void CbFindMultiColour_CheckedChanged(object sender, EventArgs e)
         {
             MultiColour = cbFindMultiColour.Checked;
             if (MultiColour)
@@ -954,7 +953,7 @@ namespace ScriptEditor
             }
         }
 
-        private void btnUndo_Click(object sender, EventArgs e)
+        private void BtnUndo_Click(object sender, EventArgs e)
         {
             if (MultiColour)
             {
@@ -973,7 +972,7 @@ namespace ScriptEditor
             }
         }
 
-        private void nudRGB_ValueChanged(object sender, EventArgs e)
+        private void NudRGB_ValueChanged(object sender, EventArgs e)
         {
             if (MultiColour)
             {
@@ -985,7 +984,7 @@ namespace ScriptEditor
             }
         }
 
-        private void tbComment_TextChanged(object sender, EventArgs e)
+        private void TbComment_TextChanged(object sender, EventArgs e)
         {
             if (tbOutputText.TextLength > 0)
             {
@@ -994,13 +993,13 @@ namespace ScriptEditor
             }
         }
 
-        private void btnCopy_Click(object sender, EventArgs e)
+        private void BtnCopy_Click(object sender, EventArgs e)
         {
-            string clipboard = string.Format("{{\"findString\":\"{0}\", \"searchArea\":{{\"X\":{1}, \"Y\":{2}, \"width\":{3}, \"height\":{4}}}}}", SearchText, SearchRectangle.X, SearchRectangle.Y, SearchRectangle.Width, SearchRectangle.Height);
+            string clipboard = string.Format("{{\"FindString\":\"{0}\", \"searchArea\":{{\"X\":{1}, \"Y\":{2}, \"width\":{3}, \"height\":{4}}}}}", SearchText, SearchRectangle.X, SearchRectangle.Y, SearchRectangle.Width, SearchRectangle.Height);
             Clipboard.SetText(clipboard);
         }
 
-        private void clearUI()
+        private void ClearUI()
         {
             lastSelected = Point.Empty;
             tbGrayThreshold.Text = string.Empty;
@@ -1019,9 +1018,9 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnADB_Click(object sender, EventArgs e)
+        private void BtnADB_Click(object sender, EventArgs e)
         {
-            clearUI();
+            ClearUI();
             if (server == null)
             {
                 server = new AdbServer();
@@ -1063,12 +1062,11 @@ namespace ScriptEditor
             }
         }
 
-        private void btnGenText_Click(object sender, EventArgs e)
+        private void BtnGenText_Click(object sender, EventArgs e)
         {
-            string textString = string.Empty;
+            string textString;
             string colour = colourString;
             string txt = string.Empty;
-            string comment = tbComment.Text;
 
             if (!HasBeenGrayed)
                 return;

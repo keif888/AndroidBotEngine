@@ -52,10 +52,10 @@ namespace ScriptEditor
             this.pbFrame.Size = new System.Drawing.Size(446, 208);
             this.pbFrame.TabIndex = 0;
             this.pbFrame.TabStop = false;
-            this.pbFrame.Paint += new System.Windows.Forms.PaintEventHandler(this.pbFrame_Paint);
-            this.pbFrame.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pbFrame_MouseDown);
-            this.pbFrame.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pbFrame_MouseMove);
-            this.pbFrame.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pbFrame_MouseUp);
+            this.pbFrame.Paint += new System.Windows.Forms.PaintEventHandler(this.PbFrame_Paint);
+            this.pbFrame.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PbFrame_MouseDown);
+            this.pbFrame.MouseMove += new System.Windows.Forms.MouseEventHandler(this.PbFrame_MouseMove);
+            this.pbFrame.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PbFrame_MouseUp);
             // 
             // btnCopy
             // 
@@ -65,7 +65,7 @@ namespace ScriptEditor
             this.btnCopy.TabIndex = 8;
             this.btnCopy.Text = "Copy";
             this.btnCopy.UseVisualStyleBackColor = true;
-            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            this.btnCopy.Click += new System.EventHandler(this.BtnCopy_Click);
             // 
             // tbCurrent
             // 
@@ -93,7 +93,7 @@ namespace ScriptEditor
             this.btnCapture.TabIndex = 5;
             this.btnCapture.Text = "Capture";
             this.btnCapture.UseVisualStyleBackColor = true;
-            this.btnCapture.Click += new System.EventHandler(this.btnCapture_Click);
+            this.btnCapture.Click += new System.EventHandler(this.BtnCapture_Click);
             // 
             // btnReset
             // 
@@ -103,7 +103,7 @@ namespace ScriptEditor
             this.btnReset.TabIndex = 4;
             this.btnReset.Text = "Reset";
             this.btnReset.UseVisualStyleBackColor = true;
-            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
+            this.btnReset.Click += new System.EventHandler(this.BtnReset_Click);
             // 
             // tbBottomRight
             // 

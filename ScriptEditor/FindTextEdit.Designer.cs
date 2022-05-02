@@ -155,7 +155,7 @@ namespace ScriptEditor
             this.dgvImage.ShowRowErrors = false;
             this.dgvImage.Size = new System.Drawing.Size(824, 344);
             this.dgvImage.TabIndex = 0;
-            this.dgvImage.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvImage_CellClick);
+            this.dgvImage.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.DgvImage_CellClick);
             // 
             // panel2
             // 
@@ -212,7 +212,7 @@ namespace ScriptEditor
             this.btnLoadText.TabIndex = 42;
             this.btnLoadText.Text = "Load Text";
             this.btnLoadText.UseVisualStyleBackColor = true;
-            this.btnLoadText.Click += new System.EventHandler(this.btnLoadText_Click);
+            this.btnLoadText.Click += new System.EventHandler(this.BtnLoadText_Click);
             // 
             // btnADB
             // 
@@ -222,7 +222,7 @@ namespace ScriptEditor
             this.btnADB.TabIndex = 41;
             this.btnADB.Text = "ADB";
             this.btnADB.UseVisualStyleBackColor = true;
-            this.btnADB.Click += new System.EventHandler(this.btnADB_Click);
+            this.btnADB.Click += new System.EventHandler(this.BtnADB_Click);
             // 
             // btnLoadPic
             // 
@@ -232,7 +232,7 @@ namespace ScriptEditor
             this.btnLoadPic.TabIndex = 40;
             this.btnLoadPic.Text = "Load Pic";
             this.btnLoadPic.UseVisualStyleBackColor = true;
-            this.btnLoadPic.Click += new System.EventHandler(this.btnLoadPic_Click);
+            this.btnLoadPic.Click += new System.EventHandler(this.BtnLoadPic_Click);
             // 
             // label9
             // 
@@ -337,7 +337,7 @@ namespace ScriptEditor
             this.tbComment.Name = "tbComment";
             this.tbComment.Size = new System.Drawing.Size(109, 23);
             this.tbComment.TabIndex = 28;
-            this.tbComment.TextChanged += new System.EventHandler(this.tbComment_TextChanged);
+            this.tbComment.TextChanged += new System.EventHandler(this.TbComment_TextChanged);
             // 
             // label2
             // 
@@ -375,7 +375,7 @@ namespace ScriptEditor
             this.btnCropBottom3.TabIndex = 19;
             this.btnCropBottom3.Text = "B3";
             this.btnCropBottom3.UseVisualStyleBackColor = true;
-            this.btnCropBottom3.Click += new System.EventHandler(this.btnCropBottom3_Click);
+            this.btnCropBottom3.Click += new System.EventHandler(this.BtnCropBottom3_Click);
             // 
             // btnCropBottomNegative
             // 
@@ -385,7 +385,7 @@ namespace ScriptEditor
             this.btnCropBottomNegative.TabIndex = 18;
             this.btnCropBottomNegative.Text = "-B";
             this.btnCropBottomNegative.UseVisualStyleBackColor = true;
-            this.btnCropBottomNegative.Click += new System.EventHandler(this.btnCropBottomNegative_Click);
+            this.btnCropBottomNegative.Click += new System.EventHandler(this.BtnCropBottomNegative_Click);
             // 
             // btnCropBottom
             // 
@@ -395,7 +395,7 @@ namespace ScriptEditor
             this.btnCropBottom.TabIndex = 17;
             this.btnCropBottom.Text = "B";
             this.btnCropBottom.UseVisualStyleBackColor = true;
-            this.btnCropBottom.Click += new System.EventHandler(this.btnCropBottom_Click);
+            this.btnCropBottom.Click += new System.EventHandler(this.BtnCropBottom_Click);
             // 
             // btnCropRight3
             // 
@@ -405,7 +405,7 @@ namespace ScriptEditor
             this.btnCropRight3.TabIndex = 16;
             this.btnCropRight3.Text = "R3";
             this.btnCropRight3.UseVisualStyleBackColor = true;
-            this.btnCropRight3.Click += new System.EventHandler(this.btnCropRight3_Click);
+            this.btnCropRight3.Click += new System.EventHandler(this.BtnCropRight3_Click);
             // 
             // btnCropRight
             // 
@@ -415,7 +415,7 @@ namespace ScriptEditor
             this.btnCropRight.TabIndex = 15;
             this.btnCropRight.Text = "R";
             this.btnCropRight.UseVisualStyleBackColor = true;
-            this.btnCropRight.Click += new System.EventHandler(this.btnCropRight_Click);
+            this.btnCropRight.Click += new System.EventHandler(this.BtnCropRight_Click);
             // 
             // btnCropRightNegative
             // 
@@ -425,7 +425,7 @@ namespace ScriptEditor
             this.btnCropRightNegative.TabIndex = 14;
             this.btnCropRightNegative.Text = "-R";
             this.btnCropRightNegative.UseVisualStyleBackColor = true;
-            this.btnCropRightNegative.Click += new System.EventHandler(this.btnCropRightNegative_Click);
+            this.btnCropRightNegative.Click += new System.EventHandler(this.BtnCropRightNegative_Click);
             // 
             // btnCropLeftNegative
             // 
@@ -435,7 +435,7 @@ namespace ScriptEditor
             this.btnCropLeftNegative.TabIndex = 13;
             this.btnCropLeftNegative.Text = "-L";
             this.btnCropLeftNegative.UseVisualStyleBackColor = true;
-            this.btnCropLeftNegative.Click += new System.EventHandler(this.btnCropLeftNegative_Click);
+            this.btnCropLeftNegative.Click += new System.EventHandler(this.BtnCropLeftNegative_Click);
             // 
             // btnCropLeft
             // 
@@ -445,7 +445,7 @@ namespace ScriptEditor
             this.btnCropLeft.TabIndex = 12;
             this.btnCropLeft.Text = "L";
             this.btnCropLeft.UseVisualStyleBackColor = true;
-            this.btnCropLeft.Click += new System.EventHandler(this.btnCropLeft_Click);
+            this.btnCropLeft.Click += new System.EventHandler(this.BtnCropLeft_Click);
             // 
             // btnCropAuto
             // 
@@ -464,7 +464,7 @@ namespace ScriptEditor
             this.btnCropLeft3.TabIndex = 10;
             this.btnCropLeft3.Text = "L3";
             this.btnCropLeft3.UseVisualStyleBackColor = true;
-            this.btnCropLeft3.Click += new System.EventHandler(this.btnCropLeft3_Click);
+            this.btnCropLeft3.Click += new System.EventHandler(this.BtnCropLeft3_Click);
             // 
             // btnCropTop3
             // 
@@ -474,7 +474,7 @@ namespace ScriptEditor
             this.btnCropTop3.TabIndex = 9;
             this.btnCropTop3.Text = "T3";
             this.btnCropTop3.UseVisualStyleBackColor = true;
-            this.btnCropTop3.Click += new System.EventHandler(this.btnCropTop3_Click);
+            this.btnCropTop3.Click += new System.EventHandler(this.BtnCropTop3_Click);
             // 
             // btnCropTop
             // 
@@ -484,7 +484,7 @@ namespace ScriptEditor
             this.btnCropTop.TabIndex = 8;
             this.btnCropTop.Text = "T";
             this.btnCropTop.UseVisualStyleBackColor = true;
-            this.btnCropTop.Click += new System.EventHandler(this.btnCropTop_Click);
+            this.btnCropTop.Click += new System.EventHandler(this.BtnCropTop_Click);
             // 
             // label1
             // 
@@ -503,7 +503,7 @@ namespace ScriptEditor
             this.btnCropTopNegative.TabIndex = 6;
             this.btnCropTopNegative.Text = "-T";
             this.btnCropTopNegative.UseVisualStyleBackColor = true;
-            this.btnCropTopNegative.Click += new System.EventHandler(this.btnCropTopNegative_Click);
+            this.btnCropTopNegative.Click += new System.EventHandler(this.BtnCropTopNegative_Click);
             // 
             // tcColourTabs
             // 
@@ -518,7 +518,7 @@ namespace ScriptEditor
             this.tcColourTabs.SelectedIndex = 0;
             this.tcColourTabs.Size = new System.Drawing.Size(419, 100);
             this.tcColourTabs.TabIndex = 5;
-            this.tcColourTabs.SelectedIndexChanged += new System.EventHandler(this.tcColourTabs_SelectedIndexChanged);
+            this.tcColourTabs.SelectedIndexChanged += new System.EventHandler(this.TcColourTabs_SelectedIndexChanged);
             // 
             // tpGray
             // 
@@ -541,7 +541,7 @@ namespace ScriptEditor
             this.btnGray2Two.TabIndex = 2;
             this.btnGray2Two.Text = "Gray 2 Two";
             this.btnGray2Two.UseVisualStyleBackColor = true;
-            this.btnGray2Two.Click += new System.EventHandler(this.btnGray2Two_Click);
+            this.btnGray2Two.Click += new System.EventHandler(this.BtnGray2Two_Click);
             // 
             // tbGrayThreshold
             // 
@@ -597,7 +597,7 @@ namespace ScriptEditor
             this.btnGrayDiff2Two.TabIndex = 5;
             this.btnGrayDiff2Two.Text = "Gray Diff 2 Two";
             this.btnGrayDiff2Two.UseVisualStyleBackColor = true;
-            this.btnGrayDiff2Two.Click += new System.EventHandler(this.btnGrayDiff2Two_Click);
+            this.btnGrayDiff2Two.Click += new System.EventHandler(this.BtnGrayDiff2Two_Click);
             // 
             // label10
             // 
@@ -641,7 +641,7 @@ namespace ScriptEditor
             this.btnColour2Two.TabIndex = 6;
             this.btnColour2Two.Text = "Colour 2 Two";
             this.btnColour2Two.UseVisualStyleBackColor = true;
-            this.btnColour2Two.Click += new System.EventHandler(this.btnColour2Two_Click);
+            this.btnColour2Two.Click += new System.EventHandler(this.BtnColour2Two_Click);
             // 
             // label11
             // 
@@ -685,7 +685,7 @@ namespace ScriptEditor
             this.btnColourPos2Two.TabIndex = 9;
             this.btnColourPos2Two.Text = "Colour Pos 2 Two";
             this.btnColourPos2Two.UseVisualStyleBackColor = true;
-            this.btnColourPos2Two.Click += new System.EventHandler(this.btnColourPos2Two_Click);
+            this.btnColourPos2Two.Click += new System.EventHandler(this.BtnColourPos2Two_Click);
             // 
             // label12
             // 
@@ -721,7 +721,7 @@ namespace ScriptEditor
             this.btnColourDiff2Two.TabIndex = 10;
             this.btnColourDiff2Two.Text = "Colour Diff 2 Two";
             this.btnColourDiff2Two.UseVisualStyleBackColor = true;
-            this.btnColourDiff2Two.Click += new System.EventHandler(this.btnColourDiff2Two_Click);
+            this.btnColourDiff2Two.Click += new System.EventHandler(this.BtnColourDiff2Two_Click);
             // 
             // label15
             // 
@@ -823,7 +823,7 @@ namespace ScriptEditor
             this.btnUndo.TabIndex = 5;
             this.btnUndo.Text = "Undo";
             this.btnUndo.UseVisualStyleBackColor = true;
-            this.btnUndo.Click += new System.EventHandler(this.btnUndo_Click);
+            this.btnUndo.Click += new System.EventHandler(this.BtnUndo_Click);
             // 
             // cbFindMultiColour
             // 
@@ -834,7 +834,7 @@ namespace ScriptEditor
             this.cbFindMultiColour.TabIndex = 4;
             this.cbFindMultiColour.Text = "Find Multi Colour";
             this.cbFindMultiColour.UseVisualStyleBackColor = true;
-            this.cbFindMultiColour.CheckedChanged += new System.EventHandler(this.cbFindMultiColour_CheckedChanged);
+            this.cbFindMultiColour.CheckedChanged += new System.EventHandler(this.CbFindMultiColour_CheckedChanged);
             // 
             // label16
             // 
@@ -861,7 +861,7 @@ namespace ScriptEditor
             0,
             0,
             0});
-            this.nudRGB.ValueChanged += new System.EventHandler(this.nudRGB_ValueChanged);
+            this.nudRGB.ValueChanged += new System.EventHandler(this.NudRGB_ValueChanged);
             // 
             // btnReset
             // 
@@ -871,7 +871,7 @@ namespace ScriptEditor
             this.btnReset.TabIndex = 4;
             this.btnReset.Text = "Reset";
             this.btnReset.UseVisualStyleBackColor = true;
-            this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
+            this.btnReset.Click += new System.EventHandler(this.BtnReset_Click);
             // 
             // tbOutputText
             // 
@@ -879,7 +879,7 @@ namespace ScriptEditor
             this.tbOutputText.Name = "tbOutputText";
             this.tbOutputText.Size = new System.Drawing.Size(649, 23);
             this.tbOutputText.TabIndex = 3;
-            this.tbOutputText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.tbOutputText_KeyDown);
+            this.tbOutputText.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TbOutputText_KeyDown);
             // 
             // btnGenText
             // 
@@ -889,7 +889,7 @@ namespace ScriptEditor
             this.btnGenText.TabIndex = 2;
             this.btnGenText.Text = "Gen Text";
             this.btnGenText.UseVisualStyleBackColor = true;
-            this.btnGenText.Click += new System.EventHandler(this.btnGenText_Click);
+            this.btnGenText.Click += new System.EventHandler(this.BtnGenText_Click);
             // 
             // btnOK
             // 
@@ -900,7 +900,7 @@ namespace ScriptEditor
             this.btnOK.TabIndex = 1;
             this.btnOK.Text = "OK";
             this.btnOK.UseVisualStyleBackColor = true;
-            this.btnOK.Click += new System.EventHandler(this.btnOK_Click);
+            this.btnOK.Click += new System.EventHandler(this.BtnOK_Click);
             // 
             // btnCancel
             // 
@@ -911,7 +911,7 @@ namespace ScriptEditor
             this.btnCancel.TabIndex = 0;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
             // 
             // openFileDialog1
             // 
@@ -928,7 +928,7 @@ namespace ScriptEditor
             this.btnCopy.TabIndex = 43;
             this.btnCopy.Text = "Copy Text";
             this.btnCopy.UseVisualStyleBackColor = true;
-            this.btnCopy.Click += new System.EventHandler(this.btnCopy_Click);
+            this.btnCopy.Click += new System.EventHandler(this.BtnCopy_Click);
             // 
             // FindTextEdit
             // 

@@ -21,7 +21,7 @@ namespace ScriptEditor
         /// </summary>
         public ValidCommandIds SelectedCommand { get; private set; }
 
-        private void lbCommands_SelectedIndexChanged(object sender, EventArgs e)
+        private void LbCommands_SelectedIndexChanged(object sender, EventArgs e)
         {
             SelectedCommand = Enum.Parse<ValidCommandIds>(lbCommands.SelectedItem.ToString());
             switch (SelectedCommand)

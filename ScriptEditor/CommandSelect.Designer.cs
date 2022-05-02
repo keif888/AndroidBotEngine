@@ -66,7 +66,7 @@ namespace ScriptEditor
             this.lbCommands.ScrollAlwaysVisible = true;
             this.lbCommands.Size = new System.Drawing.Size(269, 424);
             this.lbCommands.TabIndex = 0;
-            this.lbCommands.SelectedIndexChanged += new System.EventHandler(this.lbCommands_SelectedIndexChanged);
+            this.lbCommands.SelectedIndexChanged += new System.EventHandler(this.LbCommands_SelectedIndexChanged);
             // 
             // rtbCommandHelp
             // 

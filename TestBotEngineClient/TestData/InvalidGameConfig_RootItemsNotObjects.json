@@ -1,6 +1,6 @@
 {
   "FileId": "GameConfig",
-  "findStrings": "Invalid",
-  "systemActions": "Invalid",
+  "FindStrings": "Invalid",
+  "SystemActions": "Invalid",
   "actions": "Invalid"
 }

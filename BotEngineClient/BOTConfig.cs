@@ -24,18 +24,18 @@ namespace BotEngineClient
     /// </summary>
     public class BOTConfig : BOTConfigIdentifier
     {
-        public Dictionary<string, FindString> findStrings { get; set; }
-        public Dictionary<string, Action> systemActions { get; set; }
-        public Dictionary<string, Action> actions { get; set; }
+        public Dictionary<string, FindString> FindStrings { get; set; }
+        public Dictionary<string, Action> SystemActions { get; set; }
+        public Dictionary<string, Action> Actions { get; set; }
 
         /// <summary>
         /// Generic constructor for the BOTConfig class
         /// </summary>
         public BOTConfig()
         {
-            findStrings = new Dictionary<string, FindString>();
-            systemActions = new Dictionary<string, Action>();
-            actions = new Dictionary<string, Action>();
+            FindStrings = new Dictionary<string, FindString>();
+            SystemActions = new Dictionary<string, Action>();
+            Actions = new Dictionary<string, Action>();
         }
     }
 
@@ -189,26 +189,26 @@ namespace BotEngineClient
         private int? offsetY1;
         private int? offsetX1;
 
-        public string findString { get; set; }
-        public SearchArea searchArea { get; set; }
-        public float textTolerance { get; set; }
-        public float backgroundTolerance { get; set; }
-        public int? offsetX { get => offsetX1 == null ? 20 : offsetX1; set => offsetX1 = value; }
-        public int? offsetY { get => offsetY1 == null ? 10 : offsetY1; set => offsetY1 = value; }
+        public string SearchString { get; set; }
+        public SearchArea SearchArea { get; set; }
+        public float TextTolerance { get; set; }
+        public float BackgroundTolerance { get; set; }
+        public int? OffsetX { get => offsetX1 == null ? 20 : offsetX1; set => offsetX1 = value; }
+        public int? OffsetY { get => offsetY1 == null ? 10 : offsetY1; set => offsetY1 = value; }
         public FindString()
         {
-            this.findString = string.Empty;
-            this.searchArea = new SearchArea();
-            this.textTolerance = 0.2f;
-            this.backgroundTolerance = 0.2f;
+            this.SearchString = string.Empty;
+            this.SearchArea = new SearchArea();
+            this.TextTolerance = 0.2f;
+            this.BackgroundTolerance = 0.2f;
         }
 
         public FindString(string findString, SearchArea searchArea, float textTolerance, float backgroundTolerance)
         {
-            this.findString = findString ?? throw new ArgumentNullException(nameof(findString));
-            this.searchArea = searchArea ?? throw new ArgumentNullException(nameof(searchArea));
-            this.textTolerance = textTolerance;
-            this.backgroundTolerance = backgroundTolerance;
+            this.SearchString = findString ?? throw new ArgumentNullException(nameof(findString));
+            this.SearchArea = searchArea ?? throw new ArgumentNullException(nameof(searchArea));
+            this.TextTolerance = textTolerance;
+            this.BackgroundTolerance = backgroundTolerance;
         }
     }
 
@@ -331,12 +331,12 @@ namespace BotEngineClient
     {
         public int X { get; set; }
         public int Y { get; set; }
-        public int width { get; set; }
-        public int height { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
 
         public override string ToString()
         {
-            return string.Format("({0},{1}) - ({2},{3})", X, Y, X + width, Y + height);
+            return string.Format("({0},{1}) - ({2},{3})", X, Y, X + Width, Y + Height);
         }
     }
 

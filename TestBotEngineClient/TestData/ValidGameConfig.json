@@ -1,30 +1,30 @@
 {
   "FileId": "GameConfig",
-  "findStrings": {
+  "FindStrings": {
     "CloseGeneric": {
-      "findString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
-      "searchArea": {
+      "SearchString": "|<CloseGeneric>*200$32.zzzzzzTzzwT3zzy3UDzz0s1zzU60Dzk3k1zs1y0Ds0zk1w0Ty0C0Dzk107zy003zzs01zzz00zzzs0Tzzy07zzz00zzzU07zzU00zzk107zs0s0zw0T07y0Dw0z07zU7U3zw0s1zzUD0zzw3kTzzVzzzzwzzzzzzU",
+      "SearchArea": {
         "X": 350,
         "Y": 50,
-        "width": 200,
-        "height": 350
+        "Width": 200,
+        "Height": 350
       },
-      "textTolerance": 0.2,
-      "backgroundTolerance": 0.2
+      "TextTolerance": 0.2,
+      "BackgroundTolerance": 0.2
     },
     "Phone": {
-      "findString": "|<Phone>*92$83.zzzzzzzzzzzzUTzk1zzzzzzzzz0zw00TzzzzzzzU07U00Dzzw0Tzz00A0007znk0zzy00E0007znU1zzw00U000DznU3zzsD1U000zznU7zzkQ30001zzXUDzzUs70007zz3UTzz3UD000Tzy3Uzzy70T001zzw3VzzwDUz007zzs3Xzzs71y00Dzzk3bzzkA3y00zzzU3jzzUE7y03zzz03zzz10Dy0Dzzy03zzy00Ty0zzzw03zzw00zy1zzzs03zzs01zw7zzzk03zzk03zwTzzzk0HzzU07zxzzzzzzrzz008",
-      "searchArea": {
+      "SearchString": "|<Phone>*92$83.zzzzzzzzzzzzUTzk1zzzzzzzzz0zw00TzzzzzzzU07U00Dzzw0Tzz00A0007znk0zzy00E0007znU1zzw00U000DznU3zzsD1U000zznU7zzkQ30001zzXUDzzUs70007zz3UTzz3UD000Tzy3Uzzy70T001zzw3VzzwDUz007zzs3Xzzs71y00Dzzk3bzzkA3y00zzzU3jzzUE7y03zzz03zzz10Dy0Dzzy03zzy00Ty0zzzw03zzw00zy1zzzs03zzs01zw7zzzk03zzk03zwTzzzk0HzzU07zxzzzzzzrzz008",
+      "SearchArea": {
         "X": 380,
         "Y": 0,
-        "width": 150,
-        "height": 40
+        "Width": 150,
+        "Height": 40
       },
-      "textTolerance": 0.2,
-      "backgroundTolerance": 0.2
+      "TextTolerance": 0.2,
+      "BackgroundTolerance": 0.2
     }
   },
-  "systemActions": {
+  "SystemActions": {
     "ClosePopups": {
       "ActionType": "System",
       "Commands": [
@@ -43,7 +43,7 @@
       ]
     }
   },
-  "actions": {
+  "Actions": {
     "GameDownDetect": {
       "Frequency": 1,
       "ActionType": "Scheduled",

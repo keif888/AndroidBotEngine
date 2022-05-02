@@ -22,7 +22,11 @@ namespace ScriptEditor
         private BOTListConfig listConfig;
         private bool ChangePending;
         private bool UnsavedChanges;
+#pragma warning disable IDE0044 // Add readonly modifier
+#pragma warning disable IDE0051 // Remove unused private members
         private AdbServer? server;
+#pragma warning restore IDE0051 // Remove unused private members
+#pragma warning restore IDE0044 // Add readonly modifier
         private JsonHelper.ConfigFileType loadedFileType;
         private string JsonFileName;
         private TreeNode ActiveTreeNode;
@@ -90,7 +94,7 @@ namespace ScriptEditor
             {
                 string fileName = openFileDialog1.FileName;
                 JsonHelper jsonHelper = new JsonHelper();
-                switch (jsonHelper.getFileType(fileName))
+                switch (jsonHelper.GetFileType(fileName))
                 {
                     case JsonHelper.ConfigFileType.DeviceConfig:
                         if (jsonHelper.ValidateDeviceConfigStructure(fileName))
@@ -153,7 +157,7 @@ namespace ScriptEditor
             string jsonString = File.ReadAllText(fileName);
             try
             {
-                gameConfig = JsonSerializer.Deserialize<BOTConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+                gameConfig = JsonSerializer.Deserialize<BOTConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip, PropertyNameCaseInsensitive = true })!;
             }
             catch (Exception ex)
             {
@@ -167,9 +171,9 @@ namespace ScriptEditor
             cbImageNamesForList.Items.Clear();
             cbPickActionAction.Items.Clear();
             cbImageAreasImage.Items.Clear();
-            TreeNode findStringsNode = tvBotData.Nodes.Add("findStrings");
-            findStringsNode.Name = "findStrings";
-            foreach (KeyValuePair<string, BotEngineClient.FindString> item in gameConfig.findStrings)
+            TreeNode findStringsNode = tvBotData.Nodes.Add("FindStrings");
+            findStringsNode.Name = "FindStrings";
+            foreach (KeyValuePair<string, BotEngineClient.FindString> item in gameConfig.FindStrings)
             {
                 TreeNode treeNode = new TreeNode
                 {
@@ -187,17 +191,17 @@ namespace ScriptEditor
             tvBotData.Sorted = false;
 
             findStringsNode.Expand();
-            TreeNode systemActionsNode = tvBotData.Nodes.Add("systemActions");
-            systemActionsNode.Name = "systemActions";
-            foreach (KeyValuePair<string, BotEngineClient.Action> item in gameConfig.systemActions)
+            TreeNode systemActionsNode = tvBotData.Nodes.Add("SystemActions");
+            systemActionsNode.Name = "SystemActions";
+            foreach (KeyValuePair<string, BotEngineClient.Action> item in gameConfig.SystemActions)
             {
                 LoadActionTreeNode(systemActionsNode, item);
                 cbPickActionAction.Items.Add(item.Key);
             }
             systemActionsNode.Expand();
-            TreeNode actionsNode = tvBotData.Nodes.Add("actions");
-            actionsNode.Name = "actions";
-            foreach (KeyValuePair<string, BotEngineClient.Action> item in gameConfig.actions)
+            TreeNode actionsNode = tvBotData.Nodes.Add("Actions");
+            actionsNode.Name = "Actions";
+            foreach (KeyValuePair<string, BotEngineClient.Action> item in gameConfig.Actions)
             {
                 LoadActionTreeNode(actionsNode, item);
                 cbPickActionAction.Items.Add(item.Key);
@@ -220,7 +224,7 @@ namespace ScriptEditor
             string jsonString = File.ReadAllText(fileName);
             try
             {
-                deviceConfig = JsonSerializer.Deserialize<BOTDeviceConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+                deviceConfig = JsonSerializer.Deserialize<BOTDeviceConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip, PropertyNameCaseInsensitive = true })!;
             }
             catch (Exception ex)
             {
@@ -263,7 +267,7 @@ namespace ScriptEditor
             string jsonString = File.ReadAllText(fileName);
             try
             {
-                listConfig = JsonSerializer.Deserialize<BOTListConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+                listConfig = JsonSerializer.Deserialize<BOTListConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip, PropertyNameCaseInsensitive = true })!;
             }
             catch (Exception ex)
             {
@@ -394,9 +398,11 @@ namespace ScriptEditor
         /// </summary>
         private void SaveListConfig()
         {
-            BOTListConfig listConfig = new BOTListConfig();
-            listConfig.FileId = loadedFileType.ToString();
-            listConfig.Coordinates = new Dictionary<string, List<XYCoords>>();
+            BOTListConfig listConfig = new BOTListConfig
+            {
+                FileId = loadedFileType.ToString(),
+                Coordinates = new Dictionary<string, List<XYCoords>>()
+            };
             foreach (TreeNode parent in tvBotData.Nodes)
             {
                 if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "Coordinates")
@@ -436,29 +442,33 @@ namespace ScriptEditor
         /// </summary>
         private void SaveGameConfig()
         {
-            BOTConfig gameConfig = new BOTConfig();
-            gameConfig.FileId = loadedFileType.ToString();
-            gameConfig.findStrings = new Dictionary<string, FindString>();
-            gameConfig.systemActions = new Dictionary<string, BotEngineClient.Action>();
-            gameConfig.actions = new Dictionary<string, BotEngineClient.Action>();
+            BOTConfig gameConfig = new BOTConfig
+            {
+                FileId = loadedFileType.ToString(),
+                FindStrings = new Dictionary<string, FindString>(),
+                SystemActions = new Dictionary<string, BotEngineClient.Action>(),
+                Actions = new Dictionary<string, BotEngineClient.Action>()
+            };
             foreach (TreeNode parent in tvBotData.Nodes)
             {
-                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "findStrings")
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "FindStrings")
                 {
                     foreach (TreeNode child in parent.Nodes)
                     {
-                        gameConfig.findStrings.Add(child.Name, (FindString)child.Tag);
+                        gameConfig.FindStrings.Add(child.Name, (FindString)child.Tag);
                     }
                 }
-                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "systemActions")
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "SystemActions")
                 {
                     foreach (TreeNode child in parent.Nodes)
                     {
                         BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
-                        BotEngineClient.Action newAction = new BotEngineClient.Action();
-                        newAction.ActionType = sourceAction.ActionType;
-                        newAction.AfterAction = sourceAction.AfterAction;
-                        newAction.BeforeAction = sourceAction.BeforeAction;
+                        BotEngineClient.Action newAction = new BotEngineClient.Action
+                        {
+                            ActionType = sourceAction.ActionType,
+                            AfterAction = sourceAction.AfterAction,
+                            BeforeAction = sourceAction.BeforeAction
+                        };
                         if (child.Nodes.Count != 0)
                         {
                             int commandNumber = 10;
@@ -468,7 +478,7 @@ namespace ScriptEditor
                         }
                         newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
                         newAction.Frequency = sourceAction.Frequency;
-                        gameConfig.systemActions.Add(child.Name, newAction);
+                        gameConfig.SystemActions.Add(child.Name, newAction);
                     }
                 }
                 if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "actions")
@@ -476,10 +486,12 @@ namespace ScriptEditor
                     foreach (TreeNode child in parent.Nodes)
                     {
                         BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
-                        BotEngineClient.Action newAction = new BotEngineClient.Action();
-                        newAction.ActionType = sourceAction.ActionType;
-                        newAction.AfterAction = sourceAction.AfterAction;
-                        newAction.BeforeAction = sourceAction.BeforeAction;
+                        BotEngineClient.Action newAction = new BotEngineClient.Action
+                        {
+                            ActionType = sourceAction.ActionType,
+                            AfterAction = sourceAction.AfterAction,
+                            BeforeAction = sourceAction.BeforeAction
+                        };
                         if (child.Nodes.Count != 0)
                         {
                             int commandNumber = 10;
@@ -489,7 +501,7 @@ namespace ScriptEditor
                         }
                         newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
                         newAction.Frequency = sourceAction.Frequency;
-                        gameConfig.actions.Add(child.Name, newAction);
+                        gameConfig.Actions.Add(child.Name, newAction);
                     }
                 }
             }
@@ -523,12 +535,14 @@ namespace ScriptEditor
             foreach (TreeNode childNode in parent.Nodes)
             {
                 Command childCommand = (Command)childNode.Tag;
-                Command newCommand = new Command(childCommand.CommandId);
-                newCommand.ActionName = childCommand.ActionName;
-                newCommand.Areas = childCommand.Areas;
-                newCommand.ChangeDetectArea = childCommand.ChangeDetectArea;
-                newCommand.ChangeDetectDifference = childCommand.ChangeDetectDifference;
-                newCommand.CommandNumber = commandNumber;
+                Command newCommand = new Command(childCommand.CommandId)
+                {
+                    ActionName = childCommand.ActionName,
+                    Areas = childCommand.Areas,
+                    ChangeDetectArea = childCommand.ChangeDetectArea,
+                    ChangeDetectDifference = childCommand.ChangeDetectDifference,
+                    CommandNumber = commandNumber
+                };
                 commandNumber += 10;
                 if (childNode.Nodes.Count != 0)
                 {
@@ -555,9 +569,11 @@ namespace ScriptEditor
         /// </summary>
         private void SaveDeviceConfig()
         {
-            BOTDeviceConfig deviceConfig = new BOTDeviceConfig();
-            deviceConfig.FileId = loadedFileType.ToString();
-            deviceConfig.LastActionTaken = new Dictionary<string, ActionActivity>();
+            BOTDeviceConfig deviceConfig = new BOTDeviceConfig
+            {
+                FileId = loadedFileType.ToString(),
+                LastActionTaken = new Dictionary<string, ActionActivity>()
+            };
             foreach (TreeNode parent in tvBotData.Nodes)
             {
                 if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "LastActionTaken")
@@ -595,7 +611,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        private void NewToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FileTypeSelect fileTypeSelect = new FileTypeSelect();
 
@@ -616,10 +632,10 @@ namespace ScriptEditor
                     switch (loadedFileType)
                     {
                         case JsonHelper.ConfigFileType.GameConfig:
-                            TreeNode findStringsNode = tvBotData.Nodes.Add("findStrings");
-                            findStringsNode.Name = "findStrings";
-                            TreeNode systemActionsNode = tvBotData.Nodes.Add("systemActions");
-                            systemActionsNode.Name = "systemActions";
+                            TreeNode findStringsNode = tvBotData.Nodes.Add("FindStrings");
+                            findStringsNode.Name = "FindStrings";
+                            TreeNode systemActionsNode = tvBotData.Nodes.Add("SystemActions");
+                            systemActionsNode.Name = "SystemActions";
                             TreeNode actionsNode = tvBotData.Nodes.Add("actions");
                             actionsNode.Name = "actions";
                             break;
@@ -695,7 +711,7 @@ namespace ScriptEditor
                     case ValidCommandIds.WaitForChange:
                     case ValidCommandIds.WaitForNoChange:
                         if (command.ChangeDetectArea != null)
-                            childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.ChangeDetectArea.X, command.ChangeDetectArea.Y, command.ChangeDetectArea.X + command.ChangeDetectArea.width, command.ChangeDetectArea.Y + command.ChangeDetectArea.height);
+                            childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.ChangeDetectArea.X, command.ChangeDetectArea.Y, command.ChangeDetectArea.X + command.ChangeDetectArea.Width, command.ChangeDetectArea.Y + command.ChangeDetectArea.Height);
                         break;
                     case ValidCommandIds.ClickWhenNotFoundInArea:
                     case ValidCommandIds.Exit:
@@ -734,11 +750,11 @@ namespace ScriptEditor
             {
                 switch (e.Node.Name)
                 {
-                    case "systemActions":
+                    case "SystemActions":
                     case "actions":
                         addActionToolStripMenuItem.Enabled = true;
                         break;
-                    case "findStrings":
+                    case "FindStrings":
                         addFindStringtoolStripMenuItem.Enabled = true;
                         break;
                     case "Coordinates":
@@ -782,7 +798,7 @@ namespace ScriptEditor
                             {
                                 foreach (SearchArea areaItem in commandCopy.Areas)
                                 {
-                                    lbImageAreaAreas.Items.Add(string.Format("({0}, {1}) - ({2}, {3})", areaItem.X, areaItem.Y, areaItem.X + areaItem.width, areaItem.Y + areaItem.height));
+                                    lbImageAreaAreas.Items.Add(string.Format("({0}, {1}) - ({2}, {3})", areaItem.X, areaItem.Y, areaItem.X + areaItem.Width, areaItem.Y + areaItem.Height));
                                 }
                             }
                             gbImageArea.Enabled = true;
@@ -958,8 +974,8 @@ namespace ScriptEditor
                             {
                                 tbWFNCX1.Text = commandCopy.ChangeDetectArea.X.ToString();
                                 tbWFNCY1.Text = commandCopy.ChangeDetectArea.Y.ToString();
-                                tbWFNCX2.Text = (commandCopy.ChangeDetectArea.X + commandCopy.ChangeDetectArea.width).ToString();
-                                tbWFNCY2.Text = (commandCopy.ChangeDetectArea.Y + commandCopy.ChangeDetectArea.height).ToString();
+                                tbWFNCX2.Text = (commandCopy.ChangeDetectArea.X + commandCopy.ChangeDetectArea.Width).ToString();
+                                tbWFNCY2.Text = (commandCopy.ChangeDetectArea.Y + commandCopy.ChangeDetectArea.Height).ToString();
                             }
                             else
                             {
@@ -1031,7 +1047,7 @@ namespace ScriptEditor
                     dtpActionTimeOfDay.Checked = false;
                 }
                 tbActionFrequency.Text = actionCopy.Frequency.ToString();
-                if (e.Node.Parent.Name == "systemActions")
+                if (e.Node.Parent.Name == "SystemActions")
                     cbActionType.Enabled = false;
                 else
                     cbActionType.Enabled = true;
@@ -1041,14 +1057,14 @@ namespace ScriptEditor
                 gbFindText.Enabled = true;
                 gbFindText.Visible = true;
                 addFindStringtoolStripMenuItem.Enabled = true;
-                tbFindTextBackTolerance.Text = findString.backgroundTolerance.ToString();
-                tbFindTextTextTolerance.Text = findString.textTolerance.ToString();
+                tbFindTextBackTolerance.Text = findString.BackgroundTolerance.ToString();
+                tbFindTextTextTolerance.Text = findString.TextTolerance.ToString();
                 tbFindTextName.Text = e.Node.Name;
-                tbFindTextSearch.Text = findString.findString;
-                tbFindTextSearchX1.Text = findString.searchArea.X.ToString();
-                tbFindTextSearchY1.Text = findString.searchArea.Y.ToString();
-                tbFindTextSearchX2.Text = (findString.searchArea.X + findString.searchArea.width).ToString();
-                tbFindTextSearchY2.Text = (findString.searchArea.Y + findString.searchArea.height).ToString();
+                tbFindTextSearch.Text = findString.SearchString;
+                tbFindTextSearchX1.Text = findString.SearchArea.X.ToString();
+                tbFindTextSearchY1.Text = findString.SearchArea.Y.ToString();
+                tbFindTextSearchX2.Text = (findString.SearchArea.X + findString.SearchArea.Width).ToString();
+                tbFindTextSearchY2.Text = (findString.SearchArea.Y + findString.SearchArea.Height).ToString();
             }
             else if ((e.Node.Tag != null) && (e.Node.Tag is XYCoords coords))
             {
@@ -1208,13 +1224,13 @@ namespace ScriptEditor
 
                         ActiveTreeNode.Name = tbFindTextName.Text;
                         ActiveTreeNode.Text = tbFindTextName.Text;
-                        findTag.backgroundTolerance = float.Parse(tbFindTextBackTolerance.Text);
-                        findTag.textTolerance = float.Parse(tbFindTextTextTolerance.Text);
-                        findTag.findString = tbFindTextSearch.Text;
-                        findTag.searchArea.X = int.Parse(tbFindTextSearchX1.Text);
-                        findTag.searchArea.Y = int.Parse(tbFindTextSearchY1.Text);
-                        findTag.searchArea.width = int.Parse(tbFindTextSearchX2.Text) - findTag.searchArea.X;
-                        findTag.searchArea.height = int.Parse(tbFindTextSearchY2.Text) - findTag.searchArea.Y;
+                        findTag.BackgroundTolerance = float.Parse(tbFindTextBackTolerance.Text);
+                        findTag.TextTolerance = float.Parse(tbFindTextTextTolerance.Text);
+                        findTag.SearchString = tbFindTextSearch.Text;
+                        findTag.SearchArea.X = int.Parse(tbFindTextSearchX1.Text);
+                        findTag.SearchArea.Y = int.Parse(tbFindTextSearchY1.Text);
+                        findTag.SearchArea.Width = int.Parse(tbFindTextSearchX2.Text) - findTag.SearchArea.X;
+                        findTag.SearchArea.Height = int.Parse(tbFindTextSearchY2.Text) - findTag.SearchArea.Y;
                     }
                 }
                 else if (selectedTag is BotEngineClient.Action botAction)
@@ -1275,11 +1291,13 @@ namespace ScriptEditor
                                 foreach (string item in lbImageAreaAreas.Items)
                                 {
                                     string[] values = item.Replace("(", "").Replace(")", "").Replace(" ", "").Split(delimiters);
-                                    SearchArea searchArea = new SearchArea();
-                                    searchArea.X = int.Parse(values[0]);
-                                    searchArea.Y = int.Parse(values[1]);
-                                    searchArea.width = int.Parse(values[2]) - searchArea.X;
-                                    searchArea.height = int.Parse(values[3]) - searchArea.Y;
+                                    SearchArea searchArea = new SearchArea
+                                    {
+                                        X = int.Parse(values[0]),
+                                        Y = int.Parse(values[1])
+                                    };
+                                    searchArea.Width = int.Parse(values[2]) - searchArea.X;
+                                    searchArea.Height = int.Parse(values[3]) - searchArea.Y;
                                     commandCopy.Areas.Add(searchArea);
                                 }
                                 break;
@@ -1403,8 +1421,8 @@ namespace ScriptEditor
                                 }
                                 commandCopy.ChangeDetectArea.X = int.Parse(tbWFNCX1.Text);
                                 commandCopy.ChangeDetectArea.Y = int.Parse(tbWFNCY1.Text);
-                                commandCopy.ChangeDetectArea.width = int.Parse(tbWFNCX2.Text) - commandCopy.ChangeDetectArea.X;
-                                commandCopy.ChangeDetectArea.height = int.Parse(tbWFNCY2.Text) - commandCopy.ChangeDetectArea.Y;
+                                commandCopy.ChangeDetectArea.Width = int.Parse(tbWFNCX2.Text) - commandCopy.ChangeDetectArea.X;
+                                commandCopy.ChangeDetectArea.Height = int.Parse(tbWFNCY2.Text) - commandCopy.ChangeDetectArea.Y;
                                 commandCopy.ChangeDetectDifference = (float)nudWFNCDetectPercent.Value / 100.0f;
                                 break;
                             default:
@@ -1463,12 +1481,12 @@ namespace ScriptEditor
         }
 
 
-        private void testToolStripMenuItem_Click(object sender, EventArgs e)
+        private void TestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //ToDo: Implement Test of an Action Capability.
         }
 
-        private void setupToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SetupToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FindTextEdit fte = new FindTextEdit();
             if (fte.ShowDialog() == DialogResult.OK)
@@ -1477,7 +1495,7 @@ namespace ScriptEditor
                 {
                     string searchText = fte.SearchText;
                     Rectangle searchArea = fte.SearchRectangle;
-                    string clipboard = string.Format("{{\"findString\":\"{0}\", \"searchArea\":{{\"X\":{1}, \"Y\":{2}, \"width\":{3}, \"height\":{4}}}}}", searchText, searchArea.X, searchArea.Y, searchArea.Width, searchArea.Height);
+                    string clipboard = string.Format("{{\"FindString\":\"{0}\", \"searchArea\":{{\"X\":{1}, \"Y\":{2}, \"width\":{3}, \"height\":{4}}}}}", searchText, searchArea.X, searchArea.Y, searchArea.Width, searchArea.Height);
                     Clipboard.SetText(clipboard);
                 }
             }
@@ -1485,10 +1503,10 @@ namespace ScriptEditor
 
         private void AllFields_TextChanged(object sender, EventArgs e)
         {
-            setChangePending();
+            SetChangePending();
         }
 
-        private void tvBotData_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        private void TvBotData_BeforeSelect(object sender, TreeViewCancelEventArgs e)
         {
             if (ChangePending)
             {
@@ -1512,7 +1530,7 @@ namespace ScriptEditor
             }
         }
 
-        private void cbActionType_TextChanged(object sender, EventArgs e)
+        private void CbActionType_TextChanged(object sender, EventArgs e)
         {
             if (Enum.TryParse(cbActionType.Text, true, out ValidActionType validActionType))
             {
@@ -1554,46 +1572,46 @@ namespace ScriptEditor
                         break;
                 }
             }
-            setChangePending();
+            SetChangePending();
         }
 
-        private void btnAddImageNames_Click(object sender, EventArgs e)
+        private void BtnAddImageNames_Click(object sender, EventArgs e)
         {
-            setChangePending();
+            SetChangePending();
             lbImageNames.Items.Add(cbImageNamesForList.SelectedItem.ToString());
         }
 
-        private void btnRemoveImageNames_Click(object sender, EventArgs e)
+        private void BtnRemoveImageNames_Click(object sender, EventArgs e)
         {
             if (lbImageNames.SelectedItems.Count > 0)
             {
-                setChangePending();
+                SetChangePending();
                 lbImageNames.Items.RemoveAt(lbImageNames.SelectedIndex);
             }
         }
 
-        private void lbImageNames_SelectedValueChanged(object sender, EventArgs e)
+        private void LbImageNames_SelectedValueChanged(object sender, EventArgs e)
         {
             if (lbImageNames.SelectedItem != null)
                 cbImageNamesForList.Text = lbImageNames.SelectedItem.ToString();
         }
 
-        private void btImageAreaAdd_Click(object sender, EventArgs e)
+        private void BtImageAreaAdd_Click(object sender, EventArgs e)
         {
-            setChangePending();
+            SetChangePending();
             lbImageAreaAreas.Items.Add(string.Format("({0}, {1}) - ({2}, {3})", tbImageAreasX.Text, tbImageAreasY.Text, tbImageAreasW.Text, tbImageAreasH.Text));
         }
 
-        private void btImageAreaRemove_Click(object sender, EventArgs e)
+        private void BtImageAreaRemove_Click(object sender, EventArgs e)
         {
             if (lbImageAreaAreas.SelectedItems.Count > 0)
             {
-                setChangePending();
+                SetChangePending();
                 lbImageAreaAreas.Items.RemoveAt(lbImageAreaAreas.SelectedIndex);
             }
         }
 
-        private void lbImageAreaAreas_SelectedIndexChanged(object sender, EventArgs e)
+        private void LbImageAreaAreas_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (lbImageAreaAreas.SelectedItem != null)
             {
@@ -1606,13 +1624,13 @@ namespace ScriptEditor
             }
         }
 
-        private void setChangePending()
+        private void SetChangePending()
         {
             ChangePending = true;
             btnUpdate.Enabled = true;
         }
 
-        private void btnPasteFindText_Click(object sender, EventArgs e)
+        private void BtnPasteFindText_Click(object sender, EventArgs e)
         {
             if (Clipboard.ContainsText())
             {
@@ -1631,9 +1649,9 @@ namespace ScriptEditor
                     JsonNode jsonClipboard = JsonNode.Parse(clipboard, nodeOptions, documentOptions);
                     if (jsonClipboard is JsonObject jsonObject)
                     {
-                        if (jsonObject.ContainsKey("findString"))
+                        if (jsonObject.ContainsKey("SearchString"))
                         {
-                            tbFindTextSearch.Text = jsonObject["findString"].GetValue<JsonElement>().GetString();
+                            tbFindTextSearch.Text = jsonObject["SearchString"].GetValue<JsonElement>().GetString();
                         }
                         if (jsonObject.ContainsKey("searchArea"))
                         {
@@ -1670,7 +1688,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void addActionToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddActionToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ResetEditFormItems();
             if (tvBotData.SelectedNode.Nodes.ContainsKey("New Action"))
@@ -1704,7 +1722,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void addFindStringtoolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddFindStringtoolStripMenuItem_Click(object sender, EventArgs e)
         {
             ResetEditFormItems();
             if (tvBotData.SelectedNode.Nodes.ContainsKey("New FindString"))
@@ -1734,7 +1752,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void addCoordinatestoolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddCoordinatestoolStripMenuItem_Click(object sender, EventArgs e)
         {
             ResetEditFormItems();
             if (tvBotData.SelectedNode.Nodes.ContainsKey("New Coordinates"))
@@ -1764,11 +1782,9 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void addCommandToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddCommandToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode currentNode = tvBotData.SelectedNode;
-            int currentNodeIndex = tvBotData.SelectedNode.Index;
-            TreeNode parent = tvBotData.SelectedNode.Parent;
             if (currentNode.Tag != null)
             {
                 if (currentNode.Tag is Command || currentNode.Tag is BotEngineClient.Action)
@@ -1801,7 +1817,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void aboveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AboveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode currentNode = tvBotData.SelectedNode;
             int currentNodeIndex = tvBotData.SelectedNode.Index;
@@ -1861,7 +1877,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void belowToolStripMenuItem_Click(object sender, EventArgs e)
+        private void BelowToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode currentNode = tvBotData.SelectedNode;
             int currentNodeIndex = tvBotData.SelectedNode.Index;
@@ -1936,7 +1952,7 @@ namespace ScriptEditor
         }
         #endregion
 
-        private void btnFindTextGenerate_Click(object sender, EventArgs e)
+        private void BtnFindTextGenerate_Click(object sender, EventArgs e)
         {
             FindTextEdit fte = new FindTextEdit();
             if (fte.ShowDialog() == DialogResult.OK)
@@ -1954,7 +1970,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void deleteToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode currentNode = tvBotData.SelectedNode;
             if (currentNode != null)
@@ -1970,7 +1986,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void upToolStripMenuItem_Click(object sender, EventArgs e)
+        private void UpToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode currentNode = tvBotData.SelectedNode;
             if (currentNode != null && currentNode.Parent != null)
@@ -1992,7 +2008,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void downToolStripMenuItem_Click(object sender, EventArgs e)
+        private void DownToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode currentNode = tvBotData.SelectedNode;
             if (currentNode != null && currentNode.Parent != null)
@@ -2009,7 +2025,7 @@ namespace ScriptEditor
             }
         }
 
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             HelpAboutBox about = new HelpAboutBox();
             about.ShowDialog();

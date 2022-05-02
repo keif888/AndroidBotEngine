@@ -223,7 +223,7 @@ namespace ScriptEditor
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newToolStripMenuItem.Text = "&New";
-            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
+            this.newToolStripMenuItem.Click += new System.EventHandler(this.NewToolStripMenuItem_Click);
             // 
             // openToolStripMenuItem
             // 
@@ -278,7 +278,7 @@ namespace ScriptEditor
             this.addFindStringtoolStripMenuItem.Name = "addFindStringtoolStripMenuItem";
             this.addFindStringtoolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addFindStringtoolStripMenuItem.Text = "Add &FindString";
-            this.addFindStringtoolStripMenuItem.Click += new System.EventHandler(this.addFindStringtoolStripMenuItem_Click);
+            this.addFindStringtoolStripMenuItem.Click += new System.EventHandler(this.AddFindStringtoolStripMenuItem_Click);
             // 
             // addActionToolStripMenuItem
             // 
@@ -286,7 +286,7 @@ namespace ScriptEditor
             this.addActionToolStripMenuItem.Name = "addActionToolStripMenuItem";
             this.addActionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addActionToolStripMenuItem.Text = "Add Ac&tion";
-            this.addActionToolStripMenuItem.Click += new System.EventHandler(this.addActionToolStripMenuItem_Click);
+            this.addActionToolStripMenuItem.Click += new System.EventHandler(this.AddActionToolStripMenuItem_Click);
             // 
             // addCoordinatestoolStripMenuItem
             // 
@@ -294,7 +294,7 @@ namespace ScriptEditor
             this.addCoordinatestoolStripMenuItem.Name = "addCoordinatestoolStripMenuItem";
             this.addCoordinatestoolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addCoordinatestoolStripMenuItem.Text = "Add &Coordinates";
-            this.addCoordinatestoolStripMenuItem.Click += new System.EventHandler(this.addCoordinatestoolStripMenuItem_Click);
+            this.addCoordinatestoolStripMenuItem.Click += new System.EventHandler(this.AddCoordinatestoolStripMenuItem_Click);
             // 
             // toolStripMenuItem5
             // 
@@ -307,7 +307,7 @@ namespace ScriptEditor
             this.addCommandToolStripMenuItem.Name = "addCommandToolStripMenuItem";
             this.addCommandToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addCommandToolStripMenuItem.Text = "Add C&ommand";
-            this.addCommandToolStripMenuItem.Click += new System.EventHandler(this.addCommandToolStripMenuItem_Click);
+            this.addCommandToolStripMenuItem.Click += new System.EventHandler(this.AddCommandToolStripMenuItem_Click);
             // 
             // aboveToolStripMenuItem
             // 
@@ -315,7 +315,7 @@ namespace ScriptEditor
             this.aboveToolStripMenuItem.Name = "aboveToolStripMenuItem";
             this.aboveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.aboveToolStripMenuItem.Text = "Insert &Above";
-            this.aboveToolStripMenuItem.Click += new System.EventHandler(this.aboveToolStripMenuItem_Click);
+            this.aboveToolStripMenuItem.Click += new System.EventHandler(this.AboveToolStripMenuItem_Click);
             // 
             // belowToolStripMenuItem
             // 
@@ -323,7 +323,7 @@ namespace ScriptEditor
             this.belowToolStripMenuItem.Name = "belowToolStripMenuItem";
             this.belowToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.belowToolStripMenuItem.Text = "Insert &Below";
-            this.belowToolStripMenuItem.Click += new System.EventHandler(this.belowToolStripMenuItem_Click);
+            this.belowToolStripMenuItem.Click += new System.EventHandler(this.BelowToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
@@ -343,7 +343,7 @@ namespace ScriptEditor
             this.upToolStripMenuItem.Name = "upToolStripMenuItem";
             this.upToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.upToolStripMenuItem.Text = "&Up";
-            this.upToolStripMenuItem.Click += new System.EventHandler(this.upToolStripMenuItem_Click);
+            this.upToolStripMenuItem.Click += new System.EventHandler(this.UpToolStripMenuItem_Click);
             // 
             // downToolStripMenuItem
             // 
@@ -351,7 +351,7 @@ namespace ScriptEditor
             this.downToolStripMenuItem.Name = "downToolStripMenuItem";
             this.downToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.downToolStripMenuItem.Text = "&Down";
-            this.downToolStripMenuItem.Click += new System.EventHandler(this.downToolStripMenuItem_Click);
+            this.downToolStripMenuItem.Click += new System.EventHandler(this.DownToolStripMenuItem_Click);
             // 
             // toolStripMenuItem4
             // 
@@ -365,7 +365,7 @@ namespace ScriptEditor
             this.deleteToolStripMenuItem.ShortcutKeyDisplayString = "Del";
             this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
-            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.deleteToolStripMenuItem_Click);
+            this.deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
             // 
             // textToolStripMenuItem
             // 
@@ -382,7 +382,7 @@ namespace ScriptEditor
             this.setupToolStripMenuItem.Name = "setupToolStripMenuItem";
             this.setupToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.setupToolStripMenuItem.Text = "&Setup";
-            this.setupToolStripMenuItem.Click += new System.EventHandler(this.setupToolStripMenuItem_Click);
+            this.setupToolStripMenuItem.Click += new System.EventHandler(this.SetupToolStripMenuItem_Click);
             // 
             // validateToolStripMenuItem
             // 
@@ -397,7 +397,7 @@ namespace ScriptEditor
             this.testToolStripMenuItem.Name = "testToolStripMenuItem";
             this.testToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.testToolStripMenuItem.Text = "T&est";
-            this.testToolStripMenuItem.Click += new System.EventHandler(this.testToolStripMenuItem_Click);
+            this.testToolStripMenuItem.Click += new System.EventHandler(this.TestToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -412,7 +412,7 @@ namespace ScriptEditor
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem.Text = "&About";
-            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.AboutToolStripMenuItem_Click);
             // 
             // splitContainer1
             // 
@@ -458,7 +458,7 @@ namespace ScriptEditor
             this.tvBotData.Name = "tvBotData";
             this.tvBotData.Size = new System.Drawing.Size(142, 595);
             this.tvBotData.TabIndex = 0;
-            this.tvBotData.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.tvBotData_BeforeSelect);
+            this.tvBotData.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.TvBotData_BeforeSelect);
             this.tvBotData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TvBotData_AfterSelect);
             // 
             // gbList
@@ -522,7 +522,7 @@ namespace ScriptEditor
             this.btImageAreaRemove.TabIndex = 17;
             this.btImageAreaRemove.Text = "Remove";
             this.btImageAreaRemove.UseVisualStyleBackColor = true;
-            this.btImageAreaRemove.Click += new System.EventHandler(this.btImageAreaRemove_Click);
+            this.btImageAreaRemove.Click += new System.EventHandler(this.BtImageAreaRemove_Click);
             // 
             // btImageAreaAdd
             // 
@@ -532,7 +532,7 @@ namespace ScriptEditor
             this.btImageAreaAdd.TabIndex = 16;
             this.btImageAreaAdd.Text = "Add";
             this.btImageAreaAdd.UseVisualStyleBackColor = true;
-            this.btImageAreaAdd.Click += new System.EventHandler(this.btImageAreaAdd_Click);
+            this.btImageAreaAdd.Click += new System.EventHandler(this.BtImageAreaAdd_Click);
             // 
             // tbImageAreasX
             // 
@@ -606,7 +606,7 @@ namespace ScriptEditor
             this.lbImageAreaAreas.Name = "lbImageAreaAreas";
             this.lbImageAreaAreas.Size = new System.Drawing.Size(224, 94);
             this.lbImageAreaAreas.TabIndex = 2;
-            this.lbImageAreaAreas.SelectedIndexChanged += new System.EventHandler(this.lbImageAreaAreas_SelectedIndexChanged);
+            this.lbImageAreaAreas.SelectedIndexChanged += new System.EventHandler(this.LbImageAreaAreas_SelectedIndexChanged);
             // 
             // label30
             // 
@@ -1021,7 +1021,7 @@ namespace ScriptEditor
             this.btnFindTextGenerate.TabIndex = 15;
             this.btnFindTextGenerate.Text = "Generate";
             this.btnFindTextGenerate.UseVisualStyleBackColor = true;
-            this.btnFindTextGenerate.Click += new System.EventHandler(this.btnFindTextGenerate_Click);
+            this.btnFindTextGenerate.Click += new System.EventHandler(this.BtnFindTextGenerate_Click);
             // 
             // btnPastFindText
             // 
@@ -1032,7 +1032,7 @@ namespace ScriptEditor
             this.btnPastFindText.TabIndex = 14;
             this.btnPastFindText.Text = "Paste";
             this.btnPastFindText.UseVisualStyleBackColor = true;
-            this.btnPastFindText.Click += new System.EventHandler(this.btnPasteFindText_Click);
+            this.btnPastFindText.Click += new System.EventHandler(this.BtnPasteFindText_Click);
             // 
             // label13
             // 
@@ -1205,7 +1205,7 @@ namespace ScriptEditor
             this.cbActionType.Name = "cbActionType";
             this.cbActionType.Size = new System.Drawing.Size(154, 23);
             this.cbActionType.TabIndex = 3;
-            this.cbActionType.TextChanged += new System.EventHandler(this.cbActionType_TextChanged);
+            this.cbActionType.TextChanged += new System.EventHandler(this.CbActionType_TextChanged);
             // 
             // dtpActionTimeOfDay
             // 
@@ -1351,7 +1351,7 @@ namespace ScriptEditor
             this.btnRemoveImageNames.TabIndex = 3;
             this.btnRemoveImageNames.Text = "Remove";
             this.btnRemoveImageNames.UseVisualStyleBackColor = true;
-            this.btnRemoveImageNames.Click += new System.EventHandler(this.btnRemoveImageNames_Click);
+            this.btnRemoveImageNames.Click += new System.EventHandler(this.BtnRemoveImageNames_Click);
             // 
             // btnAddImageNames
             // 
@@ -1361,7 +1361,7 @@ namespace ScriptEditor
             this.btnAddImageNames.TabIndex = 2;
             this.btnAddImageNames.Text = "Add";
             this.btnAddImageNames.UseVisualStyleBackColor = true;
-            this.btnAddImageNames.Click += new System.EventHandler(this.btnAddImageNames_Click);
+            this.btnAddImageNames.Click += new System.EventHandler(this.BtnAddImageNames_Click);
             // 
             // cbImageNamesForList
             // 
@@ -1381,7 +1381,7 @@ namespace ScriptEditor
             this.lbImageNames.Name = "lbImageNames";
             this.lbImageNames.Size = new System.Drawing.Size(194, 139);
             this.lbImageNames.TabIndex = 0;
-            this.lbImageNames.SelectedValueChanged += new System.EventHandler(this.lbImageNames_SelectedValueChanged);
+            this.lbImageNames.SelectedValueChanged += new System.EventHandler(this.LbImageNames_SelectedValueChanged);
             // 
             // gbImageNameAndWait
             // 

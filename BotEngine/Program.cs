@@ -81,7 +81,7 @@ namespace BotEngine
 
             services = new ServiceCollection();
 
-            Console.CancelKeyPress += new ConsoleCancelEventHandler(cancelHandler);
+            Console.CancelKeyPress += new ConsoleCancelEventHandler(CancelHandler);
 
             var parser = new Parser(with => { with.EnableDashDash = true; with.IgnoreUnknownArguments = true; });
             ParserResult<Options> parserResult = parser.ParseArguments<Options>(args);
@@ -149,7 +149,7 @@ namespace BotEngine
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        protected static void cancelHandler(object sender, ConsoleCancelEventArgs args)
+        protected static void CancelHandler(object sender, ConsoleCancelEventArgs args)
         {
             _logger.LogCritical("Control C Captured");
             args.Cancel = true;
@@ -248,13 +248,15 @@ namespace BotEngine
                     if (!File.Exists(o.DeviceFileName))
                     {
                         botDeviceConfig.LastActionTaken = new Dictionary<string, ActionActivity>();
-                        foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.actions)
+                        foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.Actions)
                         {
                             if (item.Value.ActionType.ToLower() == "scheduled" || item.Value.ActionType.ToLower() == "daily")
                             {
-                                ActionActivity actionActivity = new ActionActivity();
-                                actionActivity.LastRun = DateTime.MinValue;
-                                actionActivity.ActionEnabled = true;
+                                ActionActivity actionActivity = new ActionActivity
+                                {
+                                    LastRun = DateTime.MinValue,
+                                    ActionEnabled = true
+                                };
                                 botDeviceConfig.LastActionTaken.Add(item.Key, actionActivity);
                             }
                         }
@@ -278,42 +280,48 @@ namespace BotEngine
 
                     ValidateAndUpdateDeviceConfig(botDeviceConfig, botGameConfig);
 
-                    gameConfigWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ConfigFileName));
-                    gameConfigWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes;
-                    gameConfigWatcher.Filter = "*.json";
+                    gameConfigWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ConfigFileName))
+                    {
+                        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
+                        Filter = "*.json"
+                    };
                     gameConfigFileName = o.ConfigFileName;
                     gameConfigWatcher.Changed += ReloadJSONConfig;
                     gameConfigWatcher.Renamed += ReloadJSONConfig;
                     gameConfigWatcher.EnableRaisingEvents = true;
 
-                    listWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ListConfigFileName));
-                    listWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes;
-                    listWatcher.Filter = Path.GetFileName(o.ListConfigFileName);
+                    listWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ListConfigFileName))
+                    {
+                        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
+                        Filter = Path.GetFileName(o.ListConfigFileName)
+                    };
                     listConfigFileName = o.ListConfigFileName;
                     listWatcher.Changed += ReloadJSONConfig;
                     listWatcher.Renamed += ReloadJSONConfig;
                     listWatcher.EnableRaisingEvents = true;
 
-                    deviceWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.DeviceFileName));
-                    deviceWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes;
-                    deviceWatcher.Filter = Path.GetFileName(o.DeviceFileName);
+                    deviceWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.DeviceFileName))
+                    {
+                        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
+                        Filter = Path.GetFileName(o.DeviceFileName)
+                    };
                     deviceConfigFileName = o.DeviceFileName;
                     deviceWatcher.Changed += ReloadJSONConfig;
                     deviceWatcher.Renamed += ReloadJSONConfig;
                     deviceWatcher.EnableRaisingEvents = true;
 
-                    Dictionary<string, BotEngineClient.Action> Actions = botGameConfig.actions;
+                    Dictionary<string, BotEngineClient.Action> Actions = botGameConfig.Actions;
                     // Validate the BeforeAction and AfterActions...
 
                     bool configErrors = false;
                     foreach (KeyValuePair<string, BotEngineClient.Action> item in Actions)
                     {
-                        if (item.Value.BeforeAction != null && !botGameConfig.actions.ContainsKey(item.Value.BeforeAction) && !botGameConfig.systemActions.ContainsKey(item.Value.BeforeAction))
+                        if (item.Value.BeforeAction != null && !botGameConfig.Actions.ContainsKey(item.Value.BeforeAction) && !botGameConfig.SystemActions.ContainsKey(item.Value.BeforeAction))
                         {
                             _logger.LogError("BeforeAction {0} on Action {1} does not exist in {2}", item.Value.BeforeAction, item.Key, o.ConfigFileName);
                             configErrors = true;
                         }
-                        if (item.Value.AfterAction != null && !botGameConfig.actions.ContainsKey(item.Value.AfterAction) && !botGameConfig.systemActions.ContainsKey(item.Value.AfterAction))
+                        if (item.Value.AfterAction != null && !botGameConfig.Actions.ContainsKey(item.Value.AfterAction) && !botGameConfig.SystemActions.ContainsKey(item.Value.AfterAction))
                         {
                             _logger.LogError("AfterAction {0} on Action {1} does not exist in {2}", item.Value.AfterAction, item.Key, o.ConfigFileName);
                             configErrors = true;
@@ -323,7 +331,7 @@ namespace BotEngine
                     if (configErrors)
                         return -2;
 
-                    BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, o.ADBPath, deviceId, botGameConfig.findStrings, botGameConfig.systemActions, botGameConfig.actions, botListConfig);
+                    BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, o.ADBPath, deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig);
                     BotEngineClient.BotEngine.CommandResults cr = BotEngineClient.BotEngine.CommandResults.Ok;
                     DateTime tenMinuteDateTime = DateTime.MinValue;
                     bool paused = false;
@@ -337,10 +345,10 @@ namespace BotEngine
 
                         if (reloadBOTGameConfig)
                         {
-                            Actions = botGameConfig.actions;
-                            bot.ReloadFindStrings(botGameConfig.findStrings);
-                            bot.ReloadNormalActions(botGameConfig.actions);
-                            bot.ReloadSystemActions(botGameConfig.systemActions);
+                            Actions = botGameConfig.Actions;
+                            bot.ReloadFindStrings(botGameConfig.FindStrings);
+                            bot.ReloadNormalActions(botGameConfig.Actions);
+                            bot.ReloadSystemActions(botGameConfig.SystemActions);
                             ValidateAndUpdateDeviceConfig(botDeviceConfig, botGameConfig);
                             reloadBOTGameConfig = false;
                         }
@@ -532,15 +540,17 @@ namespace BotEngine
 
         private static void ValidateAndUpdateDeviceConfig(BOTDeviceConfig botDeviceConfig, BOTConfig botGameConfig)
         {
-            foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.actions)
+            foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.Actions)
             {
                 if (item.Value.ActionType.ToLower() == "scheduled" || item.Value.ActionType.ToLower() == "daily")
                 {
                     if (!botDeviceConfig.LastActionTaken.ContainsKey(item.Key))
                     {
-                        ActionActivity actionActivty = new ActionActivity();
-                        actionActivty.ActionEnabled = true;
-                        actionActivty.LastRun = DateTime.MinValue;
+                        ActionActivity actionActivty = new ActionActivity
+                        {
+                            ActionEnabled = true,
+                            LastRun = DateTime.MinValue
+                        };
                         botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
                     }
                 }
@@ -565,11 +575,13 @@ namespace BotEngine
                 }
                 else
                 {
-                    ActionActivity actionActivty = new ActionActivity();
-                    actionActivty.ActionEnabled = item.Value.ActionEnabled;
-                    actionActivty.LastRun = item.Value.LastRun;
-                    actionActivty.DailyScheduledTime = item.Value.DailyScheduledTime;
-                    actionActivty.Frequency = item.Value.Frequency;
+                    ActionActivity actionActivty = new ActionActivity
+                    {
+                        ActionEnabled = item.Value.ActionEnabled,
+                        LastRun = item.Value.LastRun,
+                        DailyScheduledTime = item.Value.DailyScheduledTime,
+                        Frequency = item.Value.Frequency
+                    };
                     botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
                 }
             }
@@ -655,34 +667,17 @@ namespace BotEngine
         {
             //services.Clear();
             LogLevel logLevel = LogLevel.Information;
-            switch (opt.LogLevel.ToLower())
+            logLevel = opt.LogLevel.ToLower() switch
             {
-                case "none":
-                    logLevel = LogLevel.None;
-                    break;
-                case "critical":
-                    logLevel = LogLevel.Critical;
-                    break;
-                case "error":
-                    logLevel = LogLevel.Error;
-                    break;
-                case "warning":
-                    logLevel = LogLevel.Warning;
-                    break;
-                case "information":
-                    logLevel = LogLevel.Information;
-                    break;
-                case "debug":
-                    logLevel = LogLevel.Debug;
-                    break;
-                case "trace":
-                    logLevel = LogLevel.Trace;
-                    break;
-                default:
-                    logLevel = LogLevel.Warning;
-                    break;
-            }
-
+                "none" => LogLevel.None,
+                "critical" => LogLevel.Critical,
+                "error" => LogLevel.Error,
+                "warning" => LogLevel.Warning,
+                "information" => LogLevel.Information,
+                "debug" => LogLevel.Debug,
+                "trace" => LogLevel.Trace,
+                _ => LogLevel.Warning,
+            };
             if (logLevel == LogLevel.Debug)
             {
                 services.AddLogging(loggingBuilder => loggingBuilder

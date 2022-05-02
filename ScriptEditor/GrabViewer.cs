@@ -30,7 +30,7 @@ namespace ScriptEditor
         /// Loads the provided image into the form for display purposes
         /// </summary>
         /// <param name="newImage">An Image to be displayed</param>
-        public void setImage(Image newImage)
+        public void SetImage(Image newImage)
         {
             pnlGraphics.SuspendLayout();
             pbFrame.SuspendLayout();
@@ -44,14 +44,14 @@ namespace ScriptEditor
             startPos.Y = 0;
             currentPos.X = 0;
             currentPos.Y = 0;
-            rectangle = getRectangle();
+            rectangle = GetRectangle();
         }
 
         /// <summary>
         /// Generates a rectangle based on the selected area on the image
         /// </summary>
         /// <returns></returns>
-        private Rectangle getRectangle()
+        private Rectangle GetRectangle()
         {
             return new Rectangle(
                 Math.Min(startPos.X, currentPos.X),
@@ -66,7 +66,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void pbFrame_MouseDown(object sender, MouseEventArgs e)
+        private void PbFrame_MouseDown(object sender, MouseEventArgs e)
         {
             currentPos = startPos = e.Location;
             drawing = true;
@@ -79,12 +79,12 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void pbFrame_MouseUp(object sender, MouseEventArgs e)
+        private void PbFrame_MouseUp(object sender, MouseEventArgs e)
         {
             if (drawing)
             {
                 drawing = false;
-                var rc = getRectangle();
+                var rc = GetRectangle();
                 if (rc.Width > 0 && rc.Height > 0) rectangle = rc;
                 pbFrame.Invalidate();
                 tbBottomRight.Text = e.Location.ToString();
@@ -96,7 +96,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void pbFrame_MouseMove(object sender, MouseEventArgs e)
+        private void PbFrame_MouseMove(object sender, MouseEventArgs e)
         {
             currentPos = e.Location;
             if (drawing) pbFrame.Invalidate();
@@ -108,10 +108,10 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void pbFrame_Paint(object sender, PaintEventArgs e)
+        private void PbFrame_Paint(object sender, PaintEventArgs e)
         {
             if ((rectangle.Width > 0 && rectangle.Height > 0)) e.Graphics.DrawRectangle(Pens.Black, rectangle);
-            if (drawing) e.Graphics.DrawRectangle(Pens.Red, getRectangle());
+            if (drawing) e.Graphics.DrawRectangle(Pens.Red, GetRectangle());
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnReset_Click(object sender, EventArgs e)
+        private void BtnReset_Click(object sender, EventArgs e)
         {
             tbTopLeft.Text = string.Empty;
             tbBottomRight.Text = string.Empty;
@@ -132,7 +132,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnCapture_Click(object sender, EventArgs e)
+        private void BtnCapture_Click(object sender, EventArgs e)
         {
             this.Close();
         }
@@ -142,7 +142,7 @@ namespace ScriptEditor
         /// Ensure that it is a Postitive box, regardless of how it is drawn with the UI.
         /// </summary>
         /// <returns></returns>
-        public Rectangle getCaptureBox()
+        public Rectangle GetCaptureBox()
         {
             if (rectangle.X < 0)
                 rectangle.X = 0;
@@ -160,9 +160,9 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnCopy_Click(object sender, EventArgs e)
+        private void BtnCopy_Click(object sender, EventArgs e)
         {
-            Rectangle r = getCaptureBox();
+            Rectangle r = GetCaptureBox();
             Point p1, p2;
             p1 = r.Location;
             p2 = r.Location + r.Size;

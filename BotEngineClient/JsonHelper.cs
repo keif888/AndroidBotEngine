@@ -29,9 +29,8 @@ namespace BotEngineClient
         /// </summary>
         /// <param name="jsonFileName">The name of the json file to check.</param>
         /// <returns>Error or the type of json content in the file.</returns>
-        public ConfigFileType getFileType(string jsonFileName)
+        public ConfigFileType GetFileType(string jsonFileName)
         {
-            int startErrorCount = Errors.Count;
             ConfigFileType returnValue = ConfigFileType.Error;
             JsonDocumentOptions documentOptions = new JsonDocumentOptions
             {
@@ -40,7 +39,7 @@ namespace BotEngineClient
             };
             JsonNodeOptions nodeOptions = new JsonNodeOptions
             {
-                PropertyNameCaseInsensitive = false
+                PropertyNameCaseInsensitive = true
             };
 
             string jsonList = File.ReadAllText(jsonFileName);
@@ -114,7 +113,7 @@ namespace BotEngineClient
             };
             JsonNodeOptions nodeOptions = new JsonNodeOptions
             {
-                PropertyNameCaseInsensitive = false
+                PropertyNameCaseInsensitive = true
             };
 
             string jsonList = File.ReadAllText(jsonGameFileName);
@@ -136,8 +135,7 @@ namespace BotEngineClient
                             if (value.ValueKind == JsonValueKind.String)
                             {
                                 string fileId = value.GetString();
-                                ConfigFileType configFileType;
-                                if (Enum.TryParse(fileId, true, out configFileType))
+                                if (Enum.TryParse(fileId, true, out ConfigFileType configFileType))
                                 {
                                     if (configFileType != ConfigFileType.GameConfig)
                                         Errors.Add(string.Format("\"FileId\" indicates that this is not \"GameConfig\" but {0}", fileId));
@@ -156,16 +154,16 @@ namespace BotEngineClient
                         }
                     }
 
-                    if (!jsonObject.ContainsKey("findStrings"))
+                    if (!jsonObject.ContainsKey("FindStrings"))
                     {
-                        Errors.Add("Required root field \"findStrings\" missing.");
+                        Errors.Add("Required root field \"FindStrings\" missing.");
                     }
                     else
                     {
-                        JsonNode rootNode = jsonObject["findStrings"];
+                        JsonNode rootNode = jsonObject["FindStrings"];
                         if (!(rootNode is JsonObject findStringsObject))
                         {
-                            Errors.Add("Required root field \"findStrings\" is of the wrong type.  Expecting an Object with one or more named objects of FindStrings data");
+                            Errors.Add("Required root field \"FindStrings\" is of the wrong type.  Expecting an Object with one or more named objects of FindStrings data");
                         }
                         else
                         {
@@ -173,37 +171,37 @@ namespace BotEngineClient
                             {
                                 if (!(findStringsItem.Value is JsonObject findStringJsonObject))
                                 {
-                                    Errors.Add(string.Format("findStrings item {0} at path {1} is of the wrong type.  Was expecting Object with zero or more named findString data", findStringsItem.Key, findStringsItem.Value.GetPath()));
+                                    Errors.Add(string.Format("FindStrings item {0} at path {1} is of the wrong type.  Was expecting Object with zero or more named findString data", findStringsItem.Key, findStringsItem.Value.GetPath()));
                                 }
                                 else
                                 {
                                     // Check for required fields.
-                                    ValidateJsonValue("findStrings", findStringsItem.Key, "findString", findStringJsonObject, JsonValueKind.String);
-                                    if (ValidateJsonValue("findStrings", findStringsItem.Key, "searchArea", findStringJsonObject, "JsonObject", "containing a search area"))
+                                    ValidateJsonValue("FindStrings", findStringsItem.Key, "SearchString", findStringJsonObject, JsonValueKind.String);
+                                    if (ValidateJsonValue("FindStrings", findStringsItem.Key, "searchArea", findStringJsonObject, "JsonObject", "containing a search area"))
                                     {
                                         JsonObject searchAreaObject = (JsonObject)findStringJsonObject["searchArea"];
-                                        ValidateJsonValue("findStrings", findStringsItem.Key, "X", searchAreaObject, JsonValueKind.Number);
-                                        ValidateJsonValue("findStrings", findStringsItem.Key, "Y", searchAreaObject, JsonValueKind.Number);
-                                        ValidateJsonValue("findStrings", findStringsItem.Key, "width", searchAreaObject, JsonValueKind.Number);
-                                        ValidateJsonValue("findStrings", findStringsItem.Key, "height", searchAreaObject, JsonValueKind.Number);
+                                        ValidateJsonValue("FindStrings", findStringsItem.Key, "X", searchAreaObject, JsonValueKind.Number);
+                                        ValidateJsonValue("FindStrings", findStringsItem.Key, "Y", searchAreaObject, JsonValueKind.Number);
+                                        ValidateJsonValue("FindStrings", findStringsItem.Key, "width", searchAreaObject, JsonValueKind.Number);
+                                        ValidateJsonValue("FindStrings", findStringsItem.Key, "height", searchAreaObject, JsonValueKind.Number);
                                     }
-                                    ValidateJsonValue("findStrings", findStringsItem.Key, "textTolerance", findStringJsonObject, JsonValueKind.Number);
-                                    ValidateJsonValue("findStrings", findStringsItem.Key, "backgroundTolerance", findStringJsonObject, JsonValueKind.Number);
+                                    ValidateJsonValue("FindStrings", findStringsItem.Key, "textTolerance", findStringJsonObject, JsonValueKind.Number);
+                                    ValidateJsonValue("FindStrings", findStringsItem.Key, "backgroundTolerance", findStringJsonObject, JsonValueKind.Number);
                                 }
                             }
                         }
                     }
 
-                    if (!jsonObject.ContainsKey("systemActions"))
+                    if (!jsonObject.ContainsKey("SystemActions"))
                     {
-                        Errors.Add("Required root field \"systemActions\" missing.");
+                        Errors.Add("Required root field \"SystemActions\" missing.");
                     }
                     else
                     {
-                        JsonNode rootNode = jsonObject["systemActions"];
+                        JsonNode rootNode = jsonObject["SystemActions"];
                         if (!(rootNode is JsonObject systemActionsObject))
                         {
-                            Errors.Add("Required root field \"systemActions\" is of the wrong type.  Expecting an Object with one or more named objects of Action data");
+                            Errors.Add("Required root field \"SystemActions\" is of the wrong type.  Expecting an Object with one or more named objects of Action data");
                         }
                         else
                         {
@@ -211,26 +209,26 @@ namespace BotEngineClient
                             {
                                 if (!(systemActionsItem.Value is JsonObject systemActionJsonObject))
                                 {
-                                    Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Object with zero or more named objects contained within.", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
+                                    Errors.Add(string.Format("SystemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Object with zero or more named objects contained within.", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
                                 }
                                 else
                                 {
                                     // Check for required fields.
                                     if (!systemActionJsonObject.ContainsKey("ActionType"))
                                     {
-                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is missing required field \"ActionType\"", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
+                                        Errors.Add(string.Format("SystemActions list item \"{0}\" at path {1} is missing required field \"ActionType\"", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
                                     }
                                     else
                                     {
                                         if (!(systemActionJsonObject["ActionType"] is JsonValue))
                                         {
-                                            Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), systemActionJsonObject["ActionType"].GetType()));
+                                            Errors.Add(string.Format("SystemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), systemActionJsonObject["ActionType"].GetType()));
                                         }
                                         else
                                         {
                                             JsonElement itemNode = systemActionJsonObject["ActionType"].GetValue<JsonElement>();
                                             if (itemNode.ValueKind != JsonValueKind.String)
-                                                Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), itemNode.ValueKind));
+                                                Errors.Add(string.Format("SystemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting String but found {2}", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), itemNode.ValueKind));
                                             else
                                             {
                                                 switch (itemNode.GetString().ToLower())
@@ -238,7 +236,7 @@ namespace BotEngineClient
                                                     case "system":
                                                         break;
                                                     default:
-                                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} with value \"{2}\" is not valid.  Was expecting \"System\"", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), itemNode.GetString()));
+                                                        Errors.Add(string.Format("SystemActions list item \"{0}\" at path {1} with value \"{2}\" is not valid.  Was expecting \"System\"", systemActionsItem.Key, systemActionJsonObject["ActionType"].GetPath(), itemNode.GetString()));
                                                         break;
                                                 }
                                             }
@@ -246,17 +244,17 @@ namespace BotEngineClient
                                     }
                                     if (!systemActionJsonObject.ContainsKey("Commands"))
                                     {
-                                        Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is missing required field \"Commands\"", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
+                                        Errors.Add(string.Format("SystemActions list item \"{0}\" at path {1} is missing required field \"Commands\"", systemActionsItem.Key, systemActionsItem.Value.GetPath()));
                                     }
                                     else
                                     {
                                         if (!(systemActionJsonObject["Commands"] is JsonArray commandsJsonArray))
                                         {
-                                            Errors.Add(string.Format("systemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Array but found {2}", systemActionsItem.Key, systemActionJsonObject["Commands"].GetPath(), systemActionJsonObject["Commands"].GetType()));
+                                            Errors.Add(string.Format("SystemActions list item \"{0}\" at path {1} is of the wrong type.  Was expecting Array but found {2}", systemActionsItem.Key, systemActionJsonObject["Commands"].GetPath(), systemActionJsonObject["Commands"].GetType()));
                                         }
                                         else
                                         {
-                                            ValidateCommands("systemActions", systemActionsItem.Key, commandsJsonArray);
+                                            ValidateCommands("SystemActions", systemActionsItem.Key, commandsJsonArray);
                                         }
                                     }
                                 }
@@ -282,7 +280,7 @@ namespace BotEngineClient
                                 if (!(actionsItem.Value is JsonObject actionJsonObject))
                                 {
                                     JsonElement jsonElement = actionsItem.Value.GetValue<JsonElement>();
-                                    Errors.Add(string.Format("findStrings item {0} at path {1} is of the wrong type.  Was expecting Object, but found {2}", actionsItem.Key, actionsItem.Value.GetPath(), jsonElement.ValueKind));
+                                    Errors.Add(string.Format("FindStrings item {0} at path {1} is of the wrong type.  Was expecting Object, but found {2}", actionsItem.Key, actionsItem.Value.GetPath(), jsonElement.ValueKind));
                                 }
                                 else
                                 {
@@ -666,16 +664,15 @@ namespace BotEngineClient
             };
             JsonNodeOptions nodeOptions = new JsonNodeOptions
             {
-                PropertyNameCaseInsensitive = false
+                PropertyNameCaseInsensitive = true
             };
 
             string jsonList = File.ReadAllText(jsonListFileName);
             try
             {
                 JsonNode jsonListNode = JsonNode.Parse(jsonList, nodeOptions, documentOptions);
-                if (jsonListNode is JsonObject)
+                if (jsonListNode is JsonObject jsonObject)
                 {
-                    JsonObject jsonObject = (JsonObject)jsonListNode;
                     if (!jsonObject.ContainsKey("FileId"))
                     {
                         Errors.Add("Required field \"FileId\" missing.  Unable to confirm that the input file is a ListConfigFile");
@@ -689,8 +686,7 @@ namespace BotEngineClient
                             if (value.ValueKind == JsonValueKind.String)
                             {
                                 string fileId = value.GetString();
-                                ConfigFileType configFileType;
-                                if (Enum.TryParse(fileId, true, out configFileType))
+                                if (Enum.TryParse(fileId, true, out ConfigFileType configFileType))
                                 {
                                     if (configFileType != ConfigFileType.ListConfig)
                                         Errors.Add(string.Format("\"FileId\" indicates that this is not \"ListConfig\" but {0}", fileId));
@@ -716,9 +712,8 @@ namespace BotEngineClient
                     else
                     {
                         JsonNode rootNode = jsonObject["Coordinates"];
-                        if (rootNode is JsonObject)
+                        if (rootNode is JsonObject coordinatesObject)
                         {
-                            JsonObject coordinatesObject = (JsonObject)rootNode;
                             foreach (KeyValuePair<string, JsonNode?> coordItem in coordinatesObject)
                             {
                                 if (coordItem.Value is JsonArray)
@@ -726,9 +721,8 @@ namespace BotEngineClient
                                     JsonArray coordArray = coordItem.Value.AsArray();
                                     foreach (JsonNode arrayItem in coordArray)
                                     {
-                                        if (arrayItem is JsonObject)
+                                        if (arrayItem is JsonObject arrayObject)
                                         {
-                                            JsonObject arrayObject = (JsonObject)arrayItem;
                                             ValidateJsonValue("Coordinates", coordItem.Key, "X", arrayObject, JsonValueKind.Number);
                                             ValidateJsonValue("Coordinates", coordItem.Key, "Y", arrayObject, JsonValueKind.Number);
                                         }
@@ -805,9 +799,8 @@ namespace BotEngineClient
             try
             {
                 JsonNode jsonListNode = JsonNode.Parse(jsonList, nodeOptions, documentOptions);
-                if (jsonListNode is JsonObject)
+                if (jsonListNode is JsonObject jsonObject)
                 {
-                    JsonObject jsonObject = (JsonObject)jsonListNode;
                     if (!jsonObject.ContainsKey("FileId"))
                     {
                         Errors.Add("Required field \"FileId\" missing.  Unable to confirm that the input file is a DeviceConfigFile");
@@ -821,8 +814,7 @@ namespace BotEngineClient
                             if (value.ValueKind == JsonValueKind.String)
                             {
                                 string fileId = value.GetString();
-                                ConfigFileType configFileType;
-                                if (Enum.TryParse(fileId, true, out configFileType))
+                                if (Enum.TryParse(fileId, true, out ConfigFileType configFileType))
                                 {
                                     if (configFileType != ConfigFileType.DeviceConfig)
                                         Errors.Add(string.Format("\"FileId\" indicates that this is not \"DeviceConfig\" but {0}", fileId));
@@ -848,17 +840,15 @@ namespace BotEngineClient
                     else
                     {
                         JsonNode rootNode = jsonObject["LastActionTaken"];
-                        if (rootNode is JsonObject)
+                        if (rootNode is JsonObject lastActionTakenObject)
                         {
-                            JsonObject lastActionTakenObject = (JsonObject)rootNode;
                             foreach (KeyValuePair<string, JsonNode?> lastActionItem in lastActionTakenObject)
                             {
                                 if (ValidateJsonValue("LastActionTaken", lastActionItem.Key, lastActionItem.Value, "JsonObject", "with at least LastRun, ActionEnabled"))
                                 {
                                     if (ValidateJsonValue("LastActionTaken", lastActionItem.Key, "LastRun", lastActionItem.Value.AsObject(), JsonValueKind.String))
                                     {
-                                        DateTime temp;
-                                        if (!lastActionItem.Value.AsObject()["LastRun"].AsValue().TryGetValue<DateTime>(out temp))
+                                        if (!lastActionItem.Value.AsObject()["LastRun"].AsValue().TryGetValue<DateTime>(out DateTime temp))
                                         {
                                             Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting DateTime but found {3}", "LastActionTaken", lastActionItem.Key, lastActionItem.Value.AsObject()["LastRun"].GetPath(), lastActionItem.Value.AsObject()["LastRun"].AsValue()));
                                         }
@@ -871,8 +861,7 @@ namespace BotEngineClient
                                         {
                                             if (lastActionItem.Value.AsObject()["DailyScheduledTime"] != null)
                                             {
-                                                DateTime temp;
-                                                if (!lastActionItem.Value.AsObject()["DailyScheduledTime"].AsValue().TryGetValue<DateTime>(out temp))
+                                                if (!lastActionItem.Value.AsObject()["DailyScheduledTime"].AsValue().TryGetValue<DateTime>(out DateTime temp))
                                                 {
                                                     Errors.Add(string.Format("{0} list item \"{1}\" at path {2} is of the wrong type.  Was expecting DateTime but found {3}", "LastActionTaken", lastActionItem.Key, lastActionItem.Value.AsObject()["DailyScheduledTime"].GetPath(), lastActionItem.Value.AsObject()["DailyScheduledTime"].AsValue()));
                                                 }

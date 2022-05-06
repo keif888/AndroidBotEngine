@@ -396,6 +396,7 @@ namespace BotEngine
                                                 break;
                                             // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
                                             cr = bot.ExecuteAction(item.Key);
+                                            _logger.LogInformation(string.Format("Action result was {0}", cr));
                                             _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
                                             if (cancelRequested || paused)
                                                 break;
@@ -542,7 +543,7 @@ namespace BotEngine
         {
             foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.Actions)
             {
-                if (item.Value.ActionType.ToLower() == "scheduled" || item.Value.ActionType.ToLower() == "daily")
+                if (item.Value.ActionType.ToLower() == "scheduled" || item.Value.ActionType.ToLower() == "daily" || item.Value.ActionType.ToLower() == "adhoc")
                 {
                     if (!botDeviceConfig.LastActionTaken.ContainsKey(item.Key))
                     {

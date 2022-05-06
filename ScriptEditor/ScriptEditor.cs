@@ -481,7 +481,7 @@ namespace ScriptEditor
                         gameConfig.SystemActions.Add(child.Name, newAction);
                     }
                 }
-                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "actions")
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "Actions")
                 {
                     foreach (TreeNode child in parent.Nodes)
                     {
@@ -636,8 +636,8 @@ namespace ScriptEditor
                             findStringsNode.Name = "FindStrings";
                             TreeNode systemActionsNode = tvBotData.Nodes.Add("SystemActions");
                             systemActionsNode.Name = "SystemActions";
-                            TreeNode actionsNode = tvBotData.Nodes.Add("actions");
-                            actionsNode.Name = "actions";
+                            TreeNode actionsNode = tvBotData.Nodes.Add("Actions");
+                            actionsNode.Name = "Actions";
                             break;
                         case JsonHelper.ConfigFileType.ListConfig:
                             TreeNode coordinatesNode = tvBotData.Nodes.Add("Coordinates");
@@ -751,7 +751,7 @@ namespace ScriptEditor
                 switch (e.Node.Name)
                 {
                     case "SystemActions":
-                    case "actions":
+                    case "Actions":
                         addActionToolStripMenuItem.Enabled = true;
                         break;
                     case "FindStrings":
@@ -1393,6 +1393,33 @@ namespace ScriptEditor
                                 commandCopy.TimeOut = int.Parse(tbAppNameTimeout.Text);
                                 break;
                             case ValidCommandIds.FindClickAndWait:
+                                if (tbImageNamesWait.Text.Length == 0)
+                                {
+                                    MessageBox.Show("Wait Time required field isn't populated.");
+                                    return;
+                                }
+                                
+                                if (lbImageNames.Items.Count < 1)
+                                {
+                                    MessageBox.Show("Image Names required field isn't populated.");
+                                    return;
+                                }
+                                if (lbImageNames.Items.Count == 1)
+                                {
+                                    commandCopy.ImageName = (string)lbImageNames.Items[0];
+                                    commandCopy.ImageNames = null;
+                                }
+                                else
+                                {
+                                    commandCopy.ImageName = null;
+                                    commandCopy.ImageNames = new List<string>();
+                                    foreach(string item in lbImageNames.Items)
+                                    {
+                                        commandCopy.ImageNames.Add(item);
+                                    }
+                                }
+                                commandCopy.TimeOut = int.Parse(tbImageNamesWait.Text);
+                                break;
                             case ValidCommandIds.WaitFor:
                             case ValidCommandIds.WaitForThenClick:
                                 if (tbTimeout.Text.Length == 0)
@@ -1700,7 +1727,7 @@ namespace ScriptEditor
             else
             {
                 BotEngineClient.Action newAction = new BotEngineClient.Action();
-                if (tvBotData.SelectedNode.Name == "actions")
+                if (tvBotData.SelectedNode.Name == "Actions")
                     newAction.ActionType = ValidActionType.Scheduled.ToString();
                 else
                     newAction.ActionType = ValidActionType.System.ToString();

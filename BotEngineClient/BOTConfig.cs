@@ -123,6 +123,7 @@ namespace BotEngineClient
                     }
                     else
                         return false;
+                case "adhoc":
                 case "anywhere":
                     return true;
                 default:

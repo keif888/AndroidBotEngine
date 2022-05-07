@@ -50,6 +50,7 @@ namespace ScriptEditor
             "IfExists",
             "IfNotExists",
             "LoopCoordinates",
+            "LoopCounter",
             "LoopUntilFound",
             "LoopUntilNotFound",
             "Restart",

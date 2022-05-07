@@ -58,6 +58,7 @@ namespace ScriptEditor
             ResetGroupBox(gbActionOverride);
             ResetGroupBox(gbImageArea);
             ResetGroupBox(gbList);
+            ResetGroupBox(gbLoops);
 
             this.Size = new Size(800, 485);
             splitContainer1.SplitterDistance = 320;
@@ -726,6 +727,12 @@ namespace ScriptEditor
                         if (command.ChangeDetectArea != null)
                             childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.ChangeDetectArea.X, command.ChangeDetectArea.Y, command.ChangeDetectArea.X + command.ChangeDetectArea.Width, command.ChangeDetectArea.Y + command.ChangeDetectArea.Height);
                         break;
+                    case ValidCommandIds.LoopCounter:
+                        if (!string.IsNullOrEmpty(command.Value))
+                            childText = string.Format("{0} ({1})", command.CommandId, command.Value);
+                        else
+                            childText = string.Format("{0} (undefined)", command.CommandId);
+                        break;
                     case ValidCommandIds.ClickWhenNotFoundInArea:
                     case ValidCommandIds.Exit:
                     case ValidCommandIds.Restart:
@@ -1016,6 +1023,13 @@ namespace ScriptEditor
                             gbWFNC.Enabled = true;
                             gbWFNC.Visible = true;
                             break;
+                        case ValidCommandIds.LoopCounter:
+                            if (int.TryParse(commandCopy.Value, out _))
+                                tbLoopsCounter.Text = commandCopy.Value;
+                            addCommandToolStripMenuItem.Enabled = true; 
+                            gbLoops.Enabled = true;
+                            gbLoops.Visible = true;
+                            break;
                         default:
                             MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));
                             break;
@@ -1205,6 +1219,8 @@ namespace ScriptEditor
             gbList.Enabled = false;
             gbList.Visible = false;
             btnUpdate.Enabled = false;
+            gbLoops.Enabled = false;
+            gbLoops.Visible = false;
         }
 
         /// <summary>
@@ -1495,6 +1511,14 @@ namespace ScriptEditor
                                 commandCopy.ChangeDetectArea.Width = int.Parse(tbWFNCX2.Text) - commandCopy.ChangeDetectArea.X;
                                 commandCopy.ChangeDetectArea.Height = int.Parse(tbWFNCY2.Text) - commandCopy.ChangeDetectArea.Y;
                                 commandCopy.ChangeDetectDifference = (float)nudWFNCDetectPercent.Value / 100.0f;
+                                break;
+                            case ValidCommandIds.LoopCounter:
+                                if (tbLoopsCounter.Text.Length == 0)
+                                {
+                                    MessageBox.Show("Required fields aren't populated.");
+                                    return;
+                                }
+                                commandCopy.Value = tbLoopsCounter.Text;
                                 break;
                             default:
                                 MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));

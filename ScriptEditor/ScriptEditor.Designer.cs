@@ -174,6 +174,9 @@ namespace ScriptEditor
             this.tbPointY = new System.Windows.Forms.MaskedTextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.gbLoops = new System.Windows.Forms.GroupBox();
+            this.label38 = new System.Windows.Forms.Label();
+            this.tbLoopsCounter = new System.Windows.Forms.MaskedTextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -196,6 +199,7 @@ namespace ScriptEditor
             this.gbLoopCoordinate.SuspendLayout();
             this.gbDrag.SuspendLayout();
             this.gbClick.SuspendLayout();
+            this.gbLoops.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -434,6 +438,7 @@ namespace ScriptEditor
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.gbLoops);
             this.splitContainer1.Panel2.Controls.Add(this.gbList);
             this.splitContainer1.Panel2.Controls.Add(this.gbImageArea);
             this.splitContainer1.Panel2.Controls.Add(this.gbActionOverride);
@@ -1695,6 +1700,38 @@ namespace ScriptEditor
             this.saveFileDialog1.DefaultExt = "json";
             this.saveFileDialog1.Filter = "json files|*.json|All files|*.*";
             // 
+            // gbLoops
+            // 
+            this.gbLoops.Controls.Add(this.label38);
+            this.gbLoops.Controls.Add(this.tbLoopsCounter);
+            this.gbLoops.Enabled = false;
+            this.gbLoops.Location = new System.Drawing.Point(579, 298);
+            this.gbLoops.Name = "gbLoops";
+            this.gbLoops.Size = new System.Drawing.Size(195, 62);
+            this.gbLoops.TabIndex = 102;
+            this.gbLoops.TabStop = false;
+            this.gbLoops.Text = "Loops";
+            this.gbLoops.Visible = false;
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Location = new System.Drawing.Point(9, 25);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(65, 15);
+            this.label38.TabIndex = 10;
+            this.label38.Text = "Number of";
+            // 
+            // tbLoopsCounter
+            // 
+            this.tbLoopsCounter.Location = new System.Drawing.Point(94, 22);
+            this.tbLoopsCounter.Mask = "#00000";
+            this.tbLoopsCounter.Name = "tbLoopsCounter";
+            this.tbLoopsCounter.Size = new System.Drawing.Size(71, 23);
+            this.tbLoopsCounter.TabIndex = 11;
+            this.tbLoopsCounter.ValidatingType = typeof(int);
+            this.tbLoopsCounter.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            // 
             // ScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1745,6 +1782,8 @@ namespace ScriptEditor
             this.gbDrag.PerformLayout();
             this.gbClick.ResumeLayout(false);
             this.gbClick.PerformLayout();
+            this.gbLoops.ResumeLayout(false);
+            this.gbLoops.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1897,6 +1936,9 @@ namespace ScriptEditor
         private System.Windows.Forms.Label label37;
         private System.Windows.Forms.ComboBox cbActionBefore;
         private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.GroupBox gbLoops;
+        private System.Windows.Forms.Label label38;
+        private System.Windows.Forms.MaskedTextBox tbLoopsCounter;
     }
 }
 

@@ -53,6 +53,7 @@ namespace BotEngineClient
             IfExists,
             IfNotExists,
             LoopCoordinates,
+            LoopCounter,
             LoopUntilFound,
             LoopUntilNotFound,
             Restart,
@@ -748,6 +749,35 @@ namespace BotEngineClient
             }
         }
 
+        /// <summary>
+        /// Calls the child commands in order, the number of loops specified.
+        /// </summary>
+        /// <param name="numberOFLoops"></param>
+        /// <param name="commands"></param>
+        /// <param name="additionalData"></param>
+        /// <returns></returns>
+        private CommandResults LoopCounter(int numberOFLoops, List<Command> commands, object additionalData)
+        {
+            using (_logger.BeginScope(Helpers.CurrentMethodName()))
+            {
+                CommandResults result = CommandResults.Ok;
+                for (int i = 0; i < numberOFLoops; i++)
+                {
+                    foreach (Command command in commands)
+                    {
+                        _logger.LogDebug("Executing Loop {0} command {1}", i, command.CommandId);
+                        result = ExecuteCommand(command, additionalData);
+                        if (result != CommandResults.Ok)
+                        {
+                            _logger.LogWarning("Exiting on Loop {0} command {1} due to result {2}", i, command.CommandId, result);
+                            return result;
+                        }
+                    }
+                }
+                return result;
+            }
+        }
+
         private CommandResults WaitForChange(SearchArea changeDetectArea, float changeDetectDifference, int timeOut)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
@@ -1175,6 +1205,19 @@ namespace BotEngineClient
                                 return CommandResults.InputError;
                             }
                             return WaitForNoChange(command.ChangeDetectArea, (float)command.ChangeDetectDifference, (int)command.TimeOut);
+                        case ValidCommandIds.LoopCounter:
+                            if (string.IsNullOrEmpty(command.Value))
+                            {
+                                _logger.LogError("Command {0} Error Value is null or empty", command.CommandId);
+                                return CommandResults.InputError;
+                            }
+                            int NumberOFLoops = 0;
+                            if (!int.TryParse(command.Value, out NumberOFLoops))
+                            {
+                                _logger.LogError("Command {0} Error Value {1} is not an integer", command.CommandId, command.Value);
+                                return CommandResults.InputError;
+                            }
+                            return LoopCounter(NumberOFLoops, command.Commands, additionalData);
                         default:
                             _logger.LogError("Valid but unhandled Command {0}", command.CommandId);
                             throw new Exception(string.Format("Valid but unhandled CommandId {0}", command.CommandId));

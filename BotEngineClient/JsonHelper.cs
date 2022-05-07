@@ -526,6 +526,9 @@ namespace BotEngineClient
                                     ValidateJsonValue(location, listItemName, "height", commandsObject[Key].AsObject(), JsonValueKind.Number);
                                 }
                                 break;
+                            case BotEngine.ValidCommandIds.LoopCounter:
+                                ValidateJsonValue(location, listItemName, "Value", commandsObject, JsonValueKind.String);
+                                break;
                             default:
                                 break;
                         }

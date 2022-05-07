@@ -159,6 +159,12 @@ Finally enter the command like this into the editor (which is to launch the chro
 \b0\fs22 This command will wait for the contents within an area of the screen to change more than the specified percentage.  If changes occur within the specified time, then the Action will be taken as failed, and scheduled for retry.\par
 }";
                     break;
+                case ValidCommandIds.LoopCounter:
+                    rtbCommandHelp.Rtf = @"{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang3081{\fonttbl{\f0\fnil\fcharset0 Calibri;}}\viewkind4\uc1\pard\sa200\sl276\slmult1
+\b\fs32 Loop Counter\par
+\b0\fs22 This command will execute all the child commands the specified number of times.\par
+}";
+                    break;
                 default:
                     break;
             }

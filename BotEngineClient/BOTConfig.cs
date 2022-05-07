@@ -292,6 +292,9 @@ namespace BotEngineClient
                     ChangeDetectDifference = 0;
                     ChangeDetectArea = new SearchArea();
                     break;
+                case BotEngine.ValidCommandIds.LoopCounter:
+                    Value = string.Empty;
+                    break;
                 default:
                     break;
             }

@@ -1475,7 +1475,7 @@ namespace FindTextClient
 
     public class SearchResult
     {
-        SearchResult()
+        public SearchResult()
         {
             this.Width = 0;
             this.Height = 0;

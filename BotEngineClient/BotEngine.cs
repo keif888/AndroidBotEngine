@@ -442,6 +442,8 @@ namespace BotEngineClient
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))
             {
                 bool found = false;
+                bool stillThere = false;
+                SearchResult foundAt = new SearchResult();
                 CommandResults result = CommandResults.Missing;
                 System.Threading.CancellationToken cancellationToken = default;
                 System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
@@ -464,6 +466,27 @@ namespace BotEngineClient
                             result = CommandResults.TimeOut;
                             ADBClick(dataresult[0].X, dataresult[0].Y);
                             found = true;
+                            foundAt = new SearchResult(dataresult[0].TopLeftX, dataresult[0].TopLeftY, dataresult[0].Width, dataresult[0].Height, dataresult[0].X, dataresult[0].Y, dataresult[0].Id);
+                        }
+                        else
+                        {
+                            stillThere = false;
+                            foreach (SearchResult item in dataresult)
+                            {
+                                if ((item.X > foundAt.TopLeftX && item.X < foundAt.TopLeftX + foundAt.Width)
+                                    && (item.Y > foundAt.TopLeftY && item.X < foundAt.TopLeftY + foundAt.Height))
+                                {
+                                    _logger.LogDebug("Secondary Search Successful (bad) whilst looking for {0}", searchName);
+                                    stillThere = true;
+                                    break;
+                                }
+                            }
+                            if (!stillThere)
+                            {
+                                _logger.LogDebug("Secondary Search Unsuccessful (good) whilst looking for {0}", searchName);
+                                result = CommandResults.Ok;
+                                break;
+                            }
                         }
                     }
                     else

@@ -126,6 +126,10 @@ namespace ScriptEditor
             this.tbFindTextName = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
             this.gbAction = new System.Windows.Forms.GroupBox();
+            this.cbActionAfter = new System.Windows.Forms.ComboBox();
+            this.label37 = new System.Windows.Forms.Label();
+            this.cbActionBefore = new System.Windows.Forms.ComboBox();
+            this.label36 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
             this.cbActionType = new System.Windows.Forms.ComboBox();
             this.dtpActionTimeOfDay = new System.Windows.Forms.DateTimePicker();
@@ -156,6 +160,8 @@ namespace ScriptEditor
             this.rbLoopCoordY = new System.Windows.Forms.RadioButton();
             this.rbLoopCoordX = new System.Windows.Forms.RadioButton();
             this.gbDrag = new System.Windows.Forms.GroupBox();
+            this.label35 = new System.Windows.Forms.Label();
+            this.tbDragTime = new System.Windows.Forms.MaskedTextBox();
             this.tbDragX1 = new System.Windows.Forms.MaskedTextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tbDragY2 = new System.Windows.Forms.MaskedTextBox();
@@ -168,8 +174,6 @@ namespace ScriptEditor
             this.tbPointY = new System.Windows.Forms.MaskedTextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.label35 = new System.Windows.Forms.Label();
-            this.tbDragTime = new System.Windows.Forms.MaskedTextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -448,7 +452,7 @@ namespace ScriptEditor
             this.splitContainer1.Panel2.Controls.Add(this.gbDrag);
             this.splitContainer1.Panel2.Controls.Add(this.gbClick);
             this.splitContainer1.Panel2.Cursor = System.Windows.Forms.Cursors.Default;
-            this.splitContainer1.Size = new System.Drawing.Size(1387, 595);
+            this.splitContainer1.Size = new System.Drawing.Size(1387, 631);
             this.splitContainer1.SplitterDistance = 142;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -458,7 +462,7 @@ namespace ScriptEditor
             this.tvBotData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvBotData.Location = new System.Drawing.Point(0, 0);
             this.tvBotData.Name = "tvBotData";
-            this.tvBotData.Size = new System.Drawing.Size(142, 595);
+            this.tvBotData.Size = new System.Drawing.Size(142, 631);
             this.tvBotData.TabIndex = 0;
             this.tvBotData.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.TvBotData_BeforeSelect);
             this.tvBotData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TvBotData_AfterSelect);
@@ -745,7 +749,7 @@ namespace ScriptEditor
             this.gbAppName.Controls.Add(this.label24);
             this.gbAppName.Controls.Add(this.tbAppNameAppId);
             this.gbAppName.Enabled = false;
-            this.gbAppName.Location = new System.Drawing.Point(453, 484);
+            this.gbAppName.Location = new System.Drawing.Point(460, 526);
             this.gbAppName.Name = "gbAppName";
             this.gbAppName.Size = new System.Drawing.Size(438, 84);
             this.gbAppName.TabIndex = 23;
@@ -794,7 +798,7 @@ namespace ScriptEditor
             this.gbPickAction.Controls.Add(this.cbPickActionAction);
             this.gbPickAction.Controls.Add(this.label23);
             this.gbPickAction.Enabled = false;
-            this.gbPickAction.Location = new System.Drawing.Point(497, 404);
+            this.gbPickAction.Location = new System.Drawing.Point(909, 525);
             this.gbPickAction.Name = "gbPickAction";
             this.gbPickAction.Size = new System.Drawing.Size(293, 58);
             this.gbPickAction.TabIndex = 22;
@@ -828,7 +832,7 @@ namespace ScriptEditor
             this.gbAppControl.Controls.Add(this.tbAppControlName);
             this.gbAppControl.Controls.Add(this.label19);
             this.gbAppControl.Enabled = false;
-            this.gbAppControl.Location = new System.Drawing.Point(491, 298);
+            this.gbAppControl.Location = new System.Drawing.Point(568, 413);
             this.gbAppControl.Name = "gbAppControl";
             this.gbAppControl.Size = new System.Drawing.Size(324, 100);
             this.gbAppControl.TabIndex = 21;
@@ -1168,6 +1172,10 @@ namespace ScriptEditor
             // 
             // gbAction
             // 
+            this.gbAction.Controls.Add(this.cbActionAfter);
+            this.gbAction.Controls.Add(this.label37);
+            this.gbAction.Controls.Add(this.cbActionBefore);
+            this.gbAction.Controls.Add(this.label36);
             this.gbAction.Controls.Add(this.label22);
             this.gbAction.Controls.Add(this.cbActionType);
             this.gbAction.Controls.Add(this.dtpActionTimeOfDay);
@@ -1179,11 +1187,49 @@ namespace ScriptEditor
             this.gbAction.Enabled = false;
             this.gbAction.Location = new System.Drawing.Point(254, 323);
             this.gbAction.Name = "gbAction";
-            this.gbAction.Size = new System.Drawing.Size(231, 155);
+            this.gbAction.Size = new System.Drawing.Size(308, 206);
             this.gbAction.TabIndex = 17;
             this.gbAction.TabStop = false;
             this.gbAction.Text = "Action";
             this.gbAction.Visible = false;
+            // 
+            // cbActionAfter
+            // 
+            this.cbActionAfter.FormattingEnabled = true;
+            this.cbActionAfter.Location = new System.Drawing.Point(57, 168);
+            this.cbActionAfter.Name = "cbActionAfter";
+            this.cbActionAfter.Size = new System.Drawing.Size(232, 23);
+            this.cbActionAfter.Sorted = true;
+            this.cbActionAfter.TabIndex = 11;
+            this.cbActionAfter.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(9, 171);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(33, 15);
+            this.label37.TabIndex = 10;
+            this.label37.Text = "After";
+            // 
+            // cbActionBefore
+            // 
+            this.cbActionBefore.FormattingEnabled = true;
+            this.cbActionBefore.Location = new System.Drawing.Point(57, 137);
+            this.cbActionBefore.Name = "cbActionBefore";
+            this.cbActionBefore.Size = new System.Drawing.Size(232, 23);
+            this.cbActionBefore.Sorted = true;
+            this.cbActionBefore.TabIndex = 9;
+            this.cbActionBefore.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(9, 140);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(41, 15);
+            this.label36.TabIndex = 8;
+            this.label36.Text = "Before";
             // 
             // label22
             // 
@@ -1269,7 +1315,7 @@ namespace ScriptEditor
             // btnUpdate
             // 
             this.btnUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnUpdate.Location = new System.Drawing.Point(12, 560);
+            this.btnUpdate.Location = new System.Drawing.Point(12, 596);
             this.btnUpdate.Name = "btnUpdate";
             this.btnUpdate.Size = new System.Drawing.Size(75, 23);
             this.btnUpdate.TabIndex = 99;
@@ -1451,6 +1497,7 @@ namespace ScriptEditor
             this.cbIgnoreMissing.Text = "Missing Ok?";
             this.cbIgnoreMissing.UseVisualStyleBackColor = true;
             this.cbIgnoreMissing.Visible = false;
+            this.cbIgnoreMissing.CheckedChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // cbImageNameNoWait
             // 
@@ -1517,6 +1564,24 @@ namespace ScriptEditor
             this.gbDrag.TabStop = false;
             this.gbDrag.Text = "Drag";
             this.gbDrag.Visible = false;
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(10, 55);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(80, 15);
+            this.label35.TabIndex = 6;
+            this.label35.Text = "Drag Time ms";
+            // 
+            // tbDragTime
+            // 
+            this.tbDragTime.Location = new System.Drawing.Point(95, 52);
+            this.tbDragTime.Mask = "#00000";
+            this.tbDragTime.Name = "tbDragTime";
+            this.tbDragTime.Size = new System.Drawing.Size(71, 23);
+            this.tbDragTime.TabIndex = 7;
+            this.tbDragTime.ValidatingType = typeof(int);
             // 
             // tbDragX1
             // 
@@ -1630,29 +1695,11 @@ namespace ScriptEditor
             this.saveFileDialog1.DefaultExt = "json";
             this.saveFileDialog1.Filter = "json files|*.json|All files|*.*";
             // 
-            // label35
-            // 
-            this.label35.AutoSize = true;
-            this.label35.Location = new System.Drawing.Point(10, 55);
-            this.label35.Name = "label35";
-            this.label35.Size = new System.Drawing.Size(80, 15);
-            this.label35.TabIndex = 6;
-            this.label35.Text = "Drag Time ms";
-            // 
-            // tbDragTime
-            // 
-            this.tbDragTime.Location = new System.Drawing.Point(95, 52);
-            this.tbDragTime.Mask = "#00000";
-            this.tbDragTime.Name = "tbDragTime";
-            this.tbDragTime.Size = new System.Drawing.Size(71, 23);
-            this.tbDragTime.TabIndex = 7;
-            this.tbDragTime.ValidatingType = typeof(int);
-            // 
             // ScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1387, 619);
+            this.ClientSize = new System.Drawing.Size(1387, 655);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -1846,6 +1893,10 @@ namespace ScriptEditor
         private System.Windows.Forms.CheckBox cbIgnoreMissing;
         private System.Windows.Forms.Label label35;
         private System.Windows.Forms.MaskedTextBox tbDragTime;
+        private System.Windows.Forms.ComboBox cbActionAfter;
+        private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.ComboBox cbActionBefore;
+        private System.Windows.Forms.Label label36;
     }
 }
 

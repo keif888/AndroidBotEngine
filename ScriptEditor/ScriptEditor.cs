@@ -170,6 +170,8 @@ namespace ScriptEditor
             cbImageNameWithWait.Items.Clear();
             cbImageNamesForList.Items.Clear();
             cbPickActionAction.Items.Clear();
+            cbActionAfter.Items.Clear();
+            cbActionBefore.Items.Clear();
             cbImageAreasImage.Items.Clear();
             TreeNode findStringsNode = tvBotData.Nodes.Add("FindStrings");
             findStringsNode.Name = "FindStrings";
@@ -197,6 +199,8 @@ namespace ScriptEditor
             {
                 LoadActionTreeNode(systemActionsNode, item);
                 cbPickActionAction.Items.Add(item.Key);
+                cbActionAfter.Items.Add(item.Key);
+                cbActionBefore.Items.Add(item.Key);
             }
             systemActionsNode.Expand();
             TreeNode actionsNode = tvBotData.Nodes.Add("Actions");
@@ -205,6 +209,8 @@ namespace ScriptEditor
             {
                 LoadActionTreeNode(actionsNode, item);
                 cbPickActionAction.Items.Add(item.Key);
+                cbActionAfter.Items.Add(item.Key);
+                cbActionBefore.Items.Add(item.Key);
             }
             actionsNode.Expand();
 
@@ -237,6 +243,8 @@ namespace ScriptEditor
             cbImageNameWithWait.Items.Clear();
             cbImageNamesForList.Items.Clear();
             cbPickActionAction.Items.Clear();
+            cbActionAfter.Items.Clear();
+            cbActionBefore.Items.Clear();
             TreeNode lastActionNode = tvBotData.Nodes.Add("LastActionTaken");
             lastActionNode.Name = "LastActionTaken";
             foreach (KeyValuePair<string, BotEngineClient.ActionActivity> item in deviceConfig.LastActionTaken)
@@ -280,6 +288,9 @@ namespace ScriptEditor
             cbImageNameWithWait.Items.Clear();
             cbImageNamesForList.Items.Clear();
             cbPickActionAction.Items.Clear();
+            cbActionAfter.Items.Clear();
+            cbActionBefore.Items.Clear();
+
             TreeNode coordinatesNode = tvBotData.Nodes.Add("Coordinates");
             coordinatesNode.Name = "Coordinates";
             foreach (KeyValuePair<string, List<XYCoords>> item in listConfig.Coordinates)
@@ -627,6 +638,8 @@ namespace ScriptEditor
                     cbImageNamesForList.Items.Clear();
                     cbImageAreasImage.Items.Clear();
                     cbPickActionAction.Items.Clear();
+                    cbActionBefore.Items.Clear();
+                    cbActionAfter.Items.Clear();
                     ResetEditFormItems();
 
                     switch (loadedFileType)
@@ -1059,6 +1072,8 @@ namespace ScriptEditor
                     cbActionType.Enabled = false;
                 else
                     cbActionType.Enabled = true;
+                cbActionBefore.Text = actionCopy.BeforeAction;
+                cbActionAfter.Text = actionCopy.AfterAction;
             }
             else if ((e.Node.Tag != null) && (e.Node.Tag is FindString findString))
             {
@@ -1243,10 +1258,22 @@ namespace ScriptEditor
                 }
                 else if (selectedTag is BotEngineClient.Action botAction)
                 {
+                    if (cbActionAfter.Items.Contains(ActiveTreeNode.Name))
+                    {
+                        cbActionAfter.Items.Remove(ActiveTreeNode.Name);
+                        cbActionBefore.Items.Remove(ActiveTreeNode.Name);
+                        cbPickActionAction.Items.Remove(ActiveTreeNode.Name);
+                    }
+                    cbActionAfter.Items.Add(tbActionName.Text);
+                    cbActionBefore.Items.Add(tbActionName.Text);
+                    cbPickActionAction.Items.Add(tbActionName.Text);
+
                     ActiveTreeNode.Name = tbActionName.Text;
                     ActiveTreeNode.Text = tbActionName.Text;
 
                     botAction.ActionType = cbActionType.Text;
+                    botAction.AfterAction = cbActionAfter.Text;
+                    botAction.BeforeAction = cbActionBefore.Text;
                     botAction.Frequency = null;
                     botAction.DailyScheduledTime = null;
                     if (Enum.TryParse(botAction.ActionType, true, out ValidActionType validActionType))
@@ -2010,6 +2037,8 @@ namespace ScriptEditor
         private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TreeNode currentNode = tvBotData.SelectedNode;
+            // ToDo: Add warning if deleting FindText or Action.
+            // ToDo: Update the combo boxes for FindText and Actions.
             if (currentNode != null)
             {
                 tvBotData.Nodes.Remove(currentNode);

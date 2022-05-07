@@ -819,6 +819,14 @@ namespace ScriptEditor
                                 tbDragX2.Text = "0";
                                 tbDragY2.Text = "0";
                             }
+                            if (commandCopy.Delay != null)
+                            {
+                                tbDragTime.Text = commandCopy.Delay.ToString();
+                            }
+                            else
+                            {
+                                tbDragTime.Text = "150";
+                            }
                             gbDrag.Enabled = true;
                             gbDrag.Visible = true;
                             break;
@@ -1303,7 +1311,8 @@ namespace ScriptEditor
                                 break;
                             case ValidCommandIds.Drag:
                                 if (tbDragX1.Text.Length == 0 || tbDragX2.Text.Length == 0
-                                    || tbDragY1.Text.Length == 0 || tbDragY2.Text.Length == 0)
+                                    || tbDragY1.Text.Length == 0 || tbDragY2.Text.Length == 0
+                                    || tbDragTime.Text.Length == 0)
                                 {
                                     MessageBox.Show("Required fields aren't populated.");
                                     return;
@@ -1316,6 +1325,7 @@ namespace ScriptEditor
                                 commandCopy.Swipe.Y1 = int.Parse(tbDragY1.Text);
                                 commandCopy.Swipe.X2 = int.Parse(tbDragX2.Text);
                                 commandCopy.Swipe.Y2 = int.Parse(tbDragY2.Text);
+                                commandCopy.Delay = int.Parse(tbDragTime.Text);
                                 break;
                             case ValidCommandIds.Exit:
                                 break;

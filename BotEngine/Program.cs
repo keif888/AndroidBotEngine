@@ -247,6 +247,7 @@ namespace BotEngine
 
                     if (!File.Exists(o.DeviceFileName))
                     {
+                        botDeviceConfig.FileId = "DeviceConfig";
                         botDeviceConfig.LastActionTaken = new Dictionary<string, ActionActivity>();
                         foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.Actions)
                         {
@@ -256,6 +257,15 @@ namespace BotEngine
                                 {
                                     LastRun = DateTime.MinValue,
                                     ActionEnabled = true
+                                };
+                                botDeviceConfig.LastActionTaken.Add(item.Key, actionActivity);
+                            }
+                            else if (item.Value.ActionType.ToLower() == "adhoc")
+                            {
+                                ActionActivity actionActivity = new ActionActivity
+                                {
+                                    LastRun = DateTime.MinValue,
+                                    ActionEnabled = false
                                 };
                                 botDeviceConfig.LastActionTaken.Add(item.Key, actionActivity);
                             }

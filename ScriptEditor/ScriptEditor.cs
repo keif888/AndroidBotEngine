@@ -1108,7 +1108,14 @@ namespace ScriptEditor
             {
                 tbActionOverrideEnabled.Checked = actionActivity.ActionEnabled;
                 tbActionOverrideName.Text = e.Node.Name;
-                dtpActionOverrideLastRun.Value = actionActivity.LastRun;
+                if (actionActivity.LastRun != DateTime.MinValue)
+                {
+                    dtpActionOverrideLastRun.Value = actionActivity.LastRun;
+                }
+                else
+                {
+                    dtpActionOverrideLastRun.Value = new DateTime(2001, 01, 01, 10, 00, 00);
+                }
                 if (actionActivity.DailyScheduledTime != null)
                 {
                     if (actionActivity.DailyScheduledTime != DateTime.MinValue)

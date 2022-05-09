@@ -251,23 +251,38 @@ namespace BotEngine
                         botDeviceConfig.LastActionTaken = new Dictionary<string, ActionActivity>();
                         foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.Actions)
                         {
-                            if (item.Value.ActionType.ToLower() == "scheduled" || item.Value.ActionType.ToLower() == "daily")
+                            if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType validActionType))
                             {
-                                ActionActivity actionActivity = new ActionActivity
+                                switch (validActionType)
                                 {
-                                    LastRun = DateTime.MinValue,
-                                    ActionEnabled = true
-                                };
-                                botDeviceConfig.LastActionTaken.Add(item.Key, actionActivity);
+                                    case ValidActionType.Adhoc:
+                                        ActionActivity adhocActionActivity = new ActionActivity
+                                        {
+                                            LastRun = DateTime.MinValue,
+                                            ActionEnabled = false
+                                        };
+                                        botDeviceConfig.LastActionTaken.Add(item.Key, adhocActionActivity);
+                                        break;
+                                    case ValidActionType.Always:
+                                        break;
+                                    case ValidActionType.Daily:
+                                    case ValidActionType.Scheduled:
+                                        ActionActivity dailyActionActivity = new ActionActivity
+                                        {
+                                            LastRun = DateTime.MinValue,
+                                            ActionEnabled = true
+                                        };
+                                        botDeviceConfig.LastActionTaken.Add(item.Key, dailyActionActivity);
+                                        break;
+                                    case ValidActionType.System:
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
-                            else if (item.Value.ActionType.ToLower() == "adhoc")
+                            else
                             {
-                                ActionActivity actionActivity = new ActionActivity
-                                {
-                                    LastRun = DateTime.MinValue,
-                                    ActionEnabled = false
-                                };
-                                botDeviceConfig.LastActionTaken.Add(item.Key, actionActivity);
+                                _logger.LogError("Action {0} has an incorrect ActionType of {1}", item.Key, item.Value.ActionType);
                             }
                         }
                         string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(botDeviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false });
@@ -502,10 +517,28 @@ namespace BotEngine
             sb.AppendLine();
             foreach (KeyValuePair<string, BotEngineClient.Action> item in Actions)
             {
-                if (item.Value.ActionType.ToLower() == "scheduled" || item.Value.ActionType.ToLower() == "daily")
+                if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType validActionType))
                 {
-                    sb.AppendFormat("Action {0} is {1} and due at {2}", item.Key, lastActionTaken[item.Key].ActionEnabled ? "Enabled":"Disabled", item.Value.NextExecuteDue(lastActionTaken[item.Key]));
-                    sb.AppendLine();
+                    switch (validActionType)
+                    {
+                        case ValidActionType.Adhoc:
+                            break;
+                        case ValidActionType.Always:
+                            break;
+                        case ValidActionType.Daily:
+                        case ValidActionType.Scheduled:
+                            sb.AppendFormat("Action {0} is {1} and due at {2}", item.Key, lastActionTaken[item.Key].ActionEnabled ? "Enabled" : "Disabled", item.Value.NextExecuteDue(lastActionTaken[item.Key]));
+                            sb.AppendLine();
+                            break;
+                        case ValidActionType.System:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    _logger.LogError("Action {0} has invalid ActionType {1}", item.Key, item.Value.ActionType);
                 }
             }
             // Log as Warning, so that it will show by default.
@@ -553,17 +586,44 @@ namespace BotEngine
         {
             foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.Actions)
             {
-                if (item.Value.ActionType.ToLower() == "scheduled" || item.Value.ActionType.ToLower() == "daily" || item.Value.ActionType.ToLower() == "adhoc")
+                if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType validActionType))
                 {
-                    if (!botDeviceConfig.LastActionTaken.ContainsKey(item.Key))
+                    switch (validActionType)
                     {
-                        ActionActivity actionActivty = new ActionActivity
-                        {
-                            ActionEnabled = true,
-                            LastRun = DateTime.MinValue
-                        };
-                        botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
+                        case ValidActionType.Adhoc:
+                            if (!botDeviceConfig.LastActionTaken.ContainsKey(item.Key))
+                            {
+                                ActionActivity actionActivty = new ActionActivity
+                                {
+                                    ActionEnabled = false,
+                                    LastRun = DateTime.MinValue
+                                };
+                                botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
+                            }
+                            break;
+                        case ValidActionType.Always:
+                            break;
+                        case ValidActionType.Daily:
+                        case ValidActionType.Scheduled:
+                            if (!botDeviceConfig.LastActionTaken.ContainsKey(item.Key))
+                            {
+                                ActionActivity actionActivty = new ActionActivity
+                                {
+                                    ActionEnabled = true,
+                                    LastRun = DateTime.MinValue
+                                };
+                                botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
+                            }
+                            break;
+                        case ValidActionType.System:
+                            break;
+                        default:
+                            break;
                     }
+                }
+                else
+                {
+                    _logger.LogError("For {0} the ActionType of {1} is not valid", item.Key, item.Value.ActionType);
                 }
             }
         }

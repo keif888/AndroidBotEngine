@@ -42,27 +42,56 @@ namespace BotEngine
             Exit
         }
 
-        public class Options
+        interface IGameOptions
         {
-            [Option('d', "Device", Required = false, HelpText = "The device string that is returned by ADB.exe.  At least the following is required \"emulator-5556 device\".")]
+            [Option('d', "Device", SetName = "GameOptions", Required = false, HelpText = "The device string that is returned by ADB.exe.  At least the following is required \"emulator-5556 device\".")]
+            string DeviceString { get; set; }
+
+            [Option('g', "GameConfig", SetName = "GameOptions", Required = true, HelpText = "The name of the json file that contains the Search Strings and Actions.")]
+            string ConfigFileName { get; set; }
+
+            [Option('i', "ListConfig", SetName = "GameOptions", Required = true, HelpText = "The name of the json file that contains the List Settings.")]
+            string ListConfigFileName { get; set; }
+
+            [Option('c', "DeviceConfig", SetName = "GameOptions", Required = true, HelpText = "The name of the json file that contains the last time actions were taken for a device.  If the file doesn't exist it will be created.")]
+            string DeviceFileName { get; set; }
+
+            [Option('s', "SleepTime", SetName = "GameOptions", Required = false, HelpText = "The number of milliseconds to sleep between each loop of Actions.", Default = 500)]
+            int SleepTime { get; set; }
+
+            [Option('l', "LogLevel", Required = false, HelpText = "The level of output from the logger (None, Critical, Error, Warning, Information, Debug, Trace).", Default = "Warning")]
+            public string LogLevel { get; set; }
+
+        }
+
+        interface IListOptions
+        {
+            [Option('t', "ListDevices", SetName = "ListOptions", Required = true, HelpText = "Returns a list of all the devices available.")]
+            bool ListDevices { get; set; }
+
+            [Option('l', "LogLevel", Required = false, HelpText = "The level of output from the logger (None, Critical, Error, Warning, Information, Debug, Trace).", Default = "Information")]
+            public string LogLevel { get; set; }
+
+        }
+
+
+        public class Options : IGameOptions, IListOptions
+        {
             public string DeviceString { get; set; }
 
-            [Option('g', "GameConfig", Required = true, HelpText = "The name of the json file that contains the Search Strings and Actions.")]
             public string ConfigFileName { get; set; }
 
-            [Option('i', "ListConfig", Required = true, HelpText = "The name of the json file that contains the List Settings.")]
             public string ListConfigFileName { get; set; }
 
-            [Option('c', "DeviceConfig", Required = true, HelpText = "The name of the json file that contains the last time actions were taken for a device.  If the file doesn't exist it will be created.")]
             public string DeviceFileName { get; set; }
+
+            public int SleepTime { get; set; }
+
+            public bool ListDevices { get; set; }
 
             [Option('p', "ADBPath", Required = true, HelpText = "The path to where you have ADB.exe")]
             public string ADBPath { get; set; }
 
-            [Option('s', "SleepTime", Required = false, HelpText = "The number of milliseconds to sleep between each loop of Actions.", Default = 500)]
-            public int SleepTime { get; set; }
-
-            [Option('l', "LogLevel", Required = false, HelpText = "The level of output from the logger (None, Critical, Error, Warning, Information, Debug, Trace).", Default = "Warning")]
             public string LogLevel { get; set; }
 
         }
@@ -167,362 +196,407 @@ namespace BotEngine
             using (_logger.BeginScope(BotEngineClient.Helpers.CurrentMethodName()))
             {
                 var exitCode = 0;
-                JsonHelper jsonHelper = new JsonHelper();
-                JsonHelper.ConfigFileType fileType;
-                _logger.LogDebug("Ensure that files exist");
-                if(!File.Exists(o.ConfigFileName))
+                if (o.ListDevices)
                 {
-                    _logger.LogError("Game Config file {0} does not exist.  Exiting.", o.ConfigFileName);
-                    return -2;
+                    AdbServer adbServer = new AdbServer();
+                    StartServerResult result = adbServer.StartServer(o.ADBPath, restartServerIfNewer: true);
+                    _logger.LogInformation("Starting ADB Server status {0}", result.ToString());
+                    if (result != StartServerResult.AlreadyRunning)
+                    {
+                        Thread.Sleep(1500);
+                        AdbServerStatus status = adbServer.GetStatus();
+                        _logger.LogDebug("ADB Server status {0}", status.ToString());
+                        if (!status.IsRunning)
+                        {
+                            _logger.LogError("Unable to start ADB Server");
+                            throw new Exception("Unable to start ADB server");
+                        }
+                    }
+                    AdbClient client = new AdbClient();
+                    List<DeviceData> devices = new List<DeviceData>();
+                    for (int i = 0; i < 5; i++)
+                    {
+                        devices = client.GetDevices();
+                        if (devices.Count > 0)
+                            break;
+                        _logger.LogWarning("No ADB Clients Found");
+                        Thread.Sleep(1500);
+                    }
+                    if (devices.Count == 0)
+                    {
+                        _logger.LogError("No ADB Clients Found");
+                        exitCode = -2;
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Start Device Strings found");
+                        foreach (DeviceData device in devices)
+                        {
+                            string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
+                            string deviceId = String.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
+                            _logger.LogInformation("\"{0}\"", deviceId);
+                        }
+                        _logger.LogInformation("End Device Strings found");
+                    }
                 }
                 else
                 {
-                    fileType = jsonHelper.GetFileType(o.ConfigFileName);
-                    if (fileType != JsonHelper.ConfigFileType.GameConfig)
+                    JsonHelper jsonHelper = new JsonHelper();
+                    JsonHelper.ConfigFileType fileType;
+                    _logger.LogDebug("Ensure that files exist");
+                    if (!File.Exists(o.ConfigFileName))
                     {
-                        _logger.LogError("Game Config file {0} is not a GameConfig, but a {1}.  Exiting.", o.ConfigFileName, fileType);
-                        return -3;
-                    }
-                    else
-                    {
-                        if (!jsonHelper.ValidateGameConfigStructure(o.ConfigFileName))
-                        {
-                            _logger.LogError("Game Config file {0} has errors as follows:", o.ConfigFileName);
-                            foreach (string item in jsonHelper.Errors)
-                            {
-                                _logger.LogError(item);
-                            }
-                            return -4;
-                        }
-                    }
-                }
-                if (!File.Exists(o.ListConfigFileName))
-                {
-                    _logger.LogError("List Config file {0} does not exist.  Exiting.", o.ListConfigFileName);
-                    return -2;
-                }
-                else
-                {
-                    fileType = jsonHelper.GetFileType(o.ListConfigFileName);
-                    if (fileType != JsonHelper.ConfigFileType.ListConfig)
-                    {
-                        _logger.LogError("List Config file {0} is not a ListConfig, but a {1}.  Exiting.", o.ConfigFileName, fileType);
-                        return -3;
-                    }
-                    else
-                    {
-                        if (!jsonHelper.ValidateListConfigStructure(o.ListConfigFileName))
-                        {
-                            _logger.LogError("List Config file {0} has errors as follows:", o.ListConfigFileName);
-                            foreach (string item in jsonHelper.Errors)
-                            {
-                                _logger.LogError(item);
-                            }
-                            return -4;
-                        }
-                    }
-                }
-                if (File.Exists(o.DeviceFileName))
-                {
-                    fileType = jsonHelper.GetFileType(o.DeviceFileName);
-                    if (fileType != JsonHelper.ConfigFileType.DeviceConfig)
-                    {
-                        _logger.LogError("Device Config file {0} is not a DeviceConfig, but a {1}.  Exiting.", o.ConfigFileName, fileType);
-                        return -3;
-                    }
-                    else
-                    {
-                        if (!jsonHelper.ValidateDeviceConfigStructure(o.DeviceFileName))
-                        {
-                            _logger.LogError("Device Config file {0} has errors as follows:", o.DeviceFileName);
-                            foreach (string item in jsonHelper.Errors)
-                            {
-                                _logger.LogError(item);
-                            }
-                            return -4;
-                        }
-                    }
-                }
-
-                _logger.LogDebug("Device String is {0}", o.DeviceString);
-                AdbServer adbServer = new AdbServer();
-                StartServerResult result = adbServer.StartServer(o.ADBPath, restartServerIfNewer: true);
-                _logger.LogInformation("Starting ADB Server status {0}", result.ToString());
-                if (result != StartServerResult.AlreadyRunning)
-                {
-                    Thread.Sleep(1500);
-                    AdbServerStatus status = adbServer.GetStatus();
-                    _logger.LogDebug("ADB Server status {0}", status.ToString());
-                    if (!status.IsRunning)
-                    {
-                        _logger.LogError("Unable to start ADB Server");
-                        throw new Exception("Unable to start ADB server");
-                    }
-                }
-                AdbClient client = new AdbClient();
-                List<DeviceData> devices = new List<DeviceData>();
-                for (int i = 0; i < 5; i++)
-                {
-                    devices = client.GetDevices();
-                    if (devices.Count > 0)
-                        break;
-                    _logger.LogWarning("No ADB Clients Found");
-                    Thread.Sleep(1500);
-                }
-                if (devices.Count == 0)
-                {
-                    _logger.LogError("No ADB Clients Found");
-                    exitCode = -2;
-                }
-                else
-                {
-                    string deviceId;
-                    if (o.DeviceString is null)
-                    {
-                        DeviceData device = devices[0];
-                        string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
-                        deviceId = String.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
-                    }
-                    else
-                    {
-                        deviceId = o.DeviceString;
-                    }
-                    string jsonString = string.Empty;
-                    try
-                    {
-                        jsonString = File.ReadAllText(o.ConfigFileName);
-                        botGameConfig = JsonSerializer.Deserialize<BOTConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
-                    }
-                    catch (JsonException jse)
-                    {
-                        _logger.LogError(jse, "JSON file format error reading {0}", o.ConfigFileName);
+                        _logger.LogError("Game Config file {0} does not exist.  Exiting.", o.ConfigFileName);
                         return -2;
                     }
-
-                    try
+                    else
                     {
-                        jsonString = File.ReadAllText(o.ListConfigFileName);
-                        botListConfig = JsonSerializer.Deserialize<BOTListConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
-                    }
-                    catch (JsonException jse)
-                    {
-                        _logger.LogError(jse, "JSON file format error reading {0}", o.ListConfigFileName);
-                        return -2;
-                    }
-
-                    if (!File.Exists(o.DeviceFileName))
-                    {
-                        botDeviceConfig.FileId = "DeviceConfig";
-                        botDeviceConfig.LastActionTaken = new Dictionary<string, ActionActivity>();
-                        foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.Actions)
+                        fileType = jsonHelper.GetFileType(o.ConfigFileName);
+                        if (fileType != JsonHelper.ConfigFileType.GameConfig)
                         {
-                            if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType validActionType))
+                            _logger.LogError("Game Config file {0} is not a GameConfig, but a {1}.  Exiting.", o.ConfigFileName, fileType);
+                            return -3;
+                        }
+                        else
+                        {
+                            if (!jsonHelper.ValidateGameConfigStructure(o.ConfigFileName))
                             {
-                                switch (validActionType)
+                                _logger.LogError("Game Config file {0} has errors as follows:", o.ConfigFileName);
+                                foreach (string item in jsonHelper.Errors)
                                 {
-                                    case ValidActionType.Adhoc:
-                                        ActionActivity adhocActionActivity = new ActionActivity
-                                        {
-                                            LastRun = DateTime.MinValue,
-                                            ActionEnabled = false
-                                        };
-                                        botDeviceConfig.LastActionTaken.Add(item.Key, adhocActionActivity);
-                                        break;
-                                    case ValidActionType.Always:
-                                        break;
-                                    case ValidActionType.Daily:
-                                    case ValidActionType.Scheduled:
-                                        ActionActivity dailyActionActivity = new ActionActivity
-                                        {
-                                            LastRun = DateTime.MinValue,
-                                            ActionEnabled = true
-                                        };
-                                        botDeviceConfig.LastActionTaken.Add(item.Key, dailyActionActivity);
-                                        break;
-                                    case ValidActionType.System:
-                                        break;
-                                    default:
-                                        break;
+                                    _logger.LogError(item);
                                 }
-                            }
-                            else
-                            {
-                                _logger.LogError("Action {0} has an incorrect ActionType of {1}", item.Key, item.Value.ActionType);
+                                return -4;
                             }
                         }
-                        string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(botDeviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false });
-                        File.WriteAllText(o.DeviceFileName, jsonData);
-                        _logger.LogInformation("Device JSON file {0} Saved", o.DeviceFileName);
+                    }
+                    if (!File.Exists(o.ListConfigFileName))
+                    {
+                        _logger.LogError("List Config file {0} does not exist.  Exiting.", o.ListConfigFileName);
+                        return -2;
                     }
                     else
                     {
+                        fileType = jsonHelper.GetFileType(o.ListConfigFileName);
+                        if (fileType != JsonHelper.ConfigFileType.ListConfig)
+                        {
+                            _logger.LogError("List Config file {0} is not a ListConfig, but a {1}.  Exiting.", o.ConfigFileName, fileType);
+                            return -3;
+                        }
+                        else
+                        {
+                            if (!jsonHelper.ValidateListConfigStructure(o.ListConfigFileName))
+                            {
+                                _logger.LogError("List Config file {0} has errors as follows:", o.ListConfigFileName);
+                                foreach (string item in jsonHelper.Errors)
+                                {
+                                    _logger.LogError(item);
+                                }
+                                return -4;
+                            }
+                        }
+                    }
+                    if (File.Exists(o.DeviceFileName))
+                    {
+                        fileType = jsonHelper.GetFileType(o.DeviceFileName);
+                        if (fileType != JsonHelper.ConfigFileType.DeviceConfig)
+                        {
+                            _logger.LogError("Device Config file {0} is not a DeviceConfig, but a {1}.  Exiting.", o.ConfigFileName, fileType);
+                            return -3;
+                        }
+                        else
+                        {
+                            if (!jsonHelper.ValidateDeviceConfigStructure(o.DeviceFileName))
+                            {
+                                _logger.LogError("Device Config file {0} has errors as follows:", o.DeviceFileName);
+                                foreach (string item in jsonHelper.Errors)
+                                {
+                                    _logger.LogError(item);
+                                }
+                                return -4;
+                            }
+                        }
+                    }
+
+                    _logger.LogDebug("Device String is {0}", o.DeviceString);
+                    AdbServer adbServer = new AdbServer();
+                    StartServerResult result = adbServer.StartServer(o.ADBPath, restartServerIfNewer: true);
+                    _logger.LogInformation("Starting ADB Server status {0}", result.ToString());
+                    if (result != StartServerResult.AlreadyRunning)
+                    {
+                        Thread.Sleep(1500);
+                        AdbServerStatus status = adbServer.GetStatus();
+                        _logger.LogDebug("ADB Server status {0}", status.ToString());
+                        if (!status.IsRunning)
+                        {
+                            _logger.LogError("Unable to start ADB Server");
+                            throw new Exception("Unable to start ADB server");
+                        }
+                    }
+                    AdbClient client = new AdbClient();
+                    List<DeviceData> devices = new List<DeviceData>();
+                    for (int i = 0; i < 5; i++)
+                    {
+                        devices = client.GetDevices();
+                        if (devices.Count > 0)
+                            break;
+                        _logger.LogWarning("No ADB Clients Found");
+                        Thread.Sleep(1500);
+                    }
+                    if (devices.Count == 0)
+                    {
+                        _logger.LogError("No ADB Clients Found");
+                        exitCode = -2;
+                    }
+                    else
+                    {
+                        string deviceId;
+                        if (o.DeviceString is null)
+                        {
+                            DeviceData device = devices[0];
+                            string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
+                            deviceId = String.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
+                        }
+                        else
+                        {
+                            deviceId = o.DeviceString;
+                        }
+                        string jsonString = string.Empty;
                         try
                         {
-                            jsonString = File.ReadAllText(o.DeviceFileName);
-                            botDeviceConfig = JsonSerializer.Deserialize<BOTDeviceConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+                            jsonString = File.ReadAllText(o.ConfigFileName);
+                            botGameConfig = JsonSerializer.Deserialize<BOTConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
                         }
                         catch (JsonException jse)
                         {
-                            _logger.LogError(jse, "JSON file format error reading {0}", o.DeviceFileName);
+                            _logger.LogError(jse, "JSON file format error reading {0}", o.ConfigFileName);
                             return -2;
                         }
-                    }
 
-                    ValidateAndUpdateDeviceConfig(botDeviceConfig, botGameConfig);
-
-                    gameConfigWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ConfigFileName))
-                    {
-                        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
-                        Filter = "*.json"
-                    };
-                    gameConfigFileName = o.ConfigFileName;
-                    gameConfigWatcher.Changed += ReloadJSONConfig;
-                    gameConfigWatcher.Renamed += ReloadJSONConfig;
-                    gameConfigWatcher.EnableRaisingEvents = true;
-
-                    listWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ListConfigFileName))
-                    {
-                        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
-                        Filter = Path.GetFileName(o.ListConfigFileName)
-                    };
-                    listConfigFileName = o.ListConfigFileName;
-                    listWatcher.Changed += ReloadJSONConfig;
-                    listWatcher.Renamed += ReloadJSONConfig;
-                    listWatcher.EnableRaisingEvents = true;
-
-                    deviceWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.DeviceFileName))
-                    {
-                        NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
-                        Filter = Path.GetFileName(o.DeviceFileName)
-                    };
-                    deviceConfigFileName = o.DeviceFileName;
-                    deviceWatcher.Changed += ReloadJSONConfig;
-                    deviceWatcher.Renamed += ReloadJSONConfig;
-                    deviceWatcher.EnableRaisingEvents = true;
-
-                    Dictionary<string, BotEngineClient.Action> Actions = botGameConfig.Actions;
-                    // Validate the BeforeAction and AfterActions...
-
-                    bool configErrors = false;
-                    foreach (KeyValuePair<string, BotEngineClient.Action> item in Actions)
-                    {
-                        if (item.Value.BeforeAction != null && !botGameConfig.Actions.ContainsKey(item.Value.BeforeAction) && !botGameConfig.SystemActions.ContainsKey(item.Value.BeforeAction))
+                        try
                         {
-                            _logger.LogError("BeforeAction {0} on Action {1} does not exist in {2}", item.Value.BeforeAction, item.Key, o.ConfigFileName);
-                            configErrors = true;
+                            jsonString = File.ReadAllText(o.ListConfigFileName);
+                            botListConfig = JsonSerializer.Deserialize<BOTListConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
                         }
-                        if (item.Value.AfterAction != null && !botGameConfig.Actions.ContainsKey(item.Value.AfterAction) && !botGameConfig.SystemActions.ContainsKey(item.Value.AfterAction))
+                        catch (JsonException jse)
                         {
-                            _logger.LogError("AfterAction {0} on Action {1} does not exist in {2}", item.Value.AfterAction, item.Key, o.ConfigFileName);
-                            configErrors = true;
-                        }
-                    }
-
-                    if (configErrors)
-                        return -2;
-
-                    BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, o.ADBPath, deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig);
-                    BotEngineClient.BotEngine.CommandResults cr = BotEngineClient.BotEngine.CommandResults.Ok;
-                    DateTime tenMinuteDateTime = DateTime.MinValue;
-                    bool paused = false;
-                    do
-                    {
-                        if (reloadBOTListConfig)
-                        {
-                            bot.ReloadListConfig(botListConfig);
-                            reloadBOTListConfig = false;
+                            _logger.LogError(jse, "JSON file format error reading {0}", o.ListConfigFileName);
+                            return -2;
                         }
 
-                        if (reloadBOTGameConfig)
+                        if (!File.Exists(o.DeviceFileName))
                         {
-                            Actions = botGameConfig.Actions;
-                            bot.ReloadFindStrings(botGameConfig.FindStrings);
-                            bot.ReloadNormalActions(botGameConfig.Actions);
-                            bot.ReloadSystemActions(botGameConfig.SystemActions);
-                            ValidateAndUpdateDeviceConfig(botDeviceConfig, botGameConfig);
-                            reloadBOTGameConfig = false;
-                        }
-
-                        if (reloadBOTDeviceConfig)
-                        {
-                            RefreshDeviceConfig(botDeviceConfig, botDeviceConfigNew);
-                            ValidateAndUpdateDeviceConfig(botDeviceConfig, botGameConfig);
-                            reloadBOTDeviceConfig = false;
-                            tenMinuteDateTime = DateTime.Now;
-                        }
-
-                        if ((DateTime.Now - tenMinuteDateTime).TotalMinutes >= 10)
-                        {
-                            tenMinuteDateTime = DateTime.Now;
-                            SaveDeviceConfigJson();
-                            ShowBotStatus(Actions, botDeviceConfig.LastActionTaken);
-                        }
-                        _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
-                        if ((!paused) && (!cancelRequested))
-                        {
-                            foreach (KeyValuePair<string, BotEngineClient.Action> item in Actions)
+                            botDeviceConfig.FileId = "DeviceConfig";
+                            botDeviceConfig.LastActionTaken = new Dictionary<string, ActionActivity>();
+                            foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.Actions)
                             {
-                                _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
-                                if (cancelRequested || paused)
-                                    break;
                                 if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType validActionType))
                                 {
-                                    if (   ((validActionType == ValidActionType.Scheduled) && (botDeviceConfig.LastActionTaken[item.Key].ActionEnabled))
-                                        || ((validActionType == ValidActionType.Daily) && (botDeviceConfig.LastActionTaken[item.Key].ActionEnabled))
-                                        || ((validActionType == ValidActionType.Adhoc) && (botDeviceConfig.LastActionTaken[item.Key].ActionEnabled))
-                                        )
+                                    switch (validActionType)
                                     {
-                                        if (item.Value.ExecuteDue(botDeviceConfig.LastActionTaken[item.Key]))
-                                        {
-                                            if (item.Value.BeforeAction != null)
+                                        case ValidActionType.Adhoc:
+                                            ActionActivity adhocActionActivity = new ActionActivity
                                             {
-                                                // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                                cr = bot.ExecuteAction(item.Value.BeforeAction);
-                                                if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
-                                                    break;
-                                            }
-                                            _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
-                                            if (cancelRequested || paused)
-                                                break;
-                                            // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                            cr = bot.ExecuteAction(item.Key);
-                                            _logger.LogInformation(string.Format("Action result was {0}", cr));
-                                            _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
-                                            if (cancelRequested || paused)
-                                                break;
-                                            if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
-                                                break;
-                                            if (cr == BotEngineClient.BotEngine.CommandResults.Ok)
+                                                LastRun = DateTime.MinValue,
+                                                ActionEnabled = false
+                                            };
+                                            botDeviceConfig.LastActionTaken.Add(item.Key, adhocActionActivity);
+                                            break;
+                                        case ValidActionType.Always:
+                                            break;
+                                        case ValidActionType.Daily:
+                                        case ValidActionType.Scheduled:
+                                            ActionActivity dailyActionActivity = new ActionActivity
                                             {
-                                                botDeviceConfig.LastActionTaken[item.Key].MarkExecuted();
-                                                if (validActionType == ValidActionType.Adhoc)
-                                                    botDeviceConfig.LastActionTaken[item.Key].MarkDisabled();
-                                            }
-                                            if (item.Value.AfterAction != null)
-                                            {
-                                                // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                                cr = bot.ExecuteAction(item.Value.AfterAction);
-                                                if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                    else if (validActionType == ValidActionType.Always)
-                                    {
-                                        // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                        cr = bot.ExecuteAction(item.Key);
-                                        if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                                LastRun = DateTime.MinValue,
+                                                ActionEnabled = true
+                                            };
+                                            botDeviceConfig.LastActionTaken.Add(item.Key, dailyActionActivity);
+                                            break;
+                                        case ValidActionType.System:
+                                            break;
+                                        default:
                                             break;
                                     }
                                 }
+                                else
+                                {
+                                    _logger.LogError("Action {0} has an incorrect ActionType of {1}", item.Key, item.Value.ActionType);
+                                }
+                            }
+                            string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(botDeviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false });
+                            File.WriteAllText(o.DeviceFileName, jsonData);
+                            _logger.LogInformation("Device JSON file {0} Saved", o.DeviceFileName);
+                        }
+                        else
+                        {
+                            try
+                            {
+                                jsonString = File.ReadAllText(o.DeviceFileName);
+                                botDeviceConfig = JsonSerializer.Deserialize<BOTDeviceConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+                            }
+                            catch (JsonException jse)
+                            {
+                                _logger.LogError(jse, "JSON file format error reading {0}", o.DeviceFileName);
+                                return -2;
                             }
                         }
-                        if (!cancelRequested)
-                            Thread.Sleep(options.SleepTime);
-                    }
-                    while ((cr != BotEngineClient.BotEngine.CommandResults.ADBError) && (cancelRequested == false));
-                }
 
+                        ValidateAndUpdateDeviceConfig(botDeviceConfig, botGameConfig);
+
+                        gameConfigWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ConfigFileName))
+                        {
+                            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
+                            Filter = "*.json"
+                        };
+                        gameConfigFileName = o.ConfigFileName;
+                        gameConfigWatcher.Changed += ReloadJSONConfig;
+                        gameConfigWatcher.Renamed += ReloadJSONConfig;
+                        gameConfigWatcher.EnableRaisingEvents = true;
+
+                        listWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ListConfigFileName))
+                        {
+                            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
+                            Filter = Path.GetFileName(o.ListConfigFileName)
+                        };
+                        listConfigFileName = o.ListConfigFileName;
+                        listWatcher.Changed += ReloadJSONConfig;
+                        listWatcher.Renamed += ReloadJSONConfig;
+                        listWatcher.EnableRaisingEvents = true;
+
+                        deviceWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.DeviceFileName))
+                        {
+                            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
+                            Filter = Path.GetFileName(o.DeviceFileName)
+                        };
+                        deviceConfigFileName = o.DeviceFileName;
+                        deviceWatcher.Changed += ReloadJSONConfig;
+                        deviceWatcher.Renamed += ReloadJSONConfig;
+                        deviceWatcher.EnableRaisingEvents = true;
+
+                        Dictionary<string, BotEngineClient.Action> Actions = botGameConfig.Actions;
+                        // Validate the BeforeAction and AfterActions...
+
+                        bool configErrors = false;
+                        foreach (KeyValuePair<string, BotEngineClient.Action> item in Actions)
+                        {
+                            if (item.Value.BeforeAction != null && !botGameConfig.Actions.ContainsKey(item.Value.BeforeAction) && !botGameConfig.SystemActions.ContainsKey(item.Value.BeforeAction))
+                            {
+                                _logger.LogError("BeforeAction {0} on Action {1} does not exist in {2}", item.Value.BeforeAction, item.Key, o.ConfigFileName);
+                                configErrors = true;
+                            }
+                            if (item.Value.AfterAction != null && !botGameConfig.Actions.ContainsKey(item.Value.AfterAction) && !botGameConfig.SystemActions.ContainsKey(item.Value.AfterAction))
+                            {
+                                _logger.LogError("AfterAction {0} on Action {1} does not exist in {2}", item.Value.AfterAction, item.Key, o.ConfigFileName);
+                                configErrors = true;
+                            }
+                        }
+
+                        if (configErrors)
+                            return -2;
+
+                        BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, o.ADBPath, deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig);
+                        BotEngineClient.BotEngine.CommandResults cr = BotEngineClient.BotEngine.CommandResults.Ok;
+                        DateTime tenMinuteDateTime = DateTime.MinValue;
+                        bool paused = false;
+                        do
+                        {
+                            if (reloadBOTListConfig)
+                            {
+                                bot.ReloadListConfig(botListConfig);
+                                reloadBOTListConfig = false;
+                            }
+
+                            if (reloadBOTGameConfig)
+                            {
+                                Actions = botGameConfig.Actions;
+                                bot.ReloadFindStrings(botGameConfig.FindStrings);
+                                bot.ReloadNormalActions(botGameConfig.Actions);
+                                bot.ReloadSystemActions(botGameConfig.SystemActions);
+                                ValidateAndUpdateDeviceConfig(botDeviceConfig, botGameConfig);
+                                reloadBOTGameConfig = false;
+                            }
+
+                            if (reloadBOTDeviceConfig)
+                            {
+                                RefreshDeviceConfig(botDeviceConfig, botDeviceConfigNew);
+                                ValidateAndUpdateDeviceConfig(botDeviceConfig, botGameConfig);
+                                reloadBOTDeviceConfig = false;
+                                tenMinuteDateTime = DateTime.Now;
+                            }
+
+                            if ((DateTime.Now - tenMinuteDateTime).TotalMinutes >= 10)
+                            {
+                                tenMinuteDateTime = DateTime.Now;
+                                SaveDeviceConfigJson();
+                                ShowBotStatus(Actions, botDeviceConfig.LastActionTaken);
+                            }
+                            _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
+                            if ((!paused) && (!cancelRequested))
+                            {
+                                foreach (KeyValuePair<string, BotEngineClient.Action> item in Actions)
+                                {
+                                    _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
+                                    if (cancelRequested || paused)
+                                        break;
+                                    if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType validActionType))
+                                    {
+                                        if (((validActionType == ValidActionType.Scheduled) && (botDeviceConfig.LastActionTaken[item.Key].ActionEnabled))
+                                            || ((validActionType == ValidActionType.Daily) && (botDeviceConfig.LastActionTaken[item.Key].ActionEnabled))
+                                            || ((validActionType == ValidActionType.Adhoc) && (botDeviceConfig.LastActionTaken[item.Key].ActionEnabled))
+                                            )
+                                        {
+                                            if (item.Value.ExecuteDue(botDeviceConfig.LastActionTaken[item.Key]))
+                                            {
+                                                if (item.Value.BeforeAction != null)
+                                                {
+                                                    // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
+                                                    cr = bot.ExecuteAction(item.Value.BeforeAction);
+                                                    if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                                        break;
+                                                }
+                                                _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
+                                                if (cancelRequested || paused)
+                                                    break;
+                                                // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
+                                                cr = bot.ExecuteAction(item.Key);
+                                                _logger.LogInformation(string.Format("Action result was {0}", cr));
+                                                _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
+                                                if (cancelRequested || paused)
+                                                    break;
+                                                if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                                    break;
+                                                if (cr == BotEngineClient.BotEngine.CommandResults.Ok)
+                                                {
+                                                    botDeviceConfig.LastActionTaken[item.Key].MarkExecuted();
+                                                    if (validActionType == ValidActionType.Adhoc)
+                                                        botDeviceConfig.LastActionTaken[item.Key].MarkDisabled();
+                                                }
+                                                if (item.Value.AfterAction != null)
+                                                {
+                                                    // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
+                                                    cr = bot.ExecuteAction(item.Value.AfterAction);
+                                                    if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                                        break;
+                                                }
+                                            }
+                                        }
+                                        else if (validActionType == ValidActionType.Always)
+                                        {
+                                            // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
+                                            cr = bot.ExecuteAction(item.Key);
+                                            if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                                break;
+                                        }
+                                    }
+                                }
+                            }
+                            if (!cancelRequested)
+                                Thread.Sleep(options.SleepTime);
+                        }
+                        while ((cr != BotEngineClient.BotEngine.CommandResults.ADBError) && (cancelRequested == false));
+                    }
+                }
                 return exitCode;
             }
         }

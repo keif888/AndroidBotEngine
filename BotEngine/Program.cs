@@ -167,16 +167,81 @@ namespace BotEngine
             using (_logger.BeginScope(BotEngineClient.Helpers.CurrentMethodName()))
             {
                 var exitCode = 0;
+                JsonHelper jsonHelper = new JsonHelper();
+                JsonHelper.ConfigFileType fileType;
                 _logger.LogDebug("Ensure that files exist");
                 if(!File.Exists(o.ConfigFileName))
                 {
                     _logger.LogError("Game Config file {0} does not exist.  Exiting.", o.ConfigFileName);
                     return -2;
                 }
+                else
+                {
+                    fileType = jsonHelper.GetFileType(o.ConfigFileName);
+                    if (fileType != JsonHelper.ConfigFileType.GameConfig)
+                    {
+                        _logger.LogError("Game Config file {0} is not a GameConfig, but a {1}.  Exiting.", o.ConfigFileName, fileType);
+                        return -3;
+                    }
+                    else
+                    {
+                        if (!jsonHelper.ValidateGameConfigStructure(o.ConfigFileName))
+                        {
+                            _logger.LogError("Game Config file {0} has errors as follows:", o.ConfigFileName);
+                            foreach (string item in jsonHelper.Errors)
+                            {
+                                _logger.LogError(item);
+                            }
+                            return -4;
+                        }
+                    }
+                }
                 if (!File.Exists(o.ListConfigFileName))
                 {
                     _logger.LogError("List Config file {0} does not exist.  Exiting.", o.ListConfigFileName);
                     return -2;
+                }
+                else
+                {
+                    fileType = jsonHelper.GetFileType(o.ListConfigFileName);
+                    if (fileType != JsonHelper.ConfigFileType.ListConfig)
+                    {
+                        _logger.LogError("List Config file {0} is not a ListConfig, but a {1}.  Exiting.", o.ConfigFileName, fileType);
+                        return -3;
+                    }
+                    else
+                    {
+                        if (!jsonHelper.ValidateListConfigStructure(o.ListConfigFileName))
+                        {
+                            _logger.LogError("List Config file {0} has errors as follows:", o.ListConfigFileName);
+                            foreach (string item in jsonHelper.Errors)
+                            {
+                                _logger.LogError(item);
+                            }
+                            return -4;
+                        }
+                    }
+                }
+                if (File.Exists(o.DeviceFileName))
+                {
+                    fileType = jsonHelper.GetFileType(o.DeviceFileName);
+                    if (fileType != JsonHelper.ConfigFileType.DeviceConfig)
+                    {
+                        _logger.LogError("Device Config file {0} is not a DeviceConfig, but a {1}.  Exiting.", o.ConfigFileName, fileType);
+                        return -3;
+                    }
+                    else
+                    {
+                        if (!jsonHelper.ValidateDeviceConfigStructure(o.DeviceFileName))
+                        {
+                            _logger.LogError("Device Config file {0} has errors as follows:", o.DeviceFileName);
+                            foreach (string item in jsonHelper.Errors)
+                            {
+                                _logger.LogError(item);
+                            }
+                            return -4;
+                        }
+                    }
                 }
 
                 _logger.LogDebug("Device String is {0}", o.DeviceString);

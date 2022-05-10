@@ -145,20 +145,27 @@ namespace BotEngine
 
         private static void SaveDeviceConfigJson()
         {
-            if (botDeviceConfig.LastActionTaken.Count > 0)
+            if (botDeviceConfig != null && botDeviceConfig.FileId != null && botDeviceConfig.LastActionTaken != null)
             {
-                try
+                if (botDeviceConfig.LastActionTaken.Count > 0)
                 {
-                    if (deviceWatcher != null) deviceWatcher.EnableRaisingEvents = false;
-                    string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(botDeviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false });
-                    File.WriteAllText(options.DeviceFileName, jsonData);
-                    _logger.LogInformation("Device JSON file {0} Saved", options.DeviceFileName);
-                    if (deviceWatcher != null) deviceWatcher.EnableRaisingEvents = true;
+                    try
+                    {
+                        if (deviceWatcher != null) deviceWatcher.EnableRaisingEvents = false;
+                        string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(botDeviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false });
+                        File.WriteAllText(options.DeviceFileName, jsonData);
+                        _logger.LogInformation("Device JSON file {0} Saved", options.DeviceFileName);
+                        if (deviceWatcher != null) deviceWatcher.EnableRaisingEvents = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Exception thrown when writing {0}", options.DeviceFileName);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Exception thrown when writing {0}", options.DeviceFileName);
-                }
+            }
+            else
+            {
+                _logger.LogWarning("Attempt to save device config file {0}, when it hasn't been loaded.", options.DeviceFileName);
             }
         }
 
@@ -279,7 +286,7 @@ namespace BotEngine
                         fileType = jsonHelper.GetFileType(o.ListConfigFileName);
                         if (fileType != JsonHelper.ConfigFileType.ListConfig)
                         {
-                            _logger.LogError("List Config file {0} is not a ListConfig, but a {1}.  Exiting.", o.ConfigFileName, fileType);
+                            _logger.LogError("List Config file {0} is not a ListConfig, but a {1}.  Exiting.", o.ListConfigFileName, fileType);
                             return -3;
                         }
                         else

@@ -1115,6 +1115,8 @@ namespace ScriptEditor
                     tbPointX.Text = "0";
                     tbPointY.Text = "0";
                 }
+                aboveToolStripMenuItem.Enabled = true;
+                belowToolStripMenuItem.Enabled = true;
                 gbClick.Enabled = true;
                 gbClick.Visible = true;
             }

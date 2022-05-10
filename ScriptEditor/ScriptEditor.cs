@@ -321,7 +321,7 @@ namespace ScriptEditor
             ChangePending = false;
             UnsavedChanges = false;
             saveToolStripMenuItem.Enabled = false;
-            loadedFileType = JsonHelper.ConfigFileType.DeviceConfig;
+            loadedFileType = JsonHelper.ConfigFileType.ListConfig;
         }
 
         /// <summary>
@@ -1162,6 +1162,7 @@ namespace ScriptEditor
             else if ((e.Node.Tag != null) && (e.Node.Tag is List<XYCoords>))
             {
                 tbListName.Text = ActiveTreeNode.Name;
+                addCoordinatestoolStripMenuItem.Enabled = true;
                 gbList.Enabled = true;
                 gbList.Visible = true;
             }
@@ -1856,6 +1857,17 @@ namespace ScriptEditor
                 tvBotData.SelectedNode = selectedNode;
                 MessageBox.Show("Rename this Coordinates to allow new coordinates to be added");
             }
+            else if (tvBotData.SelectedNode.Tag is List<XYCoords>)
+            {
+                TreeNode treeNode = new TreeNode
+                {
+                    Text = "(0,0)",
+                    Name = "(0,0)",
+                    Tag = new XYCoords(0, 0)
+                };
+                tvBotData.SelectedNode.Nodes.Add(treeNode);
+                tvBotData.SelectedNode = treeNode;
+            }    
             else
             {
                 List<XYCoords> newCoordinates = new List<XYCoords>();

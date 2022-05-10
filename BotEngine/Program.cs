@@ -69,9 +69,6 @@ namespace BotEngine
             [Option('t', "ListDevices", SetName = "ListOptions", Required = true, HelpText = "Returns a list of all the devices available.")]
             bool ListDevices { get; set; }
 
-            [Option('l', "LogLevel", Required = false, HelpText = "The level of output from the logger (None, Critical, Error, Warning, Information, Debug, Trace).", Default = "Information")]
-            public string LogLevel { get; set; }
-
         }
 
 
@@ -133,7 +130,7 @@ namespace BotEngine
                 parserResult
                     .WithParsed<Options>(opt => { result = RunOptionsAndReturnExitCode(opt); });
 
-                if (options != null)
+                if (options != null && !options.ListDevices)
                 {
                     SaveDeviceConfigJson();
                 }
@@ -229,14 +226,16 @@ namespace BotEngine
                     }
                     else
                     {
-                        _logger.LogInformation("Start Device Strings found");
+                        Console.WriteLine("Start Device Strings found");
+                        Console.WriteLine("-----------------------------------------------------------------------");
                         foreach (DeviceData device in devices)
                         {
                             string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
                             string deviceId = String.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
-                            _logger.LogInformation("\"{0}\"", deviceId);
+                            Console.WriteLine("\"{0}\"", deviceId);
                         }
-                        _logger.LogInformation("End Device Strings found");
+                        Console.WriteLine("-----------------------------------------------------------------------");
+                        Console.WriteLine("End Device Strings found");
                     }
                 }
                 else
@@ -876,18 +875,11 @@ namespace BotEngine
         public static IServiceProvider ConfigureServices(Options opt)
         {
             //services.Clear();
-            LogLevel logLevel = LogLevel.Information;
-            logLevel = opt.LogLevel.ToLower() switch
+            LogLevel logLevel = LogLevel.Warning;
+            if (!opt.ListDevices)
             {
-                "none" => LogLevel.None,
-                "critical" => LogLevel.Critical,
-                "error" => LogLevel.Error,
-                "warning" => LogLevel.Warning,
-                "information" => LogLevel.Information,
-                "debug" => LogLevel.Debug,
-                "trace" => LogLevel.Trace,
-                _ => LogLevel.Warning,
-            };
+                _ = Enum.TryParse(opt.LogLevel, true, out logLevel);
+            }
             if (logLevel == LogLevel.Debug)
             {
                 services.AddLogging(loggingBuilder => loggingBuilder

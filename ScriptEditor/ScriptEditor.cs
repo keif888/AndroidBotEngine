@@ -17,9 +17,9 @@ namespace ScriptEditor
     public partial class ScriptEditor : Form
     {
         #region Privates
-        private BOTConfig gameConfig;
-        private BOTDeviceConfig deviceConfig;
-        private BOTListConfig listConfig;
+        private static BOTConfig gameConfig;
+        private static BOTDeviceConfig deviceConfig;
+        private static BOTListConfig listConfig;
         private bool ChangePending;
         private bool UnsavedChanges;
 #pragma warning disable IDE0044 // Add readonly modifier
@@ -28,8 +28,10 @@ namespace ScriptEditor
 #pragma warning restore IDE0051 // Remove unused private members
 #pragma warning restore IDE0044 // Add readonly modifier
         private JsonHelper.ConfigFileType loadedFileType;
-        private string JsonFileName;
         private TreeNode ActiveTreeNode;
+        private static FileSystemWatcher fileWatcher;
+        private static string JsonFileName;
+        private static bool ReloadTreeViewRequired;
         #endregion
 
         /// <summary>
@@ -68,6 +70,45 @@ namespace ScriptEditor
             loadedFileType = JsonHelper.ConfigFileType.Error;
             ActiveTreeNode = null;
             btnUpdate.Enabled = false;
+            ReloadTreeViewRequired = false;
+        }
+
+
+        /// <summary>
+        /// Setup a file watcher on the file being edited, to warn user that it has been changed.
+        /// Most useful on DeviceConfig files, as they are likely to change every 10 minutes.
+        /// </summary>
+        /// <param name="fileName"></param>
+        private void EnableFileWatcher(string fileName)
+        {
+            if (fileWatcher != null)
+            {
+                fileWatcher.EnableRaisingEvents = false;
+                fileWatcher.Dispose();
+            }
+
+            fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(fileName))
+            {
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
+                Filter = "*.json"
+            };
+            fileWatcher.Changed += ReloadJSONConfig;
+            fileWatcher.Renamed += ReloadJSONConfig;
+            fileWatcher.EnableRaisingEvents = true;
+        }
+
+
+        private static void ReloadJSONConfig(object sender, FileSystemEventArgs e)
+        {
+            if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(JsonFileName).ToLower())
+            {
+                fileWatcher.EnableRaisingEvents = false;
+                if (MessageBox.Show(string.Format("{0} has changed, reload?", JsonFileName), "File Changed", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    ReloadTreeViewRequired = true;
+                }
+                fileWatcher.EnableRaisingEvents = true;
+            }
         }
 
         /// <summary>
@@ -94,58 +135,69 @@ namespace ScriptEditor
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 string fileName = openFileDialog1.FileName;
-                JsonHelper jsonHelper = new JsonHelper();
-                switch (jsonHelper.GetFileType(fileName))
-                {
-                    case JsonHelper.ConfigFileType.DeviceConfig:
-                        if (jsonHelper.ValidateDeviceConfigStructure(fileName))
-                        {
-                            LoadDeviceConfigFile(fileName);
-                            setupToolStripMenuItem.Enabled = false;
-                            testToolStripMenuItem.Enabled = false;
-                        }
-                        break;
-                    case JsonHelper.ConfigFileType.GameConfig:
-                        if (jsonHelper.ValidateGameConfigStructure(fileName))
-                        {
-                            LoadGameConfigFile(fileName);
-                            setupToolStripMenuItem.Enabled = true;
-                            testToolStripMenuItem.Enabled = false;
-                        }
-                        break;
-                    case JsonHelper.ConfigFileType.ListConfig:
-                        if (jsonHelper.ValidateListConfigStructure(fileName))
-                        {
-                            LoadListConfigFile(fileName);
-                            setupToolStripMenuItem.Enabled = false;
-                            testToolStripMenuItem.Enabled = false;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                if (jsonHelper.Errors.Count > 0)
-                {
-                    JsonErrors jsonErrors = new JsonErrors();
-                    StringBuilder errorString = new StringBuilder();
-                    errorString.AppendLine(string.Format("The following errors were encountered when attempting to load the file {0}", fileName));
-                    errorString.AppendLine(new string('-', 48));
-                    errorString.AppendLine("| The file has not been loaded into the editor. |");
-                    errorString.AppendLine(new string('-',48));
-                    errorString.AppendLine("");
-                    foreach (string item in jsonHelper.Errors)
+                LoadConfigFile(fileName);
+            }
+        }
+
+        /// <summary>
+        /// Loads the selected file into the TreeView.
+        /// </summary>
+        /// <param name="fileName"></param>
+        private void LoadConfigFile(string fileName)
+        {
+            ReloadTreeViewRequired = false;
+            JsonHelper jsonHelper = new JsonHelper();
+            switch (jsonHelper.GetFileType(fileName))
+            {
+                case JsonHelper.ConfigFileType.DeviceConfig:
+                    if (jsonHelper.ValidateDeviceConfigStructure(fileName))
                     {
-                        errorString.AppendLine(item);
+                        LoadDeviceConfigFile(fileName);
+                        setupToolStripMenuItem.Enabled = false;
+                        testToolStripMenuItem.Enabled = false;
                     }
-                    jsonErrors.setText(errorString);
-                    jsonErrors.ShowDialog();
-                }
-                else
+                    break;
+                case JsonHelper.ConfigFileType.GameConfig:
+                    if (jsonHelper.ValidateGameConfigStructure(fileName))
+                    {
+                        LoadGameConfigFile(fileName);
+                        setupToolStripMenuItem.Enabled = true;
+                        testToolStripMenuItem.Enabled = false;
+                    }
+                    break;
+                case JsonHelper.ConfigFileType.ListConfig:
+                    if (jsonHelper.ValidateListConfigStructure(fileName))
+                    {
+                        LoadListConfigFile(fileName);
+                        setupToolStripMenuItem.Enabled = false;
+                        testToolStripMenuItem.Enabled = false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+            if (jsonHelper.Errors.Count > 0)
+            {
+                JsonErrors jsonErrors = new JsonErrors();
+                StringBuilder errorString = new StringBuilder();
+                errorString.AppendLine(string.Format("The following errors were encountered when attempting to load the file {0}", fileName));
+                errorString.AppendLine(new string('-', 48));
+                errorString.AppendLine("| The file has not been loaded into the editor. |");
+                errorString.AppendLine(new string('-', 48));
+                errorString.AppendLine("");
+                foreach (string item in jsonHelper.Errors)
                 {
-                    JsonFileName = fileName;
-                    ResetEditFormItems();
-                    tvBotData.Nodes[0].EnsureVisible(); // Scroll to Top
+                    errorString.AppendLine(item);
                 }
+                jsonErrors.setText(errorString);
+                jsonErrors.ShowDialog();
+            }
+            else
+            {
+                JsonFileName = fileName;
+                EnableFileWatcher(fileName);
+                ResetEditFormItems();
+                tvBotData.Nodes[0].EnsureVisible(); // Scroll to Top
             }
         }
 
@@ -752,6 +804,11 @@ namespace ScriptEditor
         /// <param name="e"></param>
         private void TvBotData_AfterSelect(object sender, TreeViewEventArgs e)
         {
+            if (ReloadTreeViewRequired)
+            {
+                LoadConfigFile(JsonFileName);
+                return;
+            }
             ResetEditFormItems();
 
             if (e.Node != null)

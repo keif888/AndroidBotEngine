@@ -503,7 +503,7 @@ namespace BotEngine
 
                         BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, o.ADBPath, deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig);
                         BotEngineClient.BotEngine.CommandResults cr = BotEngineClient.BotEngine.CommandResults.Ok;
-                        DateTime tenMinuteDateTime = DateTime.MinValue;
+                        DateTime tenMinuteDateTime = DateTime.Now;
                         bool paused = false;
                         do
                         {

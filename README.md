@@ -84,4 +84,5 @@ The list of commands to date are:
 
 ## Release Notes
 
-There has been no releases, yet.
+2022-05-13 - 0.3.1.14_beta released.  
+Known issues with LDPlayer versions greater than 4.0.76 due to ADB retrieval of FrameBuffer being unstable  

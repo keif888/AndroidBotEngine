@@ -15,10 +15,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScriptEditor", "ScriptEdito
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0FDE53F8-73A3-46B1-B8BB-C3E3FA6BCCCB}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		COPYRIGHT = COPYRIGHT
+		LICENSE = LICENSE
+		LICENSE.rtf = LICENSE.rtf
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBotEngineClient", "TestBotEngineClient\TestBotEngineClient.csproj", "{A655DBE3-D7BE-4372-B4CF-26E190699053}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBotEngineClient", "TestBotEngineClient\TestBotEngineClient.csproj", "{A655DBE3-D7BE-4372-B4CF-26E190699053}"
+EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Installer\Installer.wixproj", "{F1C6E9CE-838C-49E6-8FC7-6A97A2EEFE4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +107,14 @@ Global
 		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Release|x64.Build.0 = Release|Any CPU
 		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Release|x86.ActiveCfg = Release|Any CPU
 		{A655DBE3-D7BE-4372-B4CF-26E190699053}.Release|x86.Build.0 = Release|Any CPU
+		{F1C6E9CE-838C-49E6-8FC7-6A97A2EEFE4A}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{F1C6E9CE-838C-49E6-8FC7-6A97A2EEFE4A}.Debug|x64.ActiveCfg = Debug|x86
+		{F1C6E9CE-838C-49E6-8FC7-6A97A2EEFE4A}.Debug|x86.ActiveCfg = Debug|x86
+		{F1C6E9CE-838C-49E6-8FC7-6A97A2EEFE4A}.Debug|x86.Build.0 = Debug|x86
+		{F1C6E9CE-838C-49E6-8FC7-6A97A2EEFE4A}.Release|Any CPU.ActiveCfg = Release|x86
+		{F1C6E9CE-838C-49E6-8FC7-6A97A2EEFE4A}.Release|x64.ActiveCfg = Release|x86
+		{F1C6E9CE-838C-49E6-8FC7-6A97A2EEFE4A}.Release|x86.ActiveCfg = Release|x86
+		{F1C6E9CE-838C-49E6-8FC7-6A97A2EEFE4A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

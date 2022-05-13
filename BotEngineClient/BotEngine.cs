@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// <copyright file="BotEngine.cs" company="Keith Martin">
+// Copyright (c) Keith Martin
+// Licensed under the Apache License, Version 2.0 (the "License")</copyright>
+
+using Microsoft.Extensions.Logging;
 using SharpAdbClient;
 using System;
 using System.Collections.Generic;

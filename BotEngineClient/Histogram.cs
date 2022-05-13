@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="Histogram.cs" company="Keith Martin">
+// Copyright (c) Keith Martin
+// Licensed under the Apache License, Version 2.0 (the "License")</copyright>
+
+using System;
 using System.Drawing;
 using System.Linq;
 using System.Text;

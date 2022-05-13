@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="BOTConfig.cs" company="Keith Martin">
+// Copyright (c) Keith Martin
+// Licensed under the Apache License, Version 2.0 (the "License")</copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;

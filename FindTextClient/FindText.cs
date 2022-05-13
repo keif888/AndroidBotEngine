@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="FindText.cs" company="Keith Martin, FeiYue">
+// Copyright (c) Keith Martin, FeiYue
+// Licensed under the Apache License, Version 2.0 (the "License")</copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;

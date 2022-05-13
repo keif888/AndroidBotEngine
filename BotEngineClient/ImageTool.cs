@@ -1,4 +1,8 @@
-﻿using System.Drawing;
+﻿// <copyright file="ImageTool.cs" company="Keith Martin">
+// Copyright (c) Keith Martin
+// Licensed under the Apache License, Version 2.0 (the "License")</copyright>
+
+using System.Drawing;
 using BotEngineClient.ExtensionMethods;
 
 // For Reference:

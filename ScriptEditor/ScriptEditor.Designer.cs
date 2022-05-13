@@ -29,6 +29,7 @@ namespace ScriptEditor
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScriptEditor));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,6 +59,9 @@ namespace ScriptEditor
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tvBotData = new System.Windows.Forms.TreeView();
+            this.gbLoops = new System.Windows.Forms.GroupBox();
+            this.label38 = new System.Windows.Forms.Label();
+            this.tbLoopsCounter = new System.Windows.Forms.MaskedTextBox();
             this.gbList = new System.Windows.Forms.GroupBox();
             this.tbListName = new System.Windows.Forms.TextBox();
             this.label34 = new System.Windows.Forms.Label();
@@ -174,14 +178,12 @@ namespace ScriptEditor
             this.tbPointY = new System.Windows.Forms.MaskedTextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.gbLoops = new System.Windows.Forms.GroupBox();
-            this.label38 = new System.Windows.Forms.Label();
-            this.tbLoopsCounter = new System.Windows.Forms.MaskedTextBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.gbLoops.SuspendLayout();
             this.gbList.SuspendLayout();
             this.gbImageArea.SuspendLayout();
             this.gbActionOverride.SuspendLayout();
@@ -199,7 +201,6 @@ namespace ScriptEditor
             this.gbLoopCoordinate.SuspendLayout();
             this.gbDrag.SuspendLayout();
             this.gbClick.SuspendLayout();
-            this.gbLoops.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -471,6 +472,38 @@ namespace ScriptEditor
             this.tvBotData.TabIndex = 0;
             this.tvBotData.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.TvBotData_BeforeSelect);
             this.tvBotData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TvBotData_AfterSelect);
+            // 
+            // gbLoops
+            // 
+            this.gbLoops.Controls.Add(this.label38);
+            this.gbLoops.Controls.Add(this.tbLoopsCounter);
+            this.gbLoops.Enabled = false;
+            this.gbLoops.Location = new System.Drawing.Point(579, 298);
+            this.gbLoops.Name = "gbLoops";
+            this.gbLoops.Size = new System.Drawing.Size(195, 62);
+            this.gbLoops.TabIndex = 102;
+            this.gbLoops.TabStop = false;
+            this.gbLoops.Text = "Loops";
+            this.gbLoops.Visible = false;
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Location = new System.Drawing.Point(9, 25);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(65, 15);
+            this.label38.TabIndex = 10;
+            this.label38.Text = "Number of";
+            // 
+            // tbLoopsCounter
+            // 
+            this.tbLoopsCounter.Location = new System.Drawing.Point(94, 22);
+            this.tbLoopsCounter.Mask = "#00000";
+            this.tbLoopsCounter.Name = "tbLoopsCounter";
+            this.tbLoopsCounter.Size = new System.Drawing.Size(71, 23);
+            this.tbLoopsCounter.TabIndex = 11;
+            this.tbLoopsCounter.ValidatingType = typeof(int);
+            this.tbLoopsCounter.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // gbList
             // 
@@ -1700,38 +1733,6 @@ namespace ScriptEditor
             this.saveFileDialog1.DefaultExt = "json";
             this.saveFileDialog1.Filter = "json files|*.json|All files|*.*";
             // 
-            // gbLoops
-            // 
-            this.gbLoops.Controls.Add(this.label38);
-            this.gbLoops.Controls.Add(this.tbLoopsCounter);
-            this.gbLoops.Enabled = false;
-            this.gbLoops.Location = new System.Drawing.Point(579, 298);
-            this.gbLoops.Name = "gbLoops";
-            this.gbLoops.Size = new System.Drawing.Size(195, 62);
-            this.gbLoops.TabIndex = 102;
-            this.gbLoops.TabStop = false;
-            this.gbLoops.Text = "Loops";
-            this.gbLoops.Visible = false;
-            // 
-            // label38
-            // 
-            this.label38.AutoSize = true;
-            this.label38.Location = new System.Drawing.Point(9, 25);
-            this.label38.Name = "label38";
-            this.label38.Size = new System.Drawing.Size(65, 15);
-            this.label38.TabIndex = 10;
-            this.label38.Text = "Number of";
-            // 
-            // tbLoopsCounter
-            // 
-            this.tbLoopsCounter.Location = new System.Drawing.Point(94, 22);
-            this.tbLoopsCounter.Mask = "#00000";
-            this.tbLoopsCounter.Name = "tbLoopsCounter";
-            this.tbLoopsCounter.Size = new System.Drawing.Size(71, 23);
-            this.tbLoopsCounter.TabIndex = 11;
-            this.tbLoopsCounter.ValidatingType = typeof(int);
-            this.tbLoopsCounter.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
-            // 
             // ScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1739,6 +1740,7 @@ namespace ScriptEditor
             this.ClientSize = new System.Drawing.Size(1387, 655);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "ScriptEditor";
             this.Text = "ScriptEditor";
@@ -1749,6 +1751,8 @@ namespace ScriptEditor
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.gbLoops.ResumeLayout(false);
+            this.gbLoops.PerformLayout();
             this.gbList.ResumeLayout(false);
             this.gbList.PerformLayout();
             this.gbImageArea.ResumeLayout(false);
@@ -1782,8 +1786,6 @@ namespace ScriptEditor
             this.gbDrag.PerformLayout();
             this.gbClick.ResumeLayout(false);
             this.gbClick.PerformLayout();
-            this.gbLoops.ResumeLayout(false);
-            this.gbLoops.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

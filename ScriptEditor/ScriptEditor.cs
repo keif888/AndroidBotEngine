@@ -1,4 +1,8 @@
-﻿#region Usings
+﻿// <copyright file="ScriptEditor.cs" company="Keith Martin">
+// Copyright (c) Keith Martin
+// Licensed under the Apache License, Version 2.0 (the "License")</copyright>
+
+#region Usings
 using System;
 using System.Collections.Generic;
 using System.Drawing;

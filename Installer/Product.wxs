@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<?define ProductVersion = "0.3.1.14"?>
+	<?define UpgradeCode = "8E9EA5AE-CD4E-4D6D-9159-6DD92918047D"?>
+	<?define Manufacturer = "Keith Martin"?>
+	<?define PackageCode = "*"?>
+
+	<Product Id="*" Name="Android Bot" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
+		<Package Id="$(var.PackageCode)"
+				 Description="Android BOT Engine and Editor"
+				 Comments="Installs the programs to allow editing config and executing commands against Android phones via ADB."
+				 InstallerVersion="300"
+				 Manufacturer="$(var.Manufacturer)"
+				 Compressed="yes"
+				 InstallScope="perMachine" 
+				 Platform="x64"/>
+		
+		<Property Id="ARPHELPLINK" Value="https://github.com/keif888/AndroidBotEngine" />
+		
+		<Media Id="1" Cabinet="AndroidBot.cab" EmbedCab="yes" />
+
+		<MajorUpgrade
+		  Schedule="afterInstallInitialize"
+		  DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."/>
+
+		<UIRef Id="WixUI_FeatureTree"/>
+		<WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)\LICENSE.rtf" />
+
+
+		<Condition Message="You need to be an administrator to install this product.">
+			Privileged
+		</Condition>
+
+		<Icon Id="ApplicationIcon.ico" SourceFile="$(var.ScriptEditor.ProjectDir)\ApplicationIcon.ico"/>
+		<Property Id="ARPPRODUCTICON" Value="ApplicationIcon.ico" />
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFiles64Folder">
+				<Directory Id="INSTALLFOLDER" Name="AndroidBot">
+					<Component Id="BotEngine" Guid="{2C4BD1DB-A2B5-4324-B50B-F27A42FDB4CE}" Win64="yes">
+						<File Id="FBotEngineEXE" Name="BotEngine.exe" Source="$(var.BotEngine.TargetDir)BotEngine.exe" />
+						<File Id="FBotEngineDLL" Name="BotEngine.dll" Source="$(var.BotEngine.TargetDir)BotEngine.dll" /> 
+						<File Id="FBotEnginedepsjson" Name="BotEngine.deps.json" Source="$(var.BotEngine.TargetDir)BotEngine.deps.json" />
+						<File Id="FBotEngineruntimejson" Name="BotEngine.runtimeconfig.json" Source="$(var.BotEngine.TargetDir)BotEngine.runtimeconfig.json" />
+						<File Id="FCommandLinedll" Name="CommandLine.dll" Source="$(var.BotEngine.TargetDir)CommandLine.dll" />
+					</Component>
+					<Component Id="ScriptEditor" Guid="{D7E0175A-88B0-4DDD-A32B-B5135A9157B1}" Win64="yes">
+						<File Id="FScriptEditorEXE" Name="ScriptEditor.exe" Source="$(var.ScriptEditor.TargetDir)ScriptEditor.exe" />
+						<File Id="FScriptEditorDLL" Name="ScriptEditor.dll" Source="$(var.ScriptEditor.TargetDir)ScriptEditor.dll" /> 
+						<File Id="FScriptEditordepsjson" Name="ScriptEditor.deps.json" Source="$(var.ScriptEditor.TargetDir)ScriptEditor.deps.json" />
+						<File Id="FScriptEditorruntimejson" Name="ScriptEditor.runtimeconfig.json" Source="$(var.ScriptEditor.TargetDir)ScriptEditor.runtimeconfig.json" />
+					</Component>
+					<Component Id="Common" Guid="{2957C2FE-3D3B-4D45-825F-B2193FC57B34}" Win64="yes">
+						<File Id="FBotEngineClient" Name="BotEngineClient.dll" Source="$(var.ScriptEditor.TargetDir)BotEngineClient.dll" />
+						<File Id="FFindTextClient" Name="FindTextClient.dll" Source="$(var.ScriptEditor.TargetDir)FindTextClient.dll" />
+						<File Id="FFindTextDLL" Name="FindTextDLL.dll" Source="$(var.ScriptEditor.TargetDir)FindTextDLL.dll" />
+						<File Id="Microsoft.Extensions.Configuration.Abstractions" Name="Microsoft.Extensions.Configuration.Abstractions.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.Configuration.Abstractions.dll" />
+						<File Id="Microsoft.Extensions.Configuration.Binder" Name="Microsoft.Extensions.Configuration.Binder.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.Configuration.Binder.dll" />
+						<File Id="Microsoft.Extensions.Configuration" Name="Microsoft.Extensions.Configuration.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.Configuration.dll" />
+						<File Id="Microsoft.Extensions.DependencyInjection.Abstractions" Name="Microsoft.Extensions.DependencyInjection.Abstractions.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
+						<File Id="Microsoft.Extensions.DependencyInjection" Name="Microsoft.Extensions.DependencyInjection.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.DependencyInjection.dll" />
+						<File Id="Microsoft.Extensions.Logging.Abstractions" Name="Microsoft.Extensions.Logging.Abstractions.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.Logging.Abstractions.dll" />
+						<File Id="Microsoft.Extensions.Logging.Configuration" Name="Microsoft.Extensions.Logging.Configuration.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.Logging.Configuration.dll" />
+						<File Id="Microsoft.Extensions.Logging.Console" Name="Microsoft.Extensions.Logging.Console.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.Logging.Console.dll" />
+						<File Id="Microsoft.Extensions.Logging.Debug" Name="Microsoft.Extensions.Logging.Debug.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.Logging.Debug.dll" />
+						<File Id="Microsoft.Extensions.Logging" Name="Microsoft.Extensions.Logging.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.Logging.dll" />
+						<File Id="Microsoft.Extensions.Options.ConfigurationExtensions" Name="Microsoft.Extensions.Options.ConfigurationExtensions.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.Options.ConfigurationExtensions.dll" />
+						<File Id="Microsoft.Extensions.Options" Name="Microsoft.Extensions.Options.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.Options.dll" />
+						<File Id="Microsoft.Extensions.Primitives" Name="Microsoft.Extensions.Primitives.dll" Source="$(var.ScriptEditor.TargetDir)Microsoft.Extensions.Primitives.dll" />
+						<File Id="SharpAdbClient" Name="SharpAdbClient.dll" Source="$(var.ScriptEditor.TargetDir)SharpAdbClient.dll" />
+						<File Id="System.Diagnostics.DiagnosticSource" Name="System.Diagnostics.DiagnosticSource.dll" Source="$(var.ScriptEditor.TargetDir)System.Diagnostics.DiagnosticSource.dll" />
+						<File Id="System.Runtime.CompilerServices.Unsafe" Name="System.Runtime.CompilerServices.Unsafe.dll" Source="$(var.ScriptEditor.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" />
+						<File Id="System.Text.Encodings.Web" Name="System.Text.Encodings.Web.dll" Source="$(var.ScriptEditor.TargetDir)System.Text.Encodings.Web.dll" />
+						<File Id="System.Text.Json" Name="System.Text.Json.dll" Source="$(var.ScriptEditor.TargetDir)System.Text.Json.dll" />
+					</Component>
+					<Directory Id="ADBDIR" Name="ADB">
+						<Component Id="ADB" Guid="{9E2EE508-FC0D-4049-8C07-660B0D15C411}" Win64="yes">
+							<File Id="adb.exe" Name="adb.exe" Source="$(var.ScriptEditor.TargetDir)adb\adb.exe" />
+							<File Id="AdbWinApi.dll" Name="AdbWinApi.dll" Source="$(var.ScriptEditor.TargetDir)adb\AdbWinApi.dll" />
+							<File Id="AdbWinUsbApi.dll" Name="AdbWinUsbApi.dll" Source="$(var.ScriptEditor.TargetDir)adb\AdbWinUsbApi.dll" />
+						</Component>
+					</Directory>
+				</Directory>
+			</Directory>
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="ApplicationProgramsFolder" Name="Android Bot">
+				  <Component Id="ApplicationShortcut" Guid="{D8960E16-8CBA-4826-AD89-04E22BC10754}">
+					<Shortcut Id="ApplicationStartMenuShortcut"
+						 Name="Script Editor"
+					   Description="Editor for the files that Android Bot Executor uses"
+						Target="[!FScriptEditorEXE]"
+							  WorkingDirectory="INSTALLFOLDER"
+							  Icon="ApplicationIcon.ico"/>
+					<RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+					<RegistryValue Root="HKCU" Key="Software\MartinSource\Android Bot" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+				  </Component>					
+				</Directory>
+			</Directory>
+		</Directory>
+		
+
+		<Feature Id="Complete" Level="1" Title="Android Bot Installer 1.0" Description="An Editor and an Executor for controlling Android Emulators with ADB" Display="expand" ConfigurableDirectory="INSTALLFOLDER">
+			<Feature Id="EditorFeature" Level="1" Title="Script Editor">
+				<ComponentRef Id="ScriptEditor"/>
+				<ComponentRef Id="ApplicationShortcut"/>
+			</Feature>
+			<Feature Id="EngineFeature" Level="1" Title="Bot Engine">
+				<ComponentRef Id="BotEngine"/>
+			</Feature>
+			<Feature Id="CommonFeature" Level="1" Title="Common DLLs (required)">
+				<ComponentRef Id="Common"/>
+				<ComponentRef Id="ADB"/>
+			</Feature>
+		</Feature>
+
+	</Product>
+</Wix>

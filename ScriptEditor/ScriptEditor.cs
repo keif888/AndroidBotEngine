@@ -440,6 +440,10 @@ namespace ScriptEditor
         /// <param name="e"></param>
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            bool fileWatcherStatus = false;
+            if (fileWatcher != null)
+                fileWatcherStatus = fileWatcher.EnableRaisingEvents;
+            fileWatcher.EnableRaisingEvents = false;
             switch (loadedFileType)
             {
                 case JsonHelper.ConfigFileType.GameConfig:
@@ -455,6 +459,8 @@ namespace ScriptEditor
                     break;
             }
             UnsavedChanges = false;
+            if (fileWatcher != null)
+                fileWatcher.EnableRaisingEvents = fileWatcherStatus;
         }
 
         /// <summary>

@@ -38,6 +38,7 @@ namespace ScriptEditor
         private static bool ReloadTreeViewRequired;
         #endregion
 
+        #region Constructor
         /// <summary>
         /// Class constructor to default all privates.
         /// </summary>
@@ -77,58 +78,9 @@ namespace ScriptEditor
             ReloadTreeViewRequired = false;
         }
 
+        #endregion
 
-        /// <summary>
-        /// Setup a file watcher on the file being edited, to warn user that it has been changed.
-        /// Most useful on DeviceConfig files, as they are likely to change every 10 minutes.
-        /// </summary>
-        /// <param name="fileName"></param>
-        private void EnableFileWatcher(string fileName)
-        {
-            if (fileWatcher != null)
-            {
-                fileWatcher.EnableRaisingEvents = false;
-                fileWatcher.Dispose();
-            }
-
-            fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(fileName))
-            {
-                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
-                Filter = "*.json"
-            };
-            fileWatcher.Changed += ReloadJSONConfig;
-            fileWatcher.Renamed += ReloadJSONConfig;
-            fileWatcher.EnableRaisingEvents = true;
-        }
-
-
-        private static void ReloadJSONConfig(object sender, FileSystemEventArgs e)
-        {
-            if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(JsonFileName).ToLower())
-            {
-                fileWatcher.EnableRaisingEvents = false;
-                if (MessageBox.Show(string.Format("{0} has changed, reload?", JsonFileName), "File Changed", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    ReloadTreeViewRequired = true;
-                }
-                fileWatcher.EnableRaisingEvents = true;
-            }
-        }
-
-        /// <summary>
-        /// Ensure that a GroupBox is in the corect position, and hidden
-        /// </summary>
-        /// <param name="item"></param>
-        private void ResetGroupBox(GroupBox item)
-        {
-            item.Top = 5;
-            item.Left = 5;
-            item.Dock = DockStyle.Top;
-            item.Enabled = false;
-            item.Visible = false;
-        }
-
-        #region Load Files
+        #region File Menu
         /// <summary>
         /// Menu method to allow the opening of a json file and then loading it into the tvBotData.
         /// </summary>
@@ -143,6 +95,517 @@ namespace ScriptEditor
             }
         }
 
+        /// <summary>
+        /// Gets the file name and type for the new json file.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FileTypeSelect fileTypeSelect = new FileTypeSelect();
+
+            if (fileTypeSelect.ShowDialog() == DialogResult.OK)
+                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    loadedFileType = fileTypeSelect.ConfigFileType;
+                    JsonFileName = saveFileDialog1.FileName;
+                    tvBotData.SuspendLayout();
+                    tvBotData.Nodes.Clear();
+                    cbImageNameNoWait.Items.Clear();
+                    cbImageNameWithWait.Items.Clear();
+                    cbImageNamesForList.Items.Clear();
+                    cbImageAreasImage.Items.Clear();
+                    cbPickActionAction.Items.Clear();
+                    cbActionBefore.Items.Clear();
+                    cbActionAfter.Items.Clear();
+                    ResetEditFormItems();
+
+                    switch (loadedFileType)
+                    {
+                        case JsonHelper.ConfigFileType.GameConfig:
+                            TreeNode findStringsNode = tvBotData.Nodes.Add("FindStrings");
+                            findStringsNode.Name = "FindStrings";
+                            TreeNode systemActionsNode = tvBotData.Nodes.Add("SystemActions");
+                            systemActionsNode.Name = "SystemActions";
+                            TreeNode actionsNode = tvBotData.Nodes.Add("Actions");
+                            actionsNode.Name = "Actions";
+                            break;
+                        case JsonHelper.ConfigFileType.ListConfig:
+                            TreeNode coordinatesNode = tvBotData.Nodes.Add("Coordinates");
+                            coordinatesNode.Name = "Coordinates";
+                            break;
+                        case JsonHelper.ConfigFileType.DeviceConfig:
+                            TreeNode lastActionNode = tvBotData.Nodes.Add("LastActionTaken");
+                            lastActionNode.Name = "LastActionTaken";
+                            break;
+                        default:
+                            break;
+                    }
+
+
+                    tvBotData.ResumeLayout();
+                    ChangePending = false;
+                    UnsavedChanges = false;
+                    saveToolStripMenuItem.Enabled = false;
+                    closeToolStripMenuItem.Enabled = true;
+                }
+        }
+
+
+        /// <summary>
+        /// Saves the data in tvBotData into the json file that it came from.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            bool fileWatcherStatus = false;
+            if (fileWatcher != null)
+                fileWatcherStatus = fileWatcher.EnableRaisingEvents;
+            fileWatcher.EnableRaisingEvents = false;
+            switch (loadedFileType)
+            {
+                case JsonHelper.ConfigFileType.GameConfig:
+                    SaveGameConfig();
+                    break;
+                case JsonHelper.ConfigFileType.ListConfig:
+                    SaveListConfig();
+                    break;
+                case JsonHelper.ConfigFileType.DeviceConfig:
+                    SaveDeviceConfig();
+                    break;
+                default:
+                    break;
+            }
+            UnsavedChanges = false;
+            if (fileWatcher != null)
+                fileWatcher.EnableRaisingEvents = fileWatcherStatus;
+        }
+
+        /// <summary>
+        /// Closes the open file, and clears the tree view, etc.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CloseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (ChangePending || UnsavedChanges)
+            {
+                if (MessageBox.Show("There are Unsaved or Pending Changes, Close File?", "Close File?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                {
+                    return;
+                }
+            }
+            UnsavedChanges = false;
+            ChangePending = false;
+            JsonFileName = string.Empty;
+            fileWatcher.EnableRaisingEvents = false;
+            tvBotData.SuspendLayout();
+            tvBotData.Nodes.Clear();
+            tvBotData.ResumeLayout();
+            saveToolStripMenuItem.Enabled = false;
+            loadedFileType = JsonHelper.ConfigFileType.Error;
+            ActiveTreeNode = null;
+            btnUpdate.Enabled = false;
+            ReloadTreeViewRequired = false;
+            ResetEditFormItems();
+            closeToolStripMenuItem.Enabled = false;
+        }
+
+        /// <summary>
+        /// Exit command from the Menu.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        #endregion
+
+        #region Edit Menu
+
+        /// <summary>
+        /// Add a new FindString node into the tvBotData tree
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddFindStringtoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ResetEditFormItems();
+            if (tvBotData.SelectedNode.Nodes.ContainsKey("New FindString"))
+            {
+                TreeNode selectedNode = tvBotData.SelectedNode.Nodes["New FindString"];
+                tvBotData.SelectedNode = selectedNode;
+                MessageBox.Show("Rename this FindString to allow new find strings to be added");
+            }
+            else
+            {
+                FindString newFindString = new FindString();
+
+                TreeNode newNode = new TreeNode {
+                    Text = "New FindString",
+                    Name = "New FindString",
+                    Tag = newFindString
+                };
+
+                tvBotData.SelectedNode.Nodes.Add(newNode);
+                tvBotData.SelectedNode = newNode;
+            }
+        }
+
+        /// <summary>
+        /// Add a new Action into the tvBotData tree
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddActionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ResetEditFormItems();
+            if (tvBotData.SelectedNode.Nodes.ContainsKey("New Action"))
+            {
+                TreeNode selectedNode = tvBotData.SelectedNode.Nodes["New Action"];
+                tvBotData.SelectedNode = selectedNode;
+                MessageBox.Show("Rename this Action to allow new actions to be added");
+            }
+            else
+            {
+                BotEngineClient.Action newAction = new BotEngineClient.Action();
+                if (tvBotData.SelectedNode.Name == "Actions")
+                    newAction.ActionType = ValidActionType.Scheduled.ToString();
+                else
+                    newAction.ActionType = ValidActionType.System.ToString();
+
+                TreeNode newNode = new TreeNode {
+                    Text = "New Action",
+                    Name = "New Action",
+                    Tag = newAction
+                };
+
+                tvBotData.SelectedNode.Nodes.Add(newNode);
+                tvBotData.SelectedNode = newNode;
+            }
+        }
+
+        /// <summary>
+        /// Add a new Coordinates node into the tvBotData tree
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddCoordinatestoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ResetEditFormItems();
+            if (tvBotData.SelectedNode.Nodes.ContainsKey("New Coordinates"))
+            {
+                TreeNode selectedNode = tvBotData.SelectedNode.Nodes["New Coordinates"];
+                tvBotData.SelectedNode = selectedNode;
+                MessageBox.Show("Rename this Coordinates to allow new coordinates to be added");
+            }
+            else if (tvBotData.SelectedNode.Tag is List<XYCoords>)
+            {
+                TreeNode treeNode = new TreeNode {
+                    Text = "(0,0)",
+                    Name = "(0,0)",
+                    Tag = new XYCoords(0, 0)
+                };
+                tvBotData.SelectedNode.Nodes.Add(treeNode);
+                tvBotData.SelectedNode = treeNode;
+            }
+            else
+            {
+                List<XYCoords> newCoordinates = new List<XYCoords>();
+
+                TreeNode newNode = new TreeNode {
+                    Text = "New Coordinates",
+                    Name = "New Coordinates",
+                    Tag = newCoordinates
+                };
+
+                tvBotData.SelectedNode.Nodes.Add(newNode);
+                tvBotData.SelectedNode = newNode;
+            }
+        }
+
+        /// <summary>
+        /// Add a command to a selected tvBotData item that is allowed to have them added.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AddCommandToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            if (currentNode.Tag != null)
+            {
+                if (currentNode.Tag is Command || currentNode.Tag is BotEngineClient.Action)
+                {
+                    CommandSelect commandSelect = new CommandSelect();
+                    if (commandSelect.ShowDialog() == DialogResult.OK)
+                    {
+                        string commandId = commandSelect.SelectedCommand.ToString();
+                        Command newCommand = new Command(commandSelect.SelectedCommand);
+                        string childText = GetCommandIdDisplayText(newCommand);
+                        TreeNode newNode = new TreeNode {
+                            Tag = newCommand,
+                            Name = commandId,
+                            Text = childText
+                        };
+                        currentNode.Nodes.Add(newNode);
+                        tvBotData.SelectedNode = newNode;
+                        UnsavedChanges = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Inserts a new node, before the current node into the tvBotData tree, and makes it active.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AboveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            int currentNodeIndex = tvBotData.SelectedNode.Index;
+            TreeNode parent = tvBotData.SelectedNode.Parent;
+            if (currentNode.Tag != null)
+            {
+                if (currentNode.Tag is Command)
+                {
+                    CommandSelect commandSelect = new CommandSelect();
+                    if (commandSelect.ShowDialog() == DialogResult.OK)
+                    {
+                        string commandId = commandSelect.SelectedCommand.ToString();
+                        Command newCommand = new Command(commandSelect.SelectedCommand);
+                        string childText = GetCommandIdDisplayText(newCommand);
+                        TreeNode newNode = new TreeNode {
+                            Tag = newCommand,
+                            Name = commandId,
+                            Text = childText
+                        };
+                        parent.Nodes.Insert(currentNodeIndex, newNode);
+                        tvBotData.SelectedNode = newNode;
+                        UnsavedChanges = true;
+                    }
+                }
+                else if (currentNode.Tag is XYCoords)
+                {
+                    XYCoords newCoords = new XYCoords(0, 0);
+                    TreeNode newNode = new TreeNode {
+                        Name = "(0,0)",
+                        Tag = newCoords,
+                        Text = "(0,0)"
+                    };
+                    parent.Nodes.Insert(currentNodeIndex, newNode);
+                    UnsavedChanges = true;
+                    tvBotData.SelectedNode = newNode;
+                }
+                else if (currentNode.Tag is List<XYCoords>)
+                {
+                    XYCoords newCoords = new XYCoords(0, 0);
+                    TreeNode newNode = new TreeNode {
+                        Name = "(0,0)",
+                        Tag = newCoords,
+                        Text = "(0,0)"
+                    };
+                    currentNode.Nodes.Add(newNode);
+                    UnsavedChanges = true;
+                    tvBotData.SelectedNode = newNode;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Inserts a new node, after the current node into the tvBotData tree, and makes it active.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BelowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            int currentNodeIndex = tvBotData.SelectedNode.Index;
+            TreeNode parent = tvBotData.SelectedNode.Parent;
+            if (currentNode.Tag != null)
+            {
+                if (currentNode.Tag is Command)
+                {
+                    CommandSelect commandSelect = new CommandSelect();
+                    if (commandSelect.ShowDialog() == DialogResult.OK)
+                    {
+                        string commandId = commandSelect.SelectedCommand.ToString();
+                        Command newCommand = new Command(commandSelect.SelectedCommand);
+                        string childText = GetCommandIdDisplayText(newCommand);
+                        TreeNode newNode = new TreeNode {
+                            Tag = newCommand,
+                            Name = commandId,
+                            Text = childText
+                        };
+                        parent.Nodes.Insert(currentNodeIndex + 1, newNode);
+                        tvBotData.SelectedNode = newNode;
+                        UnsavedChanges = true;
+                    }
+                }
+                else if (currentNode.Tag is BotEngineClient.Action)
+                {
+                    CommandSelect commandSelect = new CommandSelect();
+                    if (commandSelect.ShowDialog() == DialogResult.OK)
+                    {
+                        string commandId = commandSelect.SelectedCommand.ToString();
+                        Command newCommand = new Command(commandSelect.SelectedCommand);
+                        string childText = GetCommandIdDisplayText(newCommand);
+                        TreeNode newNode = new TreeNode {
+                            Tag = newCommand,
+                            Name = commandId,
+                            Text = childText
+                        };
+                        currentNode.Nodes.Add(newNode);
+                        tvBotData.SelectedNode = newNode;
+                        UnsavedChanges = true;
+                    }
+                }
+                else if (currentNode.Tag is XYCoords)
+                {
+                    XYCoords newCoords = new XYCoords(0, 0);
+                    TreeNode newNode = new TreeNode {
+                        Name = "(0,0)",
+                        Tag = newCoords,
+                        Text = "(0,0)"
+                    };
+                    parent.Nodes.Insert(currentNodeIndex + 1, newNode);
+                    tvBotData.SelectedNode = newNode;
+                    UnsavedChanges = true;
+                }
+                else if (currentNode.Tag is List<XYCoords>)
+                {
+                    XYCoords newCoords = new XYCoords(0, 0);
+                    TreeNode newNode = new TreeNode {
+                        Name = "(0,0)",
+                        Tag = newCoords,
+                        Text = "(0,0)"
+                    };
+                    currentNode.Nodes.Add(newNode);
+                    UnsavedChanges = true;
+                    tvBotData.SelectedNode = newNode;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Moves the selected tvBotNode node up one spot, if it can be moved.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            if (currentNode != null && currentNode.Parent != null)
+            {
+                TreeNode parentNode = currentNode.Parent;
+                int treeIndex = parentNode.Nodes.IndexOf(currentNode);
+                if (treeIndex > 0)
+                {
+                    parentNode.Nodes.RemoveAt(treeIndex);
+                    parentNode.Nodes.Insert(treeIndex - 1, currentNode);
+                    tvBotData.SelectedNode = currentNode;
+                    UnsavedChanges = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Moves the selected tvBotNode node down one spot, if it can be moved.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DownToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            if (currentNode != null && currentNode.Parent != null)
+            {
+                TreeNode parentNode = currentNode.Parent;
+                int treeIndex = parentNode.Nodes.IndexOf(currentNode);
+                if (treeIndex < parentNode.Nodes.Count - 1)
+                {
+                    parentNode.Nodes.RemoveAt(treeIndex);
+                    parentNode.Nodes.Insert(treeIndex + 1, currentNode);
+                    tvBotData.SelectedNode = currentNode;
+                    UnsavedChanges = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Delete the seleted node from tvBotData
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TreeNode currentNode = tvBotData.SelectedNode;
+            // ToDo: Add warning if deleting FindText or Action.
+            // ToDo: Update the combo boxes for FindText and Actions.
+            if (currentNode != null)
+            {
+                tvBotData.Nodes.Remove(currentNode);
+                UnsavedChanges = true;
+                ChangePending = false;
+            }
+        }
+
+        #endregion
+
+        #region Text Menu
+        /// <summary>
+        /// Shows the dialog to create FindString's
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SetupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FindTextEdit fte = new FindTextEdit();
+            if (fte.ShowDialog() == DialogResult.OK)
+            {
+                if ((!Clipboard.ContainsText()) || (Clipboard.ContainsText() && !Clipboard.GetText().StartsWith("{")))
+                {
+                    string searchText = fte.SearchText;
+                    Rectangle searchArea = fte.SearchRectangle;
+                    string clipboard = string.Format("{{\"FindString\":\"{0}\", \"searchArea\":{{\"X\":{1}, \"Y\":{2}, \"width\":{3}, \"height\":{4}}}}}", searchText, searchArea.X, searchArea.Y, searchArea.Width, searchArea.Height);
+                    Clipboard.SetText(clipboard);
+                }
+            }
+        }
+
+        // ToDo: Implement Validate option, to enable testing if a FindString can be found via ADB.
+
+        #endregion
+
+        #region Test Menu
+        /// <summary>
+        /// Will implement ability to execute actions and capture logging from Editor.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TestToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //ToDo: Implement Test of an Action Capability.
+        }
+        #endregion
+
+        #region Help Menu
+        /// <summary>
+        /// Show the About box.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            HelpAboutBox about = new HelpAboutBox();
+            about.ShowDialog();
+        }
+
+        #endregion
+
+        #region Load Files
         /// <summary>
         /// Loads the selected file into the TreeView.
         /// </summary>
@@ -202,6 +665,7 @@ namespace ScriptEditor
                 EnableFileWatcher(fileName);
                 ResetEditFormItems();
                 tvBotData.Nodes[0].EnsureVisible(); // Scroll to Top
+                closeToolStripMenuItem.Enabled = true;
             }
         }
 
@@ -437,35 +901,6 @@ namespace ScriptEditor
 
         #region Save Files
 
-        /// <summary>
-        /// Saves the data in tvBotData into the json file that it came from.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            bool fileWatcherStatus = false;
-            if (fileWatcher != null)
-                fileWatcherStatus = fileWatcher.EnableRaisingEvents;
-            fileWatcher.EnableRaisingEvents = false;
-            switch (loadedFileType)
-            {
-                case JsonHelper.ConfigFileType.GameConfig:
-                    SaveGameConfig();
-                    break;
-                case JsonHelper.ConfigFileType.ListConfig:
-                    SaveListConfig();
-                    break;
-                case JsonHelper.ConfigFileType.DeviceConfig:
-                    SaveDeviceConfig();
-                    break;
-                default:
-                    break;
-            }
-            UnsavedChanges = false;
-            if (fileWatcher != null)
-                fileWatcher.EnableRaisingEvents = fileWatcherStatus;
-        }
 
         /// <summary>
         /// Saves a List Config gile from the content saved within the tvBotData tree view and it's Tags
@@ -679,134 +1114,7 @@ namespace ScriptEditor
 
         #endregion
 
-        #region Create Files
-        /// <summary>
-        /// Gets the file name and type for the new json file.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void NewToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            FileTypeSelect fileTypeSelect = new FileTypeSelect();
-
-            if (fileTypeSelect.ShowDialog() == DialogResult.OK)
-                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-                {
-                    loadedFileType = fileTypeSelect.ConfigFileType;
-                    JsonFileName = saveFileDialog1.FileName;
-                    tvBotData.SuspendLayout();
-                    tvBotData.Nodes.Clear();
-                    cbImageNameNoWait.Items.Clear();
-                    cbImageNameWithWait.Items.Clear();
-                    cbImageNamesForList.Items.Clear();
-                    cbImageAreasImage.Items.Clear();
-                    cbPickActionAction.Items.Clear();
-                    cbActionBefore.Items.Clear();
-                    cbActionAfter.Items.Clear();
-                    ResetEditFormItems();
-
-                    switch (loadedFileType)
-                    {
-                        case JsonHelper.ConfigFileType.GameConfig:
-                            TreeNode findStringsNode = tvBotData.Nodes.Add("FindStrings");
-                            findStringsNode.Name = "FindStrings";
-                            TreeNode systemActionsNode = tvBotData.Nodes.Add("SystemActions");
-                            systemActionsNode.Name = "SystemActions";
-                            TreeNode actionsNode = tvBotData.Nodes.Add("Actions");
-                            actionsNode.Name = "Actions";
-                            break;
-                        case JsonHelper.ConfigFileType.ListConfig:
-                            TreeNode coordinatesNode = tvBotData.Nodes.Add("Coordinates");
-                            coordinatesNode.Name = "Coordinates";
-                            break;
-                        case JsonHelper.ConfigFileType.DeviceConfig:
-                            TreeNode lastActionNode = tvBotData.Nodes.Add("LastActionTaken");
-                            lastActionNode.Name = "LastActionTaken";
-                            break;
-                        default:
-                            break;
-                    }
-
-
-                    tvBotData.ResumeLayout();
-                    ChangePending = false;
-                    UnsavedChanges = false;
-                    saveToolStripMenuItem.Enabled = false;
-                }
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Set the text to show on the tvBotData for commands.
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        private string GetCommandIdDisplayText(Command command)
-        {
-            string childText = command.CommandId;
-            if (Enum.TryParse(command.CommandId, true, out ValidCommandIds validCommandIds))
-                switch (validCommandIds)
-                {
-                    case ValidCommandIds.Click:
-                        if (command.Location != null)
-                            childText = string.Format("{0} ({1},{2})", command.CommandId, command.Location.X, command.Location.Y);
-                        break;
-                    case ValidCommandIds.Drag:
-                        if (command.Swipe != null)
-                            childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.Swipe.X1, command.Swipe.Y1, command.Swipe.X2, command.Swipe.Y2);
-                        break;
-                    case ValidCommandIds.EnterLoopCoordinate:
-                        if (command.Value != null)
-                            childText = string.Format("{0} ({1})", command.CommandId, command.Value);
-                        break;
-                    case ValidCommandIds.LoopCoordinates:
-                        if (command.Coordinates != null)
-                            childText = string.Format("{0} ({1})", command.CommandId, command.Coordinates);
-                        break;
-                    case ValidCommandIds.RunAction:
-                        if (command.ActionName != null)
-                            childText = string.Format("{0} ({1})", command.CommandId, command.ActionName);
-                        break;
-                    case ValidCommandIds.Sleep:
-                        childText = string.Format("{0} ({1})", command.CommandId, command.Delay);
-                        break;
-                    case ValidCommandIds.IfExists:
-                    case ValidCommandIds.IfNotExists:
-                    case ValidCommandIds.FindClick:
-                    case ValidCommandIds.FindClickAndWait:
-                    case ValidCommandIds.LoopUntilFound:
-                    case ValidCommandIds.LoopUntilNotFound:
-                    case ValidCommandIds.WaitFor:
-                    case ValidCommandIds.WaitForThenClick:
-                        if (command.ImageName != null)
-                            childText = string.Format("{0} ({1})", command.CommandId, command.ImageName);
-                        else
-                            childText = string.Format("{0} (list)", command.CommandId);
-                        break;
-                    case ValidCommandIds.WaitForChange:
-                    case ValidCommandIds.WaitForNoChange:
-                        if (command.ChangeDetectArea != null)
-                            childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.ChangeDetectArea.X, command.ChangeDetectArea.Y, command.ChangeDetectArea.X + command.ChangeDetectArea.Width, command.ChangeDetectArea.Y + command.ChangeDetectArea.Height);
-                        break;
-                    case ValidCommandIds.LoopCounter:
-                        if (!string.IsNullOrEmpty(command.Value))
-                            childText = string.Format("{0} ({1})", command.CommandId, command.Value);
-                        else
-                            childText = string.Format("{0} (undefined)", command.CommandId);
-                        break;
-                    case ValidCommandIds.ClickWhenNotFoundInArea:
-                    case ValidCommandIds.Exit:
-                    case ValidCommandIds.Restart:
-                    case ValidCommandIds.StartGame:
-                    case ValidCommandIds.StopGame:
-                    default:
-                        childText = command.CommandId;
-                        break;
-                }
-            return childText;
-        }
-
+        #region TvBotData Events
         /// <summary>
         /// After selecting a node in the tvBotData, show the appropriate edit GroupBox.
         /// </summary>
@@ -1050,6 +1358,23 @@ namespace ScriptEditor
                             gbAppName.Visible = true;
                             break;
                         case ValidCommandIds.WaitFor:
+                            if (!string.IsNullOrEmpty(commandCopy.ImageName))
+                                cbImageNameWithWait.SelectedItem = commandCopy.ImageName;
+                            else
+                                cbImageNameWithWait.SelectedIndex = -1;
+                            if (commandCopy.TimeOut != null)
+                                tbTimeout.Text = commandCopy.TimeOut.ToString();
+                            else
+                                tbTimeout.Text = "";
+                            if (commandCopy.IgnoreMissing != null)
+                                cbImageNameMissingOk.Checked = (bool)commandCopy.IgnoreMissing;
+                            else
+                                cbImageNameMissingOk.Checked = false;
+                            cbImageNameMissingOk.Enabled = true;
+                            cbImageNameMissingOk.Visible = true;
+                            gbImageNameAndWait.Enabled = true;
+                            gbImageNameAndWait.Visible = true;
+                            break;
                         case ValidCommandIds.WaitForThenClick:
                             if (!string.IsNullOrEmpty(commandCopy.ImageName))
                                 cbImageNameWithWait.SelectedItem = commandCopy.ImageName;
@@ -1059,6 +1384,9 @@ namespace ScriptEditor
                                 tbTimeout.Text = commandCopy.TimeOut.ToString();
                             else
                                 tbTimeout.Text = "";
+                            cbImageNameMissingOk.Checked = false;
+                            cbImageNameMissingOk.Enabled = false;
+                            cbImageNameMissingOk.Visible = false;
                             gbImageNameAndWait.Enabled = true;
                             gbImageNameAndWait.Visible = true;
                             break;
@@ -1093,7 +1421,7 @@ namespace ScriptEditor
                         case ValidCommandIds.LoopCounter:
                             if (int.TryParse(commandCopy.Value, out _))
                                 tbLoopsCounter.Text = commandCopy.Value;
-                            addCommandToolStripMenuItem.Enabled = true; 
+                            addCommandToolStripMenuItem.Enabled = true;
                             gbLoops.Enabled = true;
                             gbLoops.Visible = true;
                             break;
@@ -1241,6 +1569,162 @@ namespace ScriptEditor
         }
 
         /// <summary>
+        /// Ensures that there aren't pending changes before allowing navigation within the tvBotData tree view.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void TvBotData_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        {
+            if (ChangePending)
+            {
+                DialogResult answer = MessageBox.Show("There are pending changes.  Keep Them?", "Pending Changes", MessageBoxButtons.YesNoCancel);
+                switch (answer)
+                {
+                    case DialogResult.Cancel:
+                        e.Cancel = true;
+                        break;
+                    case DialogResult.Yes:
+                        BtnUpdate_Click(sender, null);
+                        e.Cancel = false;
+                        break;
+                    case DialogResult.No:
+                        e.Cancel = false;
+                        break;
+                    default:
+                        e.Cancel = true;
+                        break;
+                }
+            }
+        }
+
+        #endregion
+
+        #region Helper Methods
+        /// <summary>
+        /// Setup a file watcher on the file being edited, to warn user that it has been changed.
+        /// Most useful on DeviceConfig files, as they are likely to change every 10 minutes.
+        /// </summary>
+        /// <param name="fileName"></param>
+        private void EnableFileWatcher(string fileName)
+        {
+            if (fileWatcher != null)
+            {
+                fileWatcher.EnableRaisingEvents = false;
+                fileWatcher.Dispose();
+            }
+
+            fileWatcher = new FileSystemWatcher(Path.GetDirectoryName(fileName)) {
+                NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
+                Filter = "*.json"
+            };
+            fileWatcher.Changed += ReloadJSONConfig;
+            fileWatcher.Renamed += ReloadJSONConfig;
+            fileWatcher.EnableRaisingEvents = true;
+        }
+
+        /// <summary>
+        /// Updates variables so that the UI knows to reload the data, on next click.
+        /// Would be nicer to force it, but the FileWatcher event needs static, and I haven't worked out how to force a reload.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void ReloadJSONConfig(object sender, FileSystemEventArgs e)
+        {
+            if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(JsonFileName).ToLower())
+            {
+                fileWatcher.EnableRaisingEvents = false;
+                if (MessageBox.Show(string.Format("{0} has changed, reload?", JsonFileName), "File Changed", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    ReloadTreeViewRequired = true;
+                }
+                fileWatcher.EnableRaisingEvents = true;
+            }
+        }
+
+        /// <summary>
+        /// Ensure that a GroupBox is in the corect position, and hidden
+        /// </summary>
+        /// <param name="item"></param>
+        private void ResetGroupBox(GroupBox item)
+        {
+            item.Top = 5;
+            item.Left = 5;
+            item.Dock = DockStyle.Top;
+            item.Enabled = false;
+            item.Visible = false;
+        }
+
+        /// <summary>
+        /// Set the text to show on the tvBotData for commands.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        private string GetCommandIdDisplayText(Command command)
+        {
+            string childText = command.CommandId;
+            if (Enum.TryParse(command.CommandId, true, out ValidCommandIds validCommandIds))
+                switch (validCommandIds)
+                {
+                    case ValidCommandIds.Click:
+                        if (command.Location != null)
+                            childText = string.Format("{0} ({1},{2})", command.CommandId, command.Location.X, command.Location.Y);
+                        break;
+                    case ValidCommandIds.Drag:
+                        if (command.Swipe != null)
+                            childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.Swipe.X1, command.Swipe.Y1, command.Swipe.X2, command.Swipe.Y2);
+                        break;
+                    case ValidCommandIds.EnterLoopCoordinate:
+                        if (command.Value != null)
+                            childText = string.Format("{0} ({1})", command.CommandId, command.Value);
+                        break;
+                    case ValidCommandIds.LoopCoordinates:
+                        if (command.Coordinates != null)
+                            childText = string.Format("{0} ({1})", command.CommandId, command.Coordinates);
+                        break;
+                    case ValidCommandIds.RunAction:
+                        if (command.ActionName != null)
+                            childText = string.Format("{0} ({1})", command.CommandId, command.ActionName);
+                        break;
+                    case ValidCommandIds.Sleep:
+                        childText = string.Format("{0} ({1})", command.CommandId, command.Delay);
+                        break;
+                    case ValidCommandIds.IfExists:
+                    case ValidCommandIds.IfNotExists:
+                    case ValidCommandIds.FindClick:
+                    case ValidCommandIds.FindClickAndWait:
+                    case ValidCommandIds.LoopUntilFound:
+                    case ValidCommandIds.LoopUntilNotFound:
+                    case ValidCommandIds.WaitFor:
+                    case ValidCommandIds.WaitForThenClick:
+                        if (command.ImageName != null)
+                            childText = string.Format("{0} ({1})", command.CommandId, command.ImageName);
+                        else
+                            childText = string.Format("{0} (list)", command.CommandId);
+                        break;
+                    case ValidCommandIds.WaitForChange:
+                    case ValidCommandIds.WaitForNoChange:
+                        if (command.ChangeDetectArea != null)
+                            childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.ChangeDetectArea.X, command.ChangeDetectArea.Y, command.ChangeDetectArea.X + command.ChangeDetectArea.Width, command.ChangeDetectArea.Y + command.ChangeDetectArea.Height);
+                        break;
+                    case ValidCommandIds.LoopCounter:
+                        if (!string.IsNullOrEmpty(command.Value))
+                            childText = string.Format("{0} ({1})", command.CommandId, command.Value);
+                        else
+                            childText = string.Format("{0} (undefined)", command.CommandId);
+                        break;
+                    case ValidCommandIds.ClickWhenNotFoundInArea:
+                    case ValidCommandIds.Exit:
+                    case ValidCommandIds.Restart:
+                    case ValidCommandIds.StartGame:
+                    case ValidCommandIds.StopGame:
+                    default:
+                        childText = command.CommandId;
+                        break;
+                }
+            return childText;
+        }
+
+        /// <summary>
         /// Hides all the GUI elements, and disables menu items.
         /// </summary>
         private void ResetEditFormItems()
@@ -1294,15 +1778,36 @@ namespace ScriptEditor
         }
 
         /// <summary>
-        /// Exit command from the Menu.
+        /// Sets the variables that control pending changes, and ensures appropriate menu items are available.
+        /// </summary>
+        private void SetChangePending()
+        {
+            ChangePending = true;
+            btnUpdate.Enabled = true;
+        }
+
+        #endregion
+
+        #region Form Event listeners
+        /// <summary>
+        /// Fires when closing the form to ensure that a prompt is given if changes are pending.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ScriptEditor_FormClosing(object sender, FormClosingEventArgs e)
         {
-            this.Close();
+            if (ChangePending || UnsavedChanges)
+            {
+                if (MessageBox.Show("There are Unsaved or Pending Changes, Exit?", "Exit?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
 
+        #endregion
+
+        #region Other Event Listeners
         /// <summary>
         /// Takes data on the form, and updates the tvBotData's names, and Tag with data from the form.
         /// </summary>
@@ -1419,8 +1924,7 @@ namespace ScriptEditor
                                 foreach (string item in lbImageAreaAreas.Items)
                                 {
                                     string[] values = item.Replace("(", "").Replace(")", "").Replace(" ", "").Split(delimiters);
-                                    SearchArea searchArea = new SearchArea
-                                    {
+                                    SearchArea searchArea = new SearchArea {
                                         X = int.Parse(values[0]),
                                         Y = int.Parse(values[1])
                                     };
@@ -1528,7 +2032,7 @@ namespace ScriptEditor
                                     MessageBox.Show("Wait Time required field isn't populated.");
                                     return;
                                 }
-                                
+
                                 if (lbImageNames.Items.Count < 1)
                                 {
                                     MessageBox.Show("Image Names required field isn't populated.");
@@ -1543,7 +2047,7 @@ namespace ScriptEditor
                                 {
                                     commandCopy.ImageName = null;
                                     commandCopy.ImageNames = new List<string>();
-                                    foreach(string item in lbImageNames.Items)
+                                    foreach (string item in lbImageNames.Items)
                                     {
                                         commandCopy.ImageNames.Add(item);
                                     }
@@ -1551,6 +2055,16 @@ namespace ScriptEditor
                                 commandCopy.TimeOut = int.Parse(tbImageNamesWait.Text);
                                 break;
                             case ValidCommandIds.WaitFor:
+                                if (tbTimeout.Text.Length == 0)
+                                {
+                                    MessageBox.Show("Required fields aren't populated.");
+                                    return;
+                                }
+
+                                commandCopy.ImageName = (string)cbImageNameWithWait.SelectedItem;
+                                commandCopy.TimeOut = int.Parse(tbTimeout.Text);
+                                commandCopy.IgnoreMissing = cbImageNameMissingOk.Checked;
+                                break;
                             case ValidCommandIds.WaitForThenClick:
                                 if (tbTimeout.Text.Length == 0)
                                 {
@@ -1645,56 +2159,133 @@ namespace ScriptEditor
             saveToolStripMenuItem.Enabled = true;
         }
 
-
-        private void TestToolStripMenuItem_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Adds a new item at the end of list boc lbImageNames
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnAddImageNames_Click(object sender, EventArgs e)
         {
-            //ToDo: Implement Test of an Action Capability.
+            SetChangePending();
+            lbImageNames.Items.Add(cbImageNamesForList.SelectedItem.ToString());
         }
 
-        private void SetupToolStripMenuItem_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Removes the selected item from list box lbImageNames
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnRemoveImageNames_Click(object sender, EventArgs e)
+        {
+            if (lbImageNames.SelectedItems.Count > 0)
+            {
+                SetChangePending();
+                lbImageNames.Items.RemoveAt(lbImageNames.SelectedIndex);
+            }
+        }
+
+        /// <summary>
+        /// Adds an item to the list box lbImageAreaAreas
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtImageAreaAdd_Click(object sender, EventArgs e)
+        {
+            SetChangePending();
+            lbImageAreaAreas.Items.Add(string.Format("({0}, {1}) - ({2}, {3})", tbImageAreasX.Text, tbImageAreasY.Text, tbImageAreasW.Text, tbImageAreasH.Text));
+        }
+
+        /// <summary>
+        /// Removes an item from the list box lbImageAreaAreas
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtImageAreaRemove_Click(object sender, EventArgs e)
+        {
+            if (lbImageAreaAreas.SelectedItems.Count > 0)
+            {
+                SetChangePending();
+                lbImageAreaAreas.Items.RemoveAt(lbImageAreaAreas.SelectedIndex);
+            }
+        }
+
+        /// <summary>
+        /// Pastes the values from the ClipBoard into a FindString, provided they are of the correct structure.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnPasteFindText_Click(object sender, EventArgs e)
+        {
+            if (Clipboard.ContainsText())
+            {
+                string clipboard = Clipboard.GetText();
+                try
+                {
+                    JsonDocumentOptions documentOptions = new JsonDocumentOptions {
+                        AllowTrailingCommas = true,
+                        CommentHandling = JsonCommentHandling.Skip
+                    };
+                    JsonNodeOptions nodeOptions = new JsonNodeOptions {
+                        PropertyNameCaseInsensitive = false
+                    };
+                    JsonNode jsonClipboard = JsonNode.Parse(clipboard, nodeOptions, documentOptions);
+                    if (jsonClipboard is JsonObject jsonObject)
+                    {
+                        if (jsonObject.ContainsKey("SearchString"))
+                        {
+                            tbFindTextSearch.Text = jsonObject["SearchString"].GetValue<JsonElement>().GetString();
+                        }
+                        if (jsonObject.ContainsKey("searchArea"))
+                        {
+                            tbFindTextSearchX1.Text = jsonObject["searchArea"].AsObject()["X"].GetValue<JsonElement>().GetInt32().ToString();
+                            tbFindTextSearchY1.Text = jsonObject["searchArea"].AsObject()["Y"].GetValue<JsonElement>().GetInt32().ToString();
+                            tbFindTextSearchX2.Text = (jsonObject["searchArea"].AsObject()["width"].GetValue<JsonElement>().GetInt32() + int.Parse(tbFindTextSearchX1.Text)).ToString();
+                            tbFindTextSearchY2.Text = (jsonObject["searchArea"].AsObject()["height"].GetValue<JsonElement>().GetInt32() + int.Parse(tbFindTextSearchY1.Text)).ToString();
+                        }
+                    }
+                }
+                catch
+                {
+                    MessageBox.Show("Clipboard content not recognised.");
+                }
+            }
+            else
+                MessageBox.Show("Clipboard content not recognised.");
+        }
+
+        /// <summary>
+        /// Loads the edit box to allow a new FindString to be generated.  On OK from the Dialog, values are populated back to this form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnFindTextGenerate_Click(object sender, EventArgs e)
         {
             FindTextEdit fte = new FindTextEdit();
             if (fte.ShowDialog() == DialogResult.OK)
             {
-                if ((!Clipboard.ContainsText()) || (Clipboard.ContainsText() && !Clipboard.GetText().StartsWith("{")))
-                {
-                    string searchText = fte.SearchText;
-                    Rectangle searchArea = fte.SearchRectangle;
-                    string clipboard = string.Format("{{\"FindString\":\"{0}\", \"searchArea\":{{\"X\":{1}, \"Y\":{2}, \"width\":{3}, \"height\":{4}}}}}", searchText, searchArea.X, searchArea.Y, searchArea.Width, searchArea.Height);
-                    Clipboard.SetText(clipboard);
-                }
+                tbFindTextSearch.Text = fte.SearchText;
+                tbFindTextSearchX1.Text = fte.SearchRectangle.X.ToString();
+                tbFindTextSearchY1.Text = fte.SearchRectangle.Y.ToString();
+                tbFindTextSearchX2.Text = (fte.SearchRectangle.X + fte.SearchRectangle.Width).ToString();
+                tbFindTextSearchY2.Text = (fte.SearchRectangle.Y + fte.SearchRectangle.Height).ToString();
             }
         }
 
+        /// <summary>
+        /// Most form items when changed will have this as the event listener.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void AllFields_TextChanged(object sender, EventArgs e)
         {
             SetChangePending();
         }
 
-        private void TvBotData_BeforeSelect(object sender, TreeViewCancelEventArgs e)
-        {
-            if (ChangePending)
-            {
-                DialogResult answer = MessageBox.Show("There are pending changes.  Keep Them?", "Pending Changes", MessageBoxButtons.YesNoCancel);
-                switch (answer)
-                {
-                    case DialogResult.Cancel:
-                        e.Cancel = true;
-                        break;
-                    case DialogResult.Yes:
-                        BtnUpdate_Click(sender, null);
-                        e.Cancel = false;
-                        break;
-                    case DialogResult.No:
-                        e.Cancel = false;
-                        break;
-                    default:
-                        e.Cancel = true;
-                        break;
-                }
-            }
-        }
-
+        /// <summary>
+        /// When the Action Type combo box changes, update all the enables on the rest of that group box
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CbActionType_TextChanged(object sender, EventArgs e)
         {
             if (Enum.TryParse(cbActionType.Text, true, out ValidActionType validActionType))
@@ -1740,42 +2331,22 @@ namespace ScriptEditor
             SetChangePending();
         }
 
-        private void BtnAddImageNames_Click(object sender, EventArgs e)
-        {
-            SetChangePending();
-            lbImageNames.Items.Add(cbImageNamesForList.SelectedItem.ToString());
-        }
-
-        private void BtnRemoveImageNames_Click(object sender, EventArgs e)
-        {
-            if (lbImageNames.SelectedItems.Count > 0)
-            {
-                SetChangePending();
-                lbImageNames.Items.RemoveAt(lbImageNames.SelectedIndex);
-            }
-        }
-
+        /// <summary>
+        /// Ensure that the combo box has the correct values, based on the list box lbImageNames
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LbImageNames_SelectedValueChanged(object sender, EventArgs e)
         {
             if (lbImageNames.SelectedItem != null)
                 cbImageNamesForList.Text = lbImageNames.SelectedItem.ToString();
         }
 
-        private void BtImageAreaAdd_Click(object sender, EventArgs e)
-        {
-            SetChangePending();
-            lbImageAreaAreas.Items.Add(string.Format("({0}, {1}) - ({2}, {3})", tbImageAreasX.Text, tbImageAreasY.Text, tbImageAreasW.Text, tbImageAreasH.Text));
-        }
-
-        private void BtImageAreaRemove_Click(object sender, EventArgs e)
-        {
-            if (lbImageAreaAreas.SelectedItems.Count > 0)
-            {
-                SetChangePending();
-                lbImageAreaAreas.Items.RemoveAt(lbImageAreaAreas.SelectedIndex);
-            }
-        }
-
+        /// <summary>
+        /// When the selected item changes in lbImageAreaAreas, update the edit boxes.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void LbImageAreaAreas_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (lbImageAreaAreas.SelectedItem != null)
@@ -1789,424 +2360,7 @@ namespace ScriptEditor
             }
         }
 
-        private void SetChangePending()
-        {
-            ChangePending = true;
-            btnUpdate.Enabled = true;
-        }
-
-        private void BtnPasteFindText_Click(object sender, EventArgs e)
-        {
-            if (Clipboard.ContainsText())
-            {
-                string clipboard = Clipboard.GetText();
-                try
-                {
-                    JsonDocumentOptions documentOptions = new JsonDocumentOptions
-                    {
-                        AllowTrailingCommas = true,
-                        CommentHandling = JsonCommentHandling.Skip
-                    };
-                    JsonNodeOptions nodeOptions = new JsonNodeOptions
-                    {
-                        PropertyNameCaseInsensitive = false
-                    };
-                    JsonNode jsonClipboard = JsonNode.Parse(clipboard, nodeOptions, documentOptions);
-                    if (jsonClipboard is JsonObject jsonObject)
-                    {
-                        if (jsonObject.ContainsKey("SearchString"))
-                        {
-                            tbFindTextSearch.Text = jsonObject["SearchString"].GetValue<JsonElement>().GetString();
-                        }
-                        if (jsonObject.ContainsKey("searchArea"))
-                        {
-                            tbFindTextSearchX1.Text = jsonObject["searchArea"].AsObject()["X"].GetValue<JsonElement>().GetInt32().ToString();
-                            tbFindTextSearchY1.Text = jsonObject["searchArea"].AsObject()["Y"].GetValue<JsonElement>().GetInt32().ToString();
-                            tbFindTextSearchX2.Text = (jsonObject["searchArea"].AsObject()["width"].GetValue<JsonElement>().GetInt32() + int.Parse(tbFindTextSearchX1.Text)).ToString();
-                            tbFindTextSearchY2.Text = (jsonObject["searchArea"].AsObject()["height"].GetValue<JsonElement>().GetInt32() + int.Parse(tbFindTextSearchY1.Text)).ToString();
-                        }
-                    }
-                }
-                catch
-                {
-                    MessageBox.Show("Clipboard content not recognised.");
-                }
-            }
-            else
-                MessageBox.Show("Clipboard content not recognised.");
-        }
-
-        private void ScriptEditor_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (ChangePending || UnsavedChanges)
-            {
-                if (MessageBox.Show("There are Unsaved or Pending Changes, Exit?", "Exit?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
-                {
-                    e.Cancel = true;
-                }
-            }
-        }
-
-        #region Add menu options
-        /// <summary>
-        /// Add a new Action into the tvBotData tree
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddActionToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ResetEditFormItems();
-            if (tvBotData.SelectedNode.Nodes.ContainsKey("New Action"))
-            {
-                TreeNode selectedNode = tvBotData.SelectedNode.Nodes["New Action"];
-                tvBotData.SelectedNode = selectedNode;
-                MessageBox.Show("Rename this Action to allow new actions to be added");
-            }
-            else
-            {
-                BotEngineClient.Action newAction = new BotEngineClient.Action();
-                if (tvBotData.SelectedNode.Name == "Actions")
-                    newAction.ActionType = ValidActionType.Scheduled.ToString();
-                else
-                    newAction.ActionType = ValidActionType.System.ToString();
-
-                TreeNode newNode = new TreeNode
-                {
-                    Text = "New Action",
-                    Name = "New Action",
-                    Tag = newAction
-                };
-
-                tvBotData.SelectedNode.Nodes.Add(newNode);
-                tvBotData.SelectedNode = newNode;
-            }
-        }
-
-        /// <summary>
-        /// Add a new FindString node into the tvBotData tree
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddFindStringtoolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ResetEditFormItems();
-            if (tvBotData.SelectedNode.Nodes.ContainsKey("New FindString"))
-            {
-                TreeNode selectedNode = tvBotData.SelectedNode.Nodes["New FindString"];
-                tvBotData.SelectedNode = selectedNode;
-                MessageBox.Show("Rename this FindString to allow new find strings to be added");
-            }
-            else
-            {
-                FindString newFindString = new FindString();
-
-                TreeNode newNode = new TreeNode
-                {
-                    Text = "New FindString",
-                    Name = "New FindString",
-                    Tag = newFindString
-                };
-
-                tvBotData.SelectedNode.Nodes.Add(newNode);
-                tvBotData.SelectedNode = newNode;
-            }
-        }
-
-        /// <summary>
-        /// Add a new Coordinates node into the tvBotData tree
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddCoordinatestoolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            ResetEditFormItems();
-            if (tvBotData.SelectedNode.Nodes.ContainsKey("New Coordinates"))
-            {
-                TreeNode selectedNode = tvBotData.SelectedNode.Nodes["New Coordinates"];
-                tvBotData.SelectedNode = selectedNode;
-                MessageBox.Show("Rename this Coordinates to allow new coordinates to be added");
-            }
-            else if (tvBotData.SelectedNode.Tag is List<XYCoords>)
-            {
-                TreeNode treeNode = new TreeNode
-                {
-                    Text = "(0,0)",
-                    Name = "(0,0)",
-                    Tag = new XYCoords(0, 0)
-                };
-                tvBotData.SelectedNode.Nodes.Add(treeNode);
-                tvBotData.SelectedNode = treeNode;
-            }    
-            else
-            {
-                List<XYCoords> newCoordinates = new List<XYCoords>();
-
-                TreeNode newNode = new TreeNode
-                {
-                    Text = "New Coordinates",
-                    Name = "New Coordinates",
-                    Tag = newCoordinates
-                };
-
-                tvBotData.SelectedNode.Nodes.Add(newNode);
-                tvBotData.SelectedNode = newNode;
-            }
-        }
-
-        /// <summary>
-        /// Add a command to a selected tvBotData item that is allowed to have them added.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AddCommandToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            TreeNode currentNode = tvBotData.SelectedNode;
-            if (currentNode.Tag != null)
-            {
-                if (currentNode.Tag is Command || currentNode.Tag is BotEngineClient.Action)
-                {
-                    CommandSelect commandSelect = new CommandSelect();
-                    if (commandSelect.ShowDialog() == DialogResult.OK)
-                    {
-                        string commandId = commandSelect.SelectedCommand.ToString();
-                        Command newCommand = new Command(commandSelect.SelectedCommand);
-                        string childText = GetCommandIdDisplayText(newCommand);
-                        TreeNode newNode = new TreeNode
-                        {
-                            Tag = newCommand,
-                            Name = commandId,
-                            Text = childText
-                        };
-                        currentNode.Nodes.Add(newNode);
-                        tvBotData.SelectedNode = newNode;
-                        UnsavedChanges = true;
-                    }
-                }
-            }
-        }
-
         #endregion
 
-        #region Insert menu options
-        /// <summary>
-        /// Inserts a new node, before the current node into the tvBotData tree, and makes it active.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AboveToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            TreeNode currentNode = tvBotData.SelectedNode;
-            int currentNodeIndex = tvBotData.SelectedNode.Index;
-            TreeNode parent = tvBotData.SelectedNode.Parent;
-            if (currentNode.Tag != null)
-            {
-                if (currentNode.Tag is Command)
-                {
-                    CommandSelect commandSelect = new CommandSelect();
-                    if (commandSelect.ShowDialog() == DialogResult.OK)
-                    {
-                        string commandId = commandSelect.SelectedCommand.ToString();
-                        Command newCommand = new Command(commandSelect.SelectedCommand);
-                        string childText = GetCommandIdDisplayText(newCommand);
-                        TreeNode newNode = new TreeNode
-                        {
-                            Tag = newCommand,
-                            Name = commandId,
-                            Text = childText
-                        };
-                        parent.Nodes.Insert(currentNodeIndex, newNode);
-                        tvBotData.SelectedNode = newNode;
-                        UnsavedChanges = true;
-                    }
-                }
-                else if (currentNode.Tag is XYCoords)
-                {
-                    XYCoords newCoords = new XYCoords(0, 0);
-                    TreeNode newNode = new TreeNode
-                    {
-                        Name = "(0,0)",
-                        Tag = newCoords,
-                        Text = "(0,0)"
-                    };
-                    parent.Nodes.Insert(currentNodeIndex, newNode);
-                    UnsavedChanges = true;
-                    tvBotData.SelectedNode = newNode;
-                }
-                else if (currentNode.Tag is List<XYCoords>)
-                {
-                    XYCoords newCoords = new XYCoords(0, 0);
-                    TreeNode newNode = new TreeNode
-                    {
-                        Name = "(0,0)",
-                        Tag = newCoords,
-                        Text = "(0,0)"
-                    };
-                    currentNode.Nodes.Add(newNode);
-                    UnsavedChanges = true;
-                    tvBotData.SelectedNode = newNode;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Inserts a new node, after the current node into the tvBotData tree, and makes it active.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void BelowToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            TreeNode currentNode = tvBotData.SelectedNode;
-            int currentNodeIndex = tvBotData.SelectedNode.Index;
-            TreeNode parent = tvBotData.SelectedNode.Parent;
-            if (currentNode.Tag != null)
-            {
-                if (currentNode.Tag is Command)
-                {
-                    CommandSelect commandSelect = new CommandSelect();
-                    if (commandSelect.ShowDialog() == DialogResult.OK)
-                    {
-                        string commandId = commandSelect.SelectedCommand.ToString();
-                        Command newCommand = new Command(commandSelect.SelectedCommand);
-                        string childText = GetCommandIdDisplayText(newCommand);
-                        TreeNode newNode = new TreeNode
-                        {
-                            Tag = newCommand,
-                            Name = commandId,
-                            Text = childText
-                        };
-                        parent.Nodes.Insert(currentNodeIndex + 1, newNode);
-                        tvBotData.SelectedNode = newNode;
-                        UnsavedChanges = true;
-                    }
-                }
-                else if (currentNode.Tag is BotEngineClient.Action)
-                {
-                    CommandSelect commandSelect = new CommandSelect();
-                    if (commandSelect.ShowDialog() == DialogResult.OK)
-                    {
-                        string commandId = commandSelect.SelectedCommand.ToString();
-                        Command newCommand = new Command(commandSelect.SelectedCommand);
-                        string childText = GetCommandIdDisplayText(newCommand);
-                        TreeNode newNode = new TreeNode
-                        {
-                            Tag = newCommand,
-                            Name = commandId,
-                            Text = childText
-                        };
-                        currentNode.Nodes.Add(newNode);
-                        tvBotData.SelectedNode = newNode;
-                        UnsavedChanges = true;
-                    }
-                }
-                else if (currentNode.Tag is XYCoords)
-                {
-                    XYCoords newCoords = new XYCoords(0, 0);
-                    TreeNode newNode = new TreeNode
-                    {
-                        Name = "(0,0)",
-                        Tag = newCoords,
-                        Text = "(0,0)"
-                    };
-                    parent.Nodes.Insert(currentNodeIndex + 1, newNode);
-                    tvBotData.SelectedNode = newNode;
-                    UnsavedChanges = true;
-                }
-                else if (currentNode.Tag is List<XYCoords>)
-                {
-                    XYCoords newCoords = new XYCoords(0, 0);
-                    TreeNode newNode = new TreeNode
-                    {
-                        Name = "(0,0)",
-                        Tag = newCoords,
-                        Text = "(0,0)"
-                    };
-                    currentNode.Nodes.Add(newNode);
-                    UnsavedChanges = true;
-                    tvBotData.SelectedNode = newNode;
-                }
-            }
-        }
-        #endregion
-
-        private void BtnFindTextGenerate_Click(object sender, EventArgs e)
-        {
-            FindTextEdit fte = new FindTextEdit();
-            if (fte.ShowDialog() == DialogResult.OK)
-            {
-                tbFindTextSearch.Text = fte.SearchText;
-                tbFindTextSearchX1.Text = fte.SearchRectangle.X.ToString();
-                tbFindTextSearchY1.Text = fte.SearchRectangle.Y.ToString();
-                tbFindTextSearchX2.Text = (fte.SearchRectangle.X + fte.SearchRectangle.Width).ToString();
-                tbFindTextSearchY2.Text = (fte.SearchRectangle.Y + fte.SearchRectangle.Height).ToString();
-            }
-        }
-
-        /// <summary>
-        /// Delete the seleted node from tvBotData
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DeleteToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            TreeNode currentNode = tvBotData.SelectedNode;
-            // ToDo: Add warning if deleting FindText or Action.
-            // ToDo: Update the combo boxes for FindText and Actions.
-            if (currentNode != null)
-            {
-                tvBotData.Nodes.Remove(currentNode);
-                UnsavedChanges = true;
-                ChangePending = false;
-            }
-        }
-
-        /// <summary>
-        /// Moves the selected tvBotNode node up one spot, if it can be moved.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void UpToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            TreeNode currentNode = tvBotData.SelectedNode;
-            if (currentNode != null && currentNode.Parent != null)
-            {
-                TreeNode parentNode = currentNode.Parent;
-                int treeIndex = parentNode.Nodes.IndexOf(currentNode);
-                if (treeIndex > 0)
-                {
-                    parentNode.Nodes.RemoveAt(treeIndex);
-                    parentNode.Nodes.Insert(treeIndex - 1, currentNode);
-                    tvBotData.SelectedNode = currentNode;
-                    UnsavedChanges = true;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Moves the selected tvBotNode node down one spot, if it can be moved.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DownToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            TreeNode currentNode = tvBotData.SelectedNode;
-            if (currentNode != null && currentNode.Parent != null)
-            {
-                TreeNode parentNode = currentNode.Parent;
-                int treeIndex = parentNode.Nodes.IndexOf(currentNode);
-                if (treeIndex < parentNode.Nodes.Count - 1)
-                {
-                    parentNode.Nodes.RemoveAt(treeIndex);
-                    parentNode.Nodes.Insert(treeIndex + 1, currentNode);
-                    tvBotData.SelectedNode = currentNode;
-                    UnsavedChanges = true;
-                }
-            }
-        }
-
-        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            HelpAboutBox about = new HelpAboutBox();
-            about.ShowDialog();
-        }
     }
 }

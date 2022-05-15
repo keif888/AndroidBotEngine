@@ -178,6 +178,8 @@ namespace ScriptEditor
             this.tbPointY = new System.Windows.Forms.MaskedTextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cbImageNameMissingOk = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -223,6 +225,7 @@ namespace ScriptEditor
             this.newToolStripMenuItem,
             this.openToolStripMenuItem,
             this.saveToolStripMenuItem,
+            this.closeToolStripMenuItem,
             this.toolStripMenuItem1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
@@ -232,14 +235,14 @@ namespace ScriptEditor
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.NewToolStripMenuItem_Click);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "&Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.OpenToolStripMenuItem_Click);
             // 
@@ -247,19 +250,19 @@ namespace ScriptEditor
             // 
             this.saveToolStripMenuItem.Enabled = false;
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "&Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.SaveToolStripMenuItem_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(100, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
             // 
@@ -1471,13 +1474,14 @@ namespace ScriptEditor
             // 
             // gbImageNameAndWait
             // 
+            this.gbImageNameAndWait.Controls.Add(this.cbImageNameMissingOk);
             this.gbImageNameAndWait.Controls.Add(this.cbImageNameWithWait);
             this.gbImageNameAndWait.Controls.Add(this.label4);
             this.gbImageNameAndWait.Controls.Add(this.tbTimeout);
             this.gbImageNameAndWait.Enabled = false;
-            this.gbImageNameAndWait.Location = new System.Drawing.Point(4, 271);
+            this.gbImageNameAndWait.Location = new System.Drawing.Point(5, 233);
             this.gbImageNameAndWait.Name = "gbImageNameAndWait";
-            this.gbImageNameAndWait.Size = new System.Drawing.Size(244, 83);
+            this.gbImageNameAndWait.Size = new System.Drawing.Size(244, 105);
             this.gbImageNameAndWait.TabIndex = 13;
             this.gbImageNameAndWait.TabStop = false;
             this.gbImageNameAndWait.Text = "Image Name And Wait";
@@ -1552,7 +1556,7 @@ namespace ScriptEditor
             this.gbLoopCoordinate.Controls.Add(this.rbLoopCoordY);
             this.gbLoopCoordinate.Controls.Add(this.rbLoopCoordX);
             this.gbLoopCoordinate.Enabled = false;
-            this.gbLoopCoordinate.Location = new System.Drawing.Point(3, 184);
+            this.gbLoopCoordinate.Location = new System.Drawing.Point(4, 157);
             this.gbLoopCoordinate.Name = "gbLoopCoordinate";
             this.gbLoopCoordinate.Size = new System.Drawing.Size(245, 73);
             this.gbLoopCoordinate.TabIndex = 11;
@@ -1732,6 +1736,26 @@ namespace ScriptEditor
             // 
             this.saveFileDialog1.DefaultExt = "json";
             this.saveFileDialog1.Filter = "json files|*.json|All files|*.*";
+            // 
+            // closeToolStripMenuItem
+            // 
+            this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.closeToolStripMenuItem.Text = "&Close";
+            this.closeToolStripMenuItem.Click += new System.EventHandler(this.CloseToolStripMenuItem_Click);
+            this.closeToolStripMenuItem.Enabled = false;
+            // 
+            // cbImageNameMissingOk
+            // 
+            this.cbImageNameMissingOk.AutoSize = true;
+            this.cbImageNameMissingOk.Location = new System.Drawing.Point(16, 80);
+            this.cbImageNameMissingOk.Name = "cbImageNameMissingOk";
+            this.cbImageNameMissingOk.Size = new System.Drawing.Size(90, 19);
+            this.cbImageNameMissingOk.TabIndex = 3;
+            this.cbImageNameMissingOk.Text = "Missing Ok?";
+            this.cbImageNameMissingOk.UseVisualStyleBackColor = true;
+            this.cbImageNameMissingOk.Visible = false;
+            this.cbImageNameMissingOk.CheckedChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // ScriptEditor
             // 
@@ -1941,6 +1965,8 @@ namespace ScriptEditor
         private System.Windows.Forms.GroupBox gbLoops;
         private System.Windows.Forms.Label label38;
         private System.Windows.Forms.MaskedTextBox tbLoopsCounter;
+        private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
+        private System.Windows.Forms.CheckBox cbImageNameMissingOk;
     }
 }
 

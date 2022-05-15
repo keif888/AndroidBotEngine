@@ -265,7 +265,15 @@ namespace BotEngineClient
             }
         }
 
-        private CommandResults WaitFor(string searchName, FindString searchString, int timeOut)
+        /// <summary>
+        /// Waits until the image indicated by searchName appears on the screen.
+        /// </summary>
+        /// <param name="searchName"></param>
+        /// <param name="searchString"></param>
+        /// <param name="ignoreMissing">Set to true if it is not a Missing state if the timeout has expired.</param>
+        /// <param name="timeOut"></param>
+        /// <returns></returns>
+        private CommandResults WaitFor(string searchName, FindString searchString, bool ignoreMissing, int timeOut) //ToDo: Add Failure OK handling, so that it can be acceptable for the image not to appear.  Assumes that there will be an IfExists or FindClick afterwards.
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))
             {
@@ -292,9 +300,14 @@ namespace BotEngineClient
                     Thread.Sleep(50);
                 }
                 stopWatch.Stop();
-                if (result != CommandResults.Ok)
+                if (result != CommandResults.Ok && !ignoreMissing)
                 {
                     _logger.LogWarning("Search Unsuccessful with {0} whilst looking for {1}", result.ToString(), searchName);
+                }
+                else if (result != CommandResults.Ok)
+                {
+                    _logger.LogDebug("Search Unsuccessful with {0} whilst looking for {1}, but ignoreMissing = true", result.ToString(), searchName);
+                    result = CommandResults.Ok;
                 }
                 return result;
             }
@@ -525,8 +538,6 @@ namespace BotEngineClient
         /// <param name="searchString"></param>
         /// <param name="areas"></param>
         /// <returns></returns>
-        // ToDo: Add optional scroll if nothing found?
-        // ToSo: Add new command, which takes a big area, and a number, which is the number of regions to search within, and the 1st click point if the image isn't found?
         private CommandResults ClickWhenNotFoundInArea(string searchName, FindString searchString, List<SearchArea> areas)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))
@@ -877,6 +888,8 @@ namespace BotEngineClient
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), command.CommandId)))
             {
                 List<string> imageNames = new List<string>();
+                bool ignoreMissing = false;
+
                 _logger.LogDebug("Starting Command Execution");
                 if (Enum.TryParse(command.CommandId, true, out ValidCommandIds validCommandIds))
                 {
@@ -958,7 +971,6 @@ namespace BotEngineClient
                                 _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
                                 return CommandResults.InputError;
                             }
-                            bool ignoreMissing = false;
                             if (command.IgnoreMissing != null)
                                 ignoreMissing = (bool)command.IgnoreMissing;
                             return FindClick(command.ImageName, FindStrings[command.ImageName], ignoreMissing);
@@ -1157,7 +1169,10 @@ namespace BotEngineClient
                                 _logger.LogError("Command {0} Error Timeout is null", command.CommandId);
                                 return CommandResults.InputError;
                             }
-                            return WaitFor(command.ImageName, FindStrings[command.ImageName], (int)command.TimeOut);
+                            if (command.IgnoreMissing != null)
+                                ignoreMissing = (bool)command.IgnoreMissing;
+
+                            return WaitFor(command.ImageName, FindStrings[command.ImageName], ignoreMissing, (int)command.TimeOut);
                         case ValidCommandIds.WaitForThenClick:
                             if (command.ImageName == null)
                             {

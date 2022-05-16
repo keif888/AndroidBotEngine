@@ -273,7 +273,7 @@ namespace BotEngineClient
         /// <param name="ignoreMissing">Set to true if it is not a Missing state if the timeout has expired.</param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
-        private CommandResults WaitFor(string searchName, FindString searchString, bool ignoreMissing, int timeOut) //ToDo: Add Failure OK handling, so that it can be acceptable for the image not to appear.  Assumes that there will be an IfExists or FindClick afterwards.
+        private CommandResults WaitFor(string searchName, FindString searchString, bool ignoreMissing, int timeOut)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))
             {

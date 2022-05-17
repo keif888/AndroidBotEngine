@@ -575,7 +575,17 @@ namespace ScriptEditor
             }
         }
 
-        // ToDo: Implement Validate option, to enable testing if a FindString can be found via ADB.
+        /// <summary>
+        /// Shows the dialog to enable testing if a FindString can be detected via ADB.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ValidateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FindTextValidate findTextValidate = new FindTextValidate();
+            findTextValidate.LoadGameConfig(gameConfig);
+            findTextValidate.ShowDialog();
+        }
 
         #endregion
 
@@ -621,6 +631,7 @@ namespace ScriptEditor
                     {
                         LoadDeviceConfigFile(fileName);
                         setupToolStripMenuItem.Enabled = false;
+                        validateToolStripMenuItem.Enabled = false;
                         testToolStripMenuItem.Enabled = false;
                     }
                     break;
@@ -629,6 +640,7 @@ namespace ScriptEditor
                     {
                         LoadGameConfigFile(fileName);
                         setupToolStripMenuItem.Enabled = true;
+                        validateToolStripMenuItem.Enabled = true;
                         testToolStripMenuItem.Enabled = false;
                     }
                     break;
@@ -637,6 +649,7 @@ namespace ScriptEditor
                     {
                         LoadListConfigFile(fileName);
                         setupToolStripMenuItem.Enabled = false;
+                        validateToolStripMenuItem.Enabled = false;
                         testToolStripMenuItem.Enabled = false;
                     }
                     break;

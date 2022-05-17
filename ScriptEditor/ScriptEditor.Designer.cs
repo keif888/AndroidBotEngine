@@ -404,6 +404,7 @@ namespace ScriptEditor
             this.validateToolStripMenuItem.Name = "validateToolStripMenuItem";
             this.validateToolStripMenuItem.Size = new System.Drawing.Size(115, 22);
             this.validateToolStripMenuItem.Text = "&Validate";
+            this.validateToolStripMenuItem.Click += new System.EventHandler(this.ValidateToolStripMenuItem_Click);
             // 
             // testToolStripMenuItem
             // 

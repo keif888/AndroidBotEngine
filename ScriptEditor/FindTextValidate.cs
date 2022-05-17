@@ -1,0 +1,178 @@
+﻿// <copyright file="FindTextValidate.cs" company="Keith Martin">
+// Copyright (c) Keith Martin
+// Licensed under the Apache License, Version 2.0 (the "License")</copyright>
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
+using BotEngineClient;
+using FindTextClient;
+using SharpAdbClient;
+
+namespace ScriptEditor
+{
+    public partial class FindTextValidate : Form
+    {
+        private Image loadedFromADBImage;
+        private BOTConfig gameConfig;
+        private AdbServer server;
+        private readonly FindText findText;
+        private Rectangle adbScreenSize;
+        private bool foundDone;
+
+        public FindTextValidate()
+        {
+            InitializeComponent();
+            gameConfig = null;
+            loadedFromADBImage = null;
+            findText = new FindText();
+            adbScreenSize = new Rectangle(0, 0, 10, 10);
+            foundDone = false;
+        }
+
+        /// <summary>
+        /// Grab a frame from the selected ADB.  And put it on the panel.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnGrab_Click(object sender, EventArgs e)
+        {
+            if (gameConfig == null)
+            {
+                MessageBox.Show("Error: Game Config not loaded.This shouldn't happen!", "No GameConfig", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                if (server == null)
+                {
+                    server = new AdbServer();
+                    StartServerResult result = server.StartServer(AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", restartServerIfNewer: true);
+                    if (result != StartServerResult.AlreadyRunning)
+                    {
+                        Thread.Sleep(1500);
+                        AdbServerStatus status = server.GetStatus();
+                        if (!status.IsRunning)
+                        {
+                            MessageBox.Show("Unable to start ADB server");
+                            return;
+                        }
+                    }
+                }
+
+                AdbClient client = new AdbClient();
+                List<DeviceData> devices = client.GetDevices();
+
+                List<string> devicesList = new List<string>();
+                DeviceSelect deviceSelect = new DeviceSelect();
+                foreach (DeviceData device in devices)
+                {
+                    string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
+                    string deviceId = string.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
+                    devicesList.Add(deviceId);
+                }
+                deviceSelect.LoadList(devicesList);
+                if (deviceSelect.ShowDialog() == DialogResult.OK)
+                {
+                    string deviceId = deviceSelect.selectedItem;
+                    DeviceData device = DeviceData.CreateFromAdbData(deviceId);
+
+                    Framebuffer framebuffer = new Framebuffer(device, client);
+                    System.Threading.CancellationToken cancellationToken = default;
+                    framebuffer.RefreshAsync(cancellationToken).Wait(3000);
+                    loadedFromADBImage = framebuffer.ToImage();
+                    adbScreenSize = new Rectangle(0, 0, loadedFromADBImage.Width, loadedFromADBImage.Height);
+                    BtnReset_Click(sender, e);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check if the selected FindString is available on the image.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnTest_Click(object sender, EventArgs e)
+        {
+            if (loadedFromADBImage != null)
+            {
+                if (gameConfig.FindStrings.ContainsKey(cbFindString.SelectedItem.ToString()))
+                {
+                    int zx = adbScreenSize.X, zy = adbScreenSize.Y, w = adbScreenSize.Width, h = adbScreenSize.Height;
+                    FindString searchString = gameConfig.FindStrings[cbFindString.SelectedItem.ToString()];
+
+                    findText.LoadImage(loadedFromADBImage, ref zx, ref zy, ref w, ref h);
+                    List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X + searchString.SearchArea.Width, searchString.SearchArea.Y + searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
+                    if (dataresult != null)
+                    {
+                        tssText.Text = string.Format("Found {0} instances of FindString {1}", dataresult.Count, cbFindString.SelectedItem.ToString());
+                        pnlGraphics.SuspendLayout();
+                        pbFrame.SuspendLayout();
+                        if (foundDone)
+                            pbFrame.Image.Dispose();
+                        Image localImage = (Image)loadedFromADBImage.Clone();
+                        using Graphics graphics = Graphics.FromImage(localImage);
+                        foreach (SearchResult result in dataresult)
+                        {
+                            Rectangle rectangle = new Rectangle(result.TopLeftX, result.TopLeftY, result.Width, result.Height);
+                            graphics.DrawRectangle(Pens.LightGray, rectangle);
+                        }
+                        pbFrame.Image = localImage;
+                        pbFrame.ResumeLayout();
+                        pnlGraphics.ResumeLayout();
+                        foundDone = true;
+                    }
+                    else
+                    {
+                        tssText.Text = string.Format("Found 0 instances of FindString {0}", cbFindString.SelectedItem.ToString());
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("You have to Grab an image 1st.", "No Image", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Resets the image back to the one loaded from ADB.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnReset_Click(object sender, EventArgs e)
+        {
+            if (loadedFromADBImage != null)
+            {
+                if (foundDone)
+                    pbFrame.Image.Dispose();
+                pnlGraphics.SuspendLayout();
+                pbFrame.SuspendLayout();
+                pbFrame.Image = loadedFromADBImage;
+                pbFrame.Width = loadedFromADBImage.Width;
+                pbFrame.Height = loadedFromADBImage.Height;
+                pbFrame.ResumeLayout();
+                pnlGraphics.ResumeLayout();
+                foundDone = false;
+            }
+            else
+            {
+                MessageBox.Show("You have to Grab an image 1st.", "No Image", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public void LoadGameConfig(BOTConfig GameConfig)
+        {
+            gameConfig = GameConfig;
+            cbFindString.Items.Clear();
+            foreach (KeyValuePair<string, FindString> item in gameConfig.FindStrings)
+            {
+                cbFindString.Items.Add(item.Key);
+            }
+            cbFindString.SelectedIndex = 0;
+        }
+    }
+}

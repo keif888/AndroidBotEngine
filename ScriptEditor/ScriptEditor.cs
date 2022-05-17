@@ -598,6 +598,41 @@ namespace ScriptEditor
         private void TestToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //ToDo: Implement Test of an Action Capability.
+            string listConfigName;
+            string saveTitle = openFileDialog1.Title;
+
+            openFileDialog1.Title = "Select the List Config File to use for testing";
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                openFileDialog1.Title = saveTitle;
+                listConfigName = openFileDialog1.FileName;
+                JsonHelper jsonHelper = new JsonHelper();
+                if (jsonHelper.GetFileType(listConfigName) != JsonHelper.ConfigFileType.ListConfig)
+                {
+                    MessageBox.Show("File selected wasn't a List Config File.", "Select correct file type", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    string jsonString = File.ReadAllText(listConfigName);
+                    try
+                    {
+                        listConfig = JsonSerializer.Deserialize<BOTListConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip, PropertyNameCaseInsensitive = true })!;
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(string.Format("Unable to parse file.\r\n{0}", ex.Message));
+                        return;
+                    }
+                    TestAction testAction = new TestAction();
+                    testAction.LoadConfig(gameConfig, listConfig);
+                    testAction.ShowDialog();
+                }
+            }
+            else
+            {
+                openFileDialog1.Title = saveTitle;
+            }
+
         }
         #endregion
 
@@ -641,7 +676,7 @@ namespace ScriptEditor
                         LoadGameConfigFile(fileName);
                         setupToolStripMenuItem.Enabled = true;
                         validateToolStripMenuItem.Enabled = true;
-                        testToolStripMenuItem.Enabled = false;
+                        testToolStripMenuItem.Enabled = true;
                     }
                     break;
                 case JsonHelper.ConfigFileType.ListConfig:

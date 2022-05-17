@@ -918,7 +918,7 @@ namespace BotEngine
                  .SetMinimumLevel(logLevel)
                 );
             }
-            services.AddSingleton(sp => sp.GetRequiredService<ILoggerFactory>().CreateLogger("MoEBot"));
+            services.AddSingleton(sp => sp.GetRequiredService<ILoggerFactory>().CreateLogger("AndroidBot"));
             return services.BuildServiceProvider();
         }
     }

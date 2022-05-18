@@ -38,11 +38,13 @@ namespace ScriptEditor
             this.btnTest = new System.Windows.Forms.Button();
             this.cbActions = new System.Windows.Forms.ComboBox();
             this.tbLogger = new System.Windows.Forms.TextBox();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.pnlControls.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlControls
             // 
+            this.pnlControls.Controls.Add(this.btnCancel);
             this.pnlControls.Controls.Add(this.label1);
             this.pnlControls.Controls.Add(this.btnTest);
             this.pnlControls.Controls.Add(this.cbActions);
@@ -91,6 +93,16 @@ namespace ScriptEditor
             this.tbLogger.TabIndex = 1;
             this.tbLogger.WordWrap = false;
             // 
+            // btnCancel
+            // 
+            this.btnCancel.Location = new System.Drawing.Point(378, 11);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.TabIndex = 3;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            // 
             // TestAction
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -115,5 +127,6 @@ namespace ScriptEditor
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.ComboBox cbActions;
+        private System.Windows.Forms.Button btnCancel;
     }
 }

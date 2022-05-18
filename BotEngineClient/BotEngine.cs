@@ -13,6 +13,9 @@ using FindTextClient;
 
 namespace BotEngineClient
 {
+
+    public delegate void BotEngineCallback(BotEngine.CommandResults result);
+
     public class BotEngine
     {
         private readonly ILogger _logger;
@@ -30,6 +33,10 @@ namespace BotEngineClient
         private Dictionary<string, Action> SystemActions;
         private BOTListConfig ListConfig;
         private readonly string EmulatorName;
+        private string ThreadActionName;
+        private BotEngineCallback callback;
+        private CancellationToken cancellationToken;
+        private bool isThreading;
 
         public enum CommandResults
         {
@@ -39,7 +46,8 @@ namespace BotEngineClient
             TimeOut,
             Restart,
             InputError,
-            ADBError
+            ADBError,
+            Cancelled
         }
 
         /// <summary>
@@ -71,6 +79,41 @@ namespace BotEngineClient
             WaitForNoChange
         }
 
+        public void SetThreadingCommand(string ActionName, BotEngineCallback callbackDelegate)
+        {
+            ThreadActionName = ActionName;
+            callback = callbackDelegate;
+        }
+
+        public void InitiateThreadingCommand(object obj)
+        {
+            cancellationToken = (CancellationToken)obj;
+            if (ThreadActionName != null)
+            {
+                isThreading = true;
+                CommandResults result = ExecuteAction(ThreadActionName);
+                if (callback != null)
+                {
+                    callback(result);
+                }
+                isThreading = false;
+            }
+        }
+
+        private bool isCancelled()
+        {
+            if (isThreading)
+            {
+                if (cancellationToken != null)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
 
         public void ReloadFindStrings(Dictionary<string, FindString> findStrings)
         {
@@ -128,6 +171,7 @@ namespace BotEngineClient
                 ListConfig = listConfig;
                 EmulatorName = adbDevice.Model;
             }
+            isThreading = false;
         }
 
         public CommandResults ExecuteAction(string actionName)
@@ -889,7 +933,11 @@ namespace BotEngineClient
             {
                 List<string> imageNames = new List<string>();
                 bool ignoreMissing = false;
-
+                if (isCancelled())
+                {
+                    _logger.LogWarning("Command {0} has been cancelled by thread request", command.CommandId);
+                    return CommandResults.Cancelled;
+                }
                 _logger.LogDebug("Starting Command Execution");
                 if (Enum.TryParse(command.CommandId, true, out ValidCommandIds validCommandIds))
                 {

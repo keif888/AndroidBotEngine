@@ -26,7 +26,8 @@ namespace ScriptEditor
         private ServiceCollection services;
         private readonly ILogger _logger;
         private TextBoxWriter? writer;
-
+        private BotEngine.CommandResults threadResult;
+        private CancellationTokenSource threadCTS;
 
         public static IServiceProvider ServiceProvider { get; set; }
 
@@ -38,6 +39,7 @@ namespace ScriptEditor
             services = new ServiceCollection();
             ServiceProvider = ConfigureServices();
             _logger = (ILogger)ServiceProvider.GetService(typeof(ILogger));
+            threadCTS = null;
         }
 
         public void LoadConfig(BOTConfig gameConfig, BOTListConfig listConfig)
@@ -149,27 +151,58 @@ namespace ScriptEditor
 
                     BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig);
                     BotEngine.CommandResults cr;
+                    threadCTS = new CancellationTokenSource();
+                    //ToDo: Make the logging from these responsive, instead of character by character.
+                    bool threadActive = false;
+                    Thread botThread;
                     if (action.BeforeAction != null)
                     {
-                        // ToDo: Make these Async so logging appears as it runs.
-                        cr = bot.ExecuteAction(action.BeforeAction);
-                        if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                        bot.SetThreadingCommand(action.BeforeAction, ResultCallback);
+                        botThread = new Thread(bot.InitiateThreadingCommand);
+                        botThread.Start(threadCTS.Token);
+                        threadActive = true;
+                        while (threadActive)
+                        {
+                            threadActive = !botThread.Join(50);
+                            Application.DoEvents();
+                        }
+                        //cr = bot.ExecuteAction(action.BeforeAction);
+                        cr = threadResult;
+                        if (cr == BotEngineClient.BotEngine.CommandResults.ADBError  || cr == BotEngine.CommandResults.Cancelled)
                         {
                             return;
                         }
                     }
-                    // ToDo: Make these Async so logging appears as it runs.
-                    cr = bot.ExecuteAction(actionName);
+                    bot.SetThreadingCommand(actionName, ResultCallback);
+                    botThread = new Thread(bot.InitiateThreadingCommand);
+                    botThread.Start(threadCTS.Token);
+                    threadActive = true;
+                    while (threadActive)
+                    {
+                        threadActive = !botThread.Join(50);
+                        Application.DoEvents();
+                    }
+                    cr = threadResult;
+                    // cr = bot.ExecuteAction(actionName);
                     _logger.LogInformation(string.Format("Action result was {0}", cr));
-                    if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                    if (cr == BotEngineClient.BotEngine.CommandResults.ADBError || cr == BotEngine.CommandResults.Cancelled)
                     {
                         return;
                     }
                     if (action.AfterAction != null)
                     {
-                        // ToDo: Make these Async so logging appears as it runs.
-                        cr = bot.ExecuteAction(action.AfterAction);
-                        if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                        bot.SetThreadingCommand(action.AfterAction, ResultCallback);
+                        botThread = new Thread(bot.InitiateThreadingCommand);
+                        botThread.Start(threadCTS.Token);
+                        threadActive = true;
+                        while (threadActive)
+                        {
+                            threadActive = !botThread.Join(50);
+                            Application.DoEvents();
+                        }
+                        cr = threadResult;
+                        //cr = bot.ExecuteAction(action.AfterAction);
+                        if (cr == BotEngineClient.BotEngine.CommandResults.ADBError || cr == BotEngine.CommandResults.Cancelled)
                         {
                             return;
                         }
@@ -178,10 +211,23 @@ namespace ScriptEditor
             }
         }
 
+        public void ResultCallback(BotEngine.CommandResults result)
+        {
+            threadResult = result;
+        }
+
         private void TestAction_Load(object sender, EventArgs e)
         {
             //writer = new TextBoxWriter(tbLogger);
             //Console.SetOut(writer);
+        }
+
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            if (threadCTS != null)
+            {
+                threadCTS.Cancel();
+            }
         }
     }
 }

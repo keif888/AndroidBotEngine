@@ -581,7 +581,11 @@ namespace ScriptEditor
         private void ValidateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FindTextValidate findTextValidate = new FindTextValidate();
-            findTextValidate.LoadGameConfig(gameConfig);
+            if (!RefreshDeviceList())
+            {
+                return;
+            }
+            findTextValidate.SetupFindTextValidate(gameConfig, devicesList);
             findTextValidate.ShowDialog();
         }
 

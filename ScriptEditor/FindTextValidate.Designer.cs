@@ -43,6 +43,8 @@ namespace ScriptEditor
             this.pbFrame = new System.Windows.Forms.PictureBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.tssText = new System.Windows.Forms.ToolStripStatusLabel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cbDevices = new System.Windows.Forms.ComboBox();
             this.pnlControls.SuspendLayout();
             this.pnlGraphics.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbFrame)).BeginInit();
@@ -51,7 +53,7 @@ namespace ScriptEditor
             // 
             // btnGrab
             // 
-            this.btnGrab.Location = new System.Drawing.Point(344, 12);
+            this.btnGrab.Location = new System.Drawing.Point(601, 12);
             this.btnGrab.Name = "btnGrab";
             this.btnGrab.Size = new System.Drawing.Size(75, 23);
             this.btnGrab.TabIndex = 0;
@@ -61,7 +63,7 @@ namespace ScriptEditor
             // 
             // btnTest
             // 
-            this.btnTest.Location = new System.Drawing.Point(425, 12);
+            this.btnTest.Location = new System.Drawing.Point(682, 12);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(75, 23);
             this.btnTest.TabIndex = 1;
@@ -71,7 +73,7 @@ namespace ScriptEditor
             // 
             // btnReset
             // 
-            this.btnReset.Location = new System.Drawing.Point(506, 12);
+            this.btnReset.Location = new System.Drawing.Point(763, 12);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(75, 23);
             this.btnReset.TabIndex = 2;
@@ -81,6 +83,8 @@ namespace ScriptEditor
             // 
             // pnlControls
             // 
+            this.pnlControls.Controls.Add(this.label2);
+            this.pnlControls.Controls.Add(this.cbDevices);
             this.pnlControls.Controls.Add(this.cbFindString);
             this.pnlControls.Controls.Add(this.label1);
             this.pnlControls.Controls.Add(this.btnGrab);
@@ -95,7 +99,7 @@ namespace ScriptEditor
             // cbFindString
             // 
             this.cbFindString.FormattingEnabled = true;
-            this.cbFindString.Location = new System.Drawing.Point(82, 12);
+            this.cbFindString.Location = new System.Drawing.Point(339, 12);
             this.cbFindString.Name = "cbFindString";
             this.cbFindString.Size = new System.Drawing.Size(256, 23);
             this.cbFindString.Sorted = true;
@@ -104,7 +108,7 @@ namespace ScriptEditor
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 16);
+            this.label1.Location = new System.Drawing.Point(269, 16);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(64, 15);
             this.label1.TabIndex = 3;
@@ -144,6 +148,25 @@ namespace ScriptEditor
             this.tssText.Size = new System.Drawing.Size(88, 17);
             this.tssText.Text = "Nothing Found";
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 15);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(42, 15);
+            this.label2.TabIndex = 7;
+            this.label2.Text = "Device";
+            // 
+            // cbDevices
+            // 
+            this.cbDevices.DropDownWidth = 400;
+            this.cbDevices.FormattingEnabled = true;
+            this.cbDevices.Location = new System.Drawing.Point(61, 12);
+            this.cbDevices.Name = "cbDevices";
+            this.cbDevices.Size = new System.Drawing.Size(200, 23);
+            this.cbDevices.Sorted = true;
+            this.cbDevices.TabIndex = 6;
+            // 
             // FindTextValidate
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -152,6 +175,7 @@ namespace ScriptEditor
             this.Controls.Add(this.pnlGraphics);
             this.Controls.Add(this.pnlControls);
             this.Controls.Add(this.statusStrip1);
+            this.MinimumSize = new System.Drawing.Size(990, 540);
             this.Name = "FindTextValidate";
             this.Text = "FindTextValidate";
             this.pnlControls.ResumeLayout(false);
@@ -177,5 +201,7 @@ namespace ScriptEditor
         private System.Windows.Forms.PictureBox pbFrame;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel tssText;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox cbDevices;
     }
 }

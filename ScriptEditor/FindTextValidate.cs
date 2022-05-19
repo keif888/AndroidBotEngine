@@ -20,7 +20,7 @@ namespace ScriptEditor
     {
         private Image loadedFromADBImage;
         private BOTConfig gameConfig;
-        private AdbServer server;
+        //private AdbServer server;
         private readonly FindText findText;
         private Rectangle adbScreenSize;
         private bool foundDone;
@@ -48,37 +48,37 @@ namespace ScriptEditor
             }
             else
             {
-                if (server == null)
-                {
-                    server = new AdbServer();
-                    StartServerResult result = server.StartServer(AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", restartServerIfNewer: true);
-                    if (result != StartServerResult.AlreadyRunning)
-                    {
-                        Thread.Sleep(1500);
-                        AdbServerStatus status = server.GetStatus();
-                        if (!status.IsRunning)
-                        {
-                            MessageBox.Show("Unable to start ADB server");
-                            return;
-                        }
-                    }
-                }
+                //if (server == null)
+                //{
+                //    server = new AdbServer();
+                //    StartServerResult result = server.StartServer(AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", restartServerIfNewer: true);
+                //    if (result != StartServerResult.AlreadyRunning)
+                //    {
+                //        Thread.Sleep(1500);
+                //        AdbServerStatus status = server.GetStatus();
+                //        if (!status.IsRunning)
+                //        {
+                //            MessageBox.Show("Unable to start ADB server");
+                //            return;
+                //        }
+                //    }
+                //}
 
                 AdbClient client = new AdbClient();
-                List<DeviceData> devices = client.GetDevices();
+                //List<DeviceData> devices = client.GetDevices();
 
-                List<string> devicesList = new List<string>();
-                DeviceSelect deviceSelect = new DeviceSelect();
-                foreach (DeviceData device in devices)
-                {
-                    string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
-                    string deviceId = string.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
-                    devicesList.Add(deviceId);
-                }
-                deviceSelect.LoadList(devicesList);
-                if (deviceSelect.ShowDialog() == DialogResult.OK)
-                {
-                    string deviceId = deviceSelect.selectedItem;
+                //List<string> devicesList = new List<string>();
+                //DeviceSelect deviceSelect = new DeviceSelect();
+                //foreach (DeviceData device in devices)
+                //{
+                //    string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
+                //    string deviceId = string.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
+                //    devicesList.Add(deviceId);
+                //}
+                //deviceSelect.LoadList(devicesList);
+                //if (deviceSelect.ShowDialog() == DialogResult.OK)
+                //{
+                    string deviceId = cbDevices.SelectedItem.ToString();
                     DeviceData device = DeviceData.CreateFromAdbData(deviceId);
 
                     Framebuffer framebuffer = new Framebuffer(device, client);
@@ -87,7 +87,7 @@ namespace ScriptEditor
                     loadedFromADBImage = framebuffer.ToImage();
                     adbScreenSize = new Rectangle(0, 0, loadedFromADBImage.Width, loadedFromADBImage.Height);
                     BtnReset_Click(sender, e);
-                }
+                //}
             }
         }
 
@@ -164,7 +164,12 @@ namespace ScriptEditor
             }
         }
 
-        public void LoadGameConfig(BOTConfig GameConfig)
+        /// <summary>
+        /// Configures the combo boxes on the form
+        /// </summary>
+        /// <param name="GameConfig"></param>
+        /// <param name="devicesList"></param>
+        public void SetupFindTextValidate(BOTConfig GameConfig, List<string> devicesList)
         {
             gameConfig = GameConfig;
             cbFindString.Items.Clear();
@@ -173,6 +178,12 @@ namespace ScriptEditor
                 cbFindString.Items.Add(item.Key);
             }
             cbFindString.SelectedIndex = 0;
+            cbDevices.Items.Clear();
+            foreach (string item in devicesList)
+            {
+                cbDevices.Items.Add(item);
+            }
+            cbDevices.SelectedIndex = 0;
         }
     }
 }

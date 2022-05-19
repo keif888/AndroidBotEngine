@@ -90,6 +90,7 @@ namespace ScriptEditor
             this.cbActions.Location = new System.Drawing.Point(60, 12);
             this.cbActions.Name = "cbActions";
             this.cbActions.Size = new System.Drawing.Size(231, 23);
+            this.cbActions.Sorted = true;
             this.cbActions.TabIndex = 0;
             // 
             // tbLogger

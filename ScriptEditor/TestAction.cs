@@ -43,6 +43,12 @@ namespace ScriptEditor
             threadCTS = null;
         }
 
+        /// <summary>
+        /// Loads the config from the caller.
+        /// Must be executed before Showing the form.
+        /// </summary>
+        /// <param name="gameConfig"></param>
+        /// <param name="listConfig"></param>
         public void LoadConfig(BOTConfig gameConfig, BOTListConfig listConfig)
         {
             botGameConfig = gameConfig;

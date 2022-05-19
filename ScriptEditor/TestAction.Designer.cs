@@ -33,7 +33,10 @@ namespace ScriptEditor
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestAction));
             this.pnlControls = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cbDevices = new System.Windows.Forms.ComboBox();
             this.btnCancel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.btnTest = new System.Windows.Forms.Button();
@@ -45,6 +48,8 @@ namespace ScriptEditor
             // 
             // pnlControls
             // 
+            this.pnlControls.Controls.Add(this.label2);
+            this.pnlControls.Controls.Add(this.cbDevices);
             this.pnlControls.Controls.Add(this.btnCancel);
             this.pnlControls.Controls.Add(this.label1);
             this.pnlControls.Controls.Add(this.btnTest);
@@ -55,9 +60,28 @@ namespace ScriptEditor
             this.pnlControls.Size = new System.Drawing.Size(800, 45);
             this.pnlControls.TabIndex = 0;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 14);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(42, 15);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "Device";
+            // 
+            // cbDevices
+            // 
+            this.cbDevices.DropDownWidth = 400;
+            this.cbDevices.FormattingEnabled = true;
+            this.cbDevices.Location = new System.Drawing.Point(61, 11);
+            this.cbDevices.Name = "cbDevices";
+            this.cbDevices.Size = new System.Drawing.Size(200, 23);
+            this.cbDevices.Sorted = true;
+            this.cbDevices.TabIndex = 4;
+            // 
             // btnCancel
             // 
-            this.btnCancel.Location = new System.Drawing.Point(378, 11);
+            this.btnCancel.Location = new System.Drawing.Point(633, 11);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 3;
@@ -68,7 +92,7 @@ namespace ScriptEditor
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 17);
+            this.label1.Location = new System.Drawing.Point(267, 17);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(42, 15);
             this.label1.TabIndex = 2;
@@ -76,7 +100,7 @@ namespace ScriptEditor
             // 
             // btnTest
             // 
-            this.btnTest.Location = new System.Drawing.Point(297, 12);
+            this.btnTest.Location = new System.Drawing.Point(552, 11);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(75, 23);
             this.btnTest.TabIndex = 1;
@@ -87,7 +111,7 @@ namespace ScriptEditor
             // cbActions
             // 
             this.cbActions.FormattingEnabled = true;
-            this.cbActions.Location = new System.Drawing.Point(60, 12);
+            this.cbActions.Location = new System.Drawing.Point(315, 11);
             this.cbActions.Name = "cbActions";
             this.cbActions.Size = new System.Drawing.Size(231, 23);
             this.cbActions.Sorted = true;
@@ -117,6 +141,8 @@ namespace ScriptEditor
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.tbLogger);
             this.Controls.Add(this.pnlControls);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(810, 480);
             this.Name = "TestAction";
             this.Text = "TestAction";
             this.pnlControls.ResumeLayout(false);
@@ -135,5 +161,7 @@ namespace ScriptEditor
         private System.Windows.Forms.ComboBox cbActions;
         private System.Windows.Forms.Button btnCancel;
         private System.ComponentModel.BackgroundWorker testWorker;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox cbDevices;
     }
 }

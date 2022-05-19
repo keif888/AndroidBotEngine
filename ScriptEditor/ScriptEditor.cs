@@ -14,6 +14,7 @@ using BotEngineClient;
 using SharpAdbClient;
 using static BotEngineClient.BotEngine;
 using System.Text.Json.Nodes;
+using System.Threading;
 #endregion
 
 namespace ScriptEditor
@@ -26,11 +27,8 @@ namespace ScriptEditor
         private static BOTListConfig listConfig;
         private bool ChangePending;
         private bool UnsavedChanges;
-#pragma warning disable IDE0044 // Add readonly modifier
-#pragma warning disable IDE0051 // Remove unused private members
-        private AdbServer? server;
-#pragma warning restore IDE0051 // Remove unused private members
-#pragma warning restore IDE0044 // Add readonly modifier
+        private AdbServer server;
+        private List<string> devicesList;
         private JsonHelper.ConfigFileType loadedFileType;
         private TreeNode ActiveTreeNode;
         private static FileSystemWatcher fileWatcher;
@@ -624,7 +622,11 @@ namespace ScriptEditor
                         return;
                     }
                     TestAction testAction = new TestAction();
-                    testAction.LoadConfig(gameConfig, listConfig);
+                    if (!RefreshDeviceList())
+                    { 
+                        return;
+                    }
+                    testAction.SetupTestActionForm(gameConfig, listConfig, devicesList);
                     testAction.ShowDialog();
                 }
             }
@@ -1648,6 +1650,47 @@ namespace ScriptEditor
         #endregion
 
         #region Helper Methods
+        /// <summary>
+        /// Connects ADB server (if not connected), and refreshes the device list.
+        /// </summary>
+        private bool RefreshDeviceList()
+        {
+            if (server == null)
+            {
+                server = new AdbServer();
+                StartServerResult result = server.StartServer(AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", restartServerIfNewer: true);
+                if (result != StartServerResult.AlreadyRunning)
+                {
+                    Thread.Sleep(1500);
+                    AdbServerStatus status = server.GetStatus();
+                    if (!status.IsRunning)
+                    {
+                        MessageBox.Show("Unable to start ADB server");
+                        return false;
+                    }
+                }
+            }
+
+            AdbClient client = new AdbClient();
+            List<DeviceData> devices = client.GetDevices();
+
+            if (devicesList == null)
+            {
+                devicesList = new List<string>();
+            }
+            else
+            {
+                devicesList.Clear();
+            }
+            foreach (DeviceData device in devices)
+            {
+                string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
+                string deviceId = string.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
+                devicesList.Add(deviceId);
+            }
+            return true;
+        }
+
         /// <summary>
         /// Setup a file watcher on the file being edited, to warn user that it has been changed.
         /// Most useful on DeviceConfig files, as they are likely to change every 10 minutes.

@@ -49,7 +49,7 @@ namespace ScriptEditor
         /// </summary>
         /// <param name="gameConfig"></param>
         /// <param name="listConfig"></param>
-        public void LoadConfig(BOTConfig gameConfig, BOTListConfig listConfig)
+        public void SetupTestActionForm(BOTConfig gameConfig, BOTListConfig listConfig, List<string> devicesList)
         {
             botGameConfig = gameConfig;
             botListConfig = listConfig;
@@ -63,9 +63,18 @@ namespace ScriptEditor
                 cbActions.Items.Add(item.Key);
             }
             cbActions.SelectedIndex = 0;
+            cbDevices.Items.Clear();
+            foreach(string item in devicesList)
+            {
+                cbDevices.Items.Add(item);
+            }
+            cbDevices.SelectedIndex = 0;
         }
 
-
+        /// <summary>
+        /// Configures the logging services that the bot uses.  Set to Debug to capture as much as possible.
+        /// </summary>
+        /// <returns></returns>
         public IServiceProvider ConfigureServices()
         {
             LogLevel logLevel = LogLevel.Debug;
@@ -125,65 +134,43 @@ namespace ScriptEditor
             {
                 btnTest.Enabled = false;
                 btnCancel.Enabled = true;
-                if (server == null)
-                {
-                    server = new AdbServer();
-                    StartServerResult result = server.StartServer(AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", restartServerIfNewer: true);
-                    if (result != StartServerResult.AlreadyRunning)
-                    {
-                        Thread.Sleep(1500);
-                        AdbServerStatus status = server.GetStatus();
-                        if (!status.IsRunning)
-                        {
-                            MessageBox.Show("Unable to start ADB server");
-                            return;
-                        }
-                    }
-                }
-
-                AdbClient client = new AdbClient();
-                List<DeviceData> devices = client.GetDevices();
-
-                List<string> devicesList = new List<string>();
-                DeviceSelect deviceSelect = new DeviceSelect();
-                foreach (DeviceData device in devices)
-                {
-                    string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
-                    string deviceId = string.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
-                    devicesList.Add(deviceId);
-                }
-                deviceSelect.LoadList(devicesList);
-                if (deviceSelect.ShowDialog() == DialogResult.OK)
-                {
-                    WorkerArgument workerArgument = new WorkerArgument {
-                        action = action,
-                        actionName = actionName,
-                        deviceId = deviceSelect.selectedItem
-                    };
-                    // Execute Action on background thread.
-                    testWorker.RunWorkerAsync(workerArgument);
-
-                }
-                else
-                {
-                    btnTest.Enabled = true;
-                    btnCancel.Enabled = false;
-                }
+                WorkerArgument workerArgument = new WorkerArgument {
+                    action = action,
+                    actionName = actionName,
+                    deviceId = cbDevices.SelectedItem.ToString()
+                };
+                // Execute Action on background thread.
+                testWorker.RunWorkerAsync(workerArgument);
             }
         }
 
+        /// <summary>
+        /// Event that gets fired when the background worker is run.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TestWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             BackgroundWorker worker = sender as BackgroundWorker;
             e.Result = ExecuteTestAction(e.Argument as WorkerArgument);
         }
 
+        /// <summary>
+        /// Fires when the background worker thread has completed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void TestWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             btnTest.Enabled = true;
             btnCancel.Enabled = false;
         }
 
+        /// <summary>
+        /// Executes the test action within a background worker thread.
+        /// </summary>
+        /// <param name="workerArgument"></param>
+        /// <returns></returns>
         private BotEngine.CommandResults ExecuteTestAction(WorkerArgument workerArgument)
         {
             Action action = workerArgument.action;
@@ -228,11 +215,20 @@ namespace ScriptEditor
             return BotEngine.CommandResults.Exit;
         }
 
+        /// <summary>
+        /// Call back from a bot thread with the results of the bot action.
+        /// </summary>
+        /// <param name="result"></param>
         public void ResultCallback(BotEngine.CommandResults result)
         {
             threadResult = result;
         }
 
+        /// <summary>
+        /// Send a cancel instruction to the bot thread
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnCancel_Click(object sender, EventArgs e)
         {
             if (threadCTS != null)
@@ -244,6 +240,9 @@ namespace ScriptEditor
 
     }
 
+    /// <summary>
+    /// Class to pass values to the Background Worker Thread.
+    /// </summary>
     public class WorkerArgument
     {
         public string deviceId;

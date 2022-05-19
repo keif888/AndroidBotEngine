@@ -34,11 +34,12 @@ namespace ScriptEditor
         private void InitializeComponent()
         {
             this.pnlControls = new System.Windows.Forms.Panel();
+            this.btnCancel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.btnTest = new System.Windows.Forms.Button();
             this.cbActions = new System.Windows.Forms.ComboBox();
             this.tbLogger = new System.Windows.Forms.TextBox();
-            this.btnCancel = new System.Windows.Forms.Button();
+            this.testWorker = new System.ComponentModel.BackgroundWorker();
             this.pnlControls.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -53,6 +54,16 @@ namespace ScriptEditor
             this.pnlControls.Name = "pnlControls";
             this.pnlControls.Size = new System.Drawing.Size(800, 45);
             this.pnlControls.TabIndex = 0;
+            // 
+            // btnCancel
+            // 
+            this.btnCancel.Location = new System.Drawing.Point(378, 11);
+            this.btnCancel.Name = "btnCancel";
+            this.btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.btnCancel.TabIndex = 3;
+            this.btnCancel.Text = "Cancel";
+            this.btnCancel.UseVisualStyleBackColor = true;
+            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // label1
             // 
@@ -93,15 +104,10 @@ namespace ScriptEditor
             this.tbLogger.TabIndex = 1;
             this.tbLogger.WordWrap = false;
             // 
-            // btnCancel
+            // testWorker
             // 
-            this.btnCancel.Location = new System.Drawing.Point(378, 11);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 3;
-            this.btnCancel.Text = "Cancel";
-            this.btnCancel.UseVisualStyleBackColor = true;
-            this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
+            this.testWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.TestWorker_DoWork);
+            this.testWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.TestWorker_RunWorkerCompleted);
             // 
             // TestAction
             // 
@@ -128,5 +134,6 @@ namespace ScriptEditor
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.ComboBox cbActions;
         private System.Windows.Forms.Button btnCancel;
+        private System.ComponentModel.BackgroundWorker testWorker;
     }
 }

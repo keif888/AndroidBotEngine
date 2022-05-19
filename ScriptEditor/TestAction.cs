@@ -39,6 +39,7 @@ namespace ScriptEditor
             services = new ServiceCollection();
             ServiceProvider = ConfigureServices();
             _logger = (ILogger)ServiceProvider.GetService(typeof(ILogger));
+            _logger.BeginScope("TestAction");
             threadCTS = null;
         }
 
@@ -56,7 +57,6 @@ namespace ScriptEditor
                 cbActions.Items.Add(item.Key);
             }
             cbActions.SelectedIndex = 0;
-            Console.WriteLine("Is This Captured?");
         }
 
 
@@ -70,7 +70,7 @@ namespace ScriptEditor
                       options.IncludeScopes = true;
                       options.SingleLine = false;
                       options.TimestampFormat = "yyyy-MM-dd HH:mm:ss.ffffff ";
-                      options.ColorBehavior = Microsoft.Extensions.Logging.Console.LoggerColorBehavior.Enabled;
+                      options.ColorBehavior = Microsoft.Extensions.Logging.Console.LoggerColorBehavior.Disabled;
                   })
                   .AddDebug()
                   .SetMinimumLevel(logLevel)
@@ -83,7 +83,7 @@ namespace ScriptEditor
                     options.IncludeScopes = true;
                     options.SingleLine = false;
                     options.TimestampFormat = "yyyy-MM-dd HH:mm:ss.ffffff ";
-                    options.ColorBehavior = Microsoft.Extensions.Logging.Console.LoggerColorBehavior.Enabled;
+                    options.ColorBehavior = Microsoft.Extensions.Logging.Console.LoggerColorBehavior.Disabled;
                 })
                  .SetMinimumLevel(logLevel)
                 );
@@ -117,6 +117,8 @@ namespace ScriptEditor
             }
             if (action != null)
             {
+                btnTest.Enabled = false;
+                btnCancel.Enabled = true;
                 if (server == null)
                 {
                     server = new AdbServer();
@@ -147,68 +149,77 @@ namespace ScriptEditor
                 deviceSelect.LoadList(devicesList);
                 if (deviceSelect.ShowDialog() == DialogResult.OK)
                 {
-                    string deviceId = deviceSelect.selectedItem;
+                    WorkerArgument workerArgument = new WorkerArgument {
+                        action = action,
+                        actionName = actionName,
+                        deviceId = deviceSelect.selectedItem
+                    };
+                    // Execute Action on background thread.
+                    testWorker.RunWorkerAsync(workerArgument);
 
-                    BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig);
-                    BotEngine.CommandResults cr;
-                    threadCTS = new CancellationTokenSource();
-                    //ToDo: Make the logging from these responsive, instead of character by character.
-                    bool threadActive = false;
-                    Thread botThread;
-                    if (action.BeforeAction != null)
-                    {
-                        bot.SetThreadingCommand(action.BeforeAction, ResultCallback);
-                        botThread = new Thread(bot.InitiateThreadingCommand);
-                        botThread.Start(threadCTS.Token);
-                        threadActive = true;
-                        while (threadActive)
-                        {
-                            threadActive = !botThread.Join(50);
-                            Application.DoEvents();
-                        }
-                        //cr = bot.ExecuteAction(action.BeforeAction);
-                        cr = threadResult;
-                        if (cr == BotEngineClient.BotEngine.CommandResults.ADBError  || cr == BotEngine.CommandResults.Cancelled)
-                        {
-                            return;
-                        }
-                    }
-                    bot.SetThreadingCommand(actionName, ResultCallback);
-                    botThread = new Thread(bot.InitiateThreadingCommand);
-                    botThread.Start(threadCTS.Token);
-                    threadActive = true;
-                    while (threadActive)
-                    {
-                        threadActive = !botThread.Join(50);
-                        Application.DoEvents();
-                    }
-                    cr = threadResult;
-                    // cr = bot.ExecuteAction(actionName);
-                    _logger.LogInformation(string.Format("Action result was {0}", cr));
-                    if (cr == BotEngineClient.BotEngine.CommandResults.ADBError || cr == BotEngine.CommandResults.Cancelled)
-                    {
-                        return;
-                    }
-                    if (action.AfterAction != null)
-                    {
-                        bot.SetThreadingCommand(action.AfterAction, ResultCallback);
-                        botThread = new Thread(bot.InitiateThreadingCommand);
-                        botThread.Start(threadCTS.Token);
-                        threadActive = true;
-                        while (threadActive)
-                        {
-                            threadActive = !botThread.Join(50);
-                            Application.DoEvents();
-                        }
-                        cr = threadResult;
-                        //cr = bot.ExecuteAction(action.AfterAction);
-                        if (cr == BotEngineClient.BotEngine.CommandResults.ADBError || cr == BotEngine.CommandResults.Cancelled)
-                        {
-                            return;
-                        }
-                    }
+                }
+                else
+                {
+                    btnTest.Enabled = true;
+                    btnCancel.Enabled = false;
                 }
             }
+        }
+
+        private void TestWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+            e.Result = ExecuteTestAction(e.Argument as WorkerArgument);
+        }
+
+        private void TestWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            btnTest.Enabled = true;
+            btnCancel.Enabled = false;
+        }
+
+        private BotEngine.CommandResults ExecuteTestAction(WorkerArgument workerArgument)
+        {
+            Action action = workerArgument.action;
+            string deviceId = workerArgument.deviceId;
+            string actionName = workerArgument.actionName;
+
+            BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig);
+            BotEngine.CommandResults cr;
+            threadCTS = new CancellationTokenSource();
+            Thread botThread;
+            if (action.BeforeAction != null)
+            {
+                bot.SetThreadingCommand(action.BeforeAction, ResultCallback);
+                botThread = new Thread(bot.InitiateThreadingCommand);
+                botThread.Start(threadCTS.Token);
+                botThread.Join();
+                cr = threadResult;
+                if (cr == BotEngineClient.BotEngine.CommandResults.ADBError || cr == BotEngine.CommandResults.Cancelled)
+                {
+                    return cr;
+                }
+            }
+            bot.SetThreadingCommand(actionName, ResultCallback);
+            botThread = new Thread(bot.InitiateThreadingCommand);
+            botThread.Start(threadCTS.Token);
+            botThread.Join();
+            cr = threadResult;
+            _logger.LogInformation(string.Format("Action result was {0}", cr));
+            if (cr == BotEngineClient.BotEngine.CommandResults.ADBError || cr == BotEngine.CommandResults.Cancelled)
+            {
+                return cr;
+            }
+            if (action.AfterAction != null)
+            {
+                bot.SetThreadingCommand(action.AfterAction, ResultCallback);
+                botThread = new Thread(bot.InitiateThreadingCommand);
+                botThread.Start(threadCTS.Token);
+                botThread.Join();
+                cr = threadResult;
+                return cr;
+            }
+            return BotEngine.CommandResults.Exit;
         }
 
         public void ResultCallback(BotEngine.CommandResults result)
@@ -229,5 +240,14 @@ namespace ScriptEditor
                 threadCTS.Cancel();
             }
         }
+
+
+    }
+
+    public class WorkerArgument
+    {
+        public string deviceId;
+        public string actionName;
+        public Action action;
     }
 }

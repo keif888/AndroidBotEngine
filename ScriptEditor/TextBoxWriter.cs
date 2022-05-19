@@ -12,6 +12,7 @@ namespace ScriptEditor
     {
         private TextBoxBase control;
         private StringBuilder? Builder;
+        private StringBuilder bufferUntilNewLine;
 
         public TextBoxWriter(TextBox control)
         {
@@ -24,17 +25,27 @@ namespace ScriptEditor
             Write(ch.ToString());
         }
 
+        private void BufferString(string s)
+        {
+            if (bufferUntilNewLine == null)
+            {
+                bufferUntilNewLine = new StringBuilder(80);
+            }
+            bufferUntilNewLine.Append(s);
+        }
+
         public override void Write(string s)
         {
-            // Strip the console formatting.
-            if (s.Contains("\u001b["))
+            BufferString(s);
+
+            if (bufferUntilNewLine.ToString().EndsWith(Environment.NewLine))
             {
-                s = Regex.Replace(s, "\u001b\\[\\d+m", "");
+                if ((control.IsHandleCreated))
+                    AppendText(bufferUntilNewLine.ToString());
+                else
+                    BufferText(bufferUntilNewLine.ToString());
+                bufferUntilNewLine.Clear();
             }
-            if ((control.IsHandleCreated))
-                AppendText(s);
-            else
-                BufferText(s);
         }
 
         public override void WriteLine(string s)

@@ -118,7 +118,6 @@ namespace ScriptEditor
             this.Controls.Add(this.pnlControls);
             this.Name = "TestAction";
             this.Text = "TestAction";
-            this.Load += new System.EventHandler(this.TestAction_Load);
             this.pnlControls.ResumeLayout(false);
             this.pnlControls.PerformLayout();
             this.ResumeLayout(false);

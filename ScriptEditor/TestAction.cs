@@ -227,12 +227,6 @@ namespace ScriptEditor
             threadResult = result;
         }
 
-        private void TestAction_Load(object sender, EventArgs e)
-        {
-            //writer = new TextBoxWriter(tbLogger);
-            //Console.SetOut(writer);
-        }
-
         private void btnCancel_Click(object sender, EventArgs e)
         {
             if (threadCTS != null)

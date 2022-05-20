@@ -882,6 +882,14 @@ namespace BotEngineClient
             }
         }
 
+        /// <summary>
+        /// If there are changes within the changeDetectArea that exceed the changeDetectDifference, then return Missing.
+        /// Use case is where you want to carry out an action if nothing has changed.
+        /// </summary>
+        /// <param name="changeDetectArea"></param>
+        /// <param name="changeDetectDifference"></param>
+        /// <param name="timeOut"></param>
+        /// <returns></returns>
         private CommandResults WaitForNoChange(SearchArea changeDetectArea, float changeDetectDifference, int timeOut)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
@@ -909,7 +917,7 @@ namespace BotEngineClient
                                 {
                                     float difference = ImageTool.GetPercentageDifference(savedPart, newPart, 3);
                                     _logger.LogDebug("Image Difference was {0}", difference);
-                                    if (difference <= changeDetectDifference)
+                                    if (difference >= changeDetectDifference)
                                     {
                                         _logger.LogDebug("Failure - Image has changed to much");
                                         result = CommandResults.Missing;

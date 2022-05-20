@@ -37,6 +37,7 @@ namespace BotEngineClient
         private BotEngineCallback callback;
         private CancellationToken cancellationToken;
         private bool isThreading;
+        private StringBuilder activePath;
 
         public enum CommandResults
         {
@@ -172,13 +173,16 @@ namespace BotEngineClient
                 EmulatorName = adbDevice.Model;
             }
             isThreading = false;
+            activePath = new StringBuilder();
         }
 
         public CommandResults ExecuteAction(string actionName)
         {
-            using (_logger.BeginScope(String.Format("{0}:{1}({2})", EmulatorName,Helpers.CurrentMethodName(), actionName)))
+            using (_logger.BeginScope(string.Format("{0}:{1}({2})", EmulatorName,Helpers.CurrentMethodName(), actionName)))
             {
                 _logger.LogInformation("Starting Action");
+                string currentPath = string.Format("{0}/", actionName);
+                activePath.Append(currentPath);
                 Action action;
                 if (SystemActions.ContainsKey(actionName))
                 {
@@ -214,6 +218,7 @@ namespace BotEngineClient
                         break;
                     }
                 }
+                activePath.Remove(activePath.Length - currentPath.Length, currentPath.Length);
                 return result;
             }
         }
@@ -416,7 +421,9 @@ namespace BotEngineClient
                     {
                         result = ExecuteCommand(command, additionalData);
                         if (result != CommandResults.Ok)
+                        {
                             return result;
+                        }
                     }
 
                 }
@@ -456,7 +463,9 @@ namespace BotEngineClient
                     {
                         result = ExecuteCommand(command, additionalData);
                         if (result != CommandResults.Ok)
+                        {
                             return result;
+                        }
                     }
                 }
                 return result;
@@ -666,7 +675,9 @@ namespace BotEngineClient
                     {
                         result = ExecuteCommand(command, point);
                         if (result != CommandResults.Ok)
+                        {
                             return result;
+                        }
                     }
                 }
                 return CommandResults.Ok;
@@ -724,7 +735,9 @@ namespace BotEngineClient
                         {
                             result = ExecuteCommand(command, additionalData);
                             if (result != CommandResults.Ok)
+                            {
                                 return result;
+                            }
                         }
                     }
                     Thread.Sleep(50);
@@ -792,7 +805,9 @@ namespace BotEngineClient
                         {
                             result = ExecuteCommand(command, additionalData);
                             if (result != CommandResults.Ok)
+                            {
                                 return result;
+                            }
                         }
                     }
                     Thread.Sleep(50);
@@ -934,11 +949,19 @@ namespace BotEngineClient
             }
         }
 
-
+        /// <summary>
+        /// Controller to call all the various commands, handling all the validation etc.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="additionalData"></param>
+        /// <returns></returns>
         private CommandResults ExecuteCommand(Command command, Object? additionalData)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), command.CommandId)))
             {
+                string currentPath = string.Empty;
+                CommandResults results = CommandResults.Ok;
+
                 List<string> imageNames = new List<string>();
                 bool ignoreMissing = false;
                 if (isCancelled())
@@ -947,6 +970,9 @@ namespace BotEngineClient
                     return CommandResults.Cancelled;
                 }
                 _logger.LogDebug("Starting Command Execution");
+                currentPath = string.Format("{0}.{1}/", command.CommandId, command.CommandNumber);
+                activePath.Append(currentPath);
+
                 if (Enum.TryParse(command.CommandId, true, out ValidCommandIds validCommandIds))
                 {
                     switch (validCommandIds)
@@ -955,39 +981,49 @@ namespace BotEngineClient
                             if (command.Location == null)
                             {
                                 _logger.LogError("Command {0} Error Location is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            ADBClick(command.Location.X, command.Location.Y);
+                            else
+                            {
+                                ADBClick(command.Location.X, command.Location.Y);
+                            }
                             break;
                         case ValidCommandIds.ClickWhenNotFoundInArea:
                             if (command.Areas == null)
                             {
                                 _logger.LogError("Command {0} Error Areas is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.ImageName == null)
+                            else if (command.ImageName == null)
                             {
                                 _logger.LogError("Command {0} Error ImageName is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (!FindStrings.ContainsKey(command.ImageName))
+                            else if (!FindStrings.ContainsKey(command.ImageName))
                             {
                                 _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            return ClickWhenNotFoundInArea(command.ImageName, FindStrings[command.ImageName], command.Areas);
+                            else
+                            {
+                                results = ClickWhenNotFoundInArea(command.ImageName, FindStrings[command.ImageName], command.Areas);
+                            }
+                            break;
                         case ValidCommandIds.Drag:
                             if (command.Swipe == null)
                             {
                                 _logger.LogError("Command {0} Error Swipe is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.Delay == null)
+                            else if (command.Delay == null)
                             {
                                 _logger.LogError("Command {0} Error Delay is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            ADBSwipe(command.Swipe.X1, command.Swipe.Y1, command.Swipe.X2, command.Swipe.Y2, (int)command.Delay);
+                            else
+                            {
+                                ADBSwipe(command.Swipe.X1, command.Swipe.Y1, command.Swipe.X2, command.Swipe.Y2, (int)command.Delay);
+                            }
                             break;
                         case ValidCommandIds.Exit:
                             return CommandResults.Exit;
@@ -995,19 +1031,19 @@ namespace BotEngineClient
                             if (command.Value == null)
                             {
                                 _logger.LogError("Command {0} Error Value is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (additionalData == null)
+                            else if (additionalData == null)
                             {
                                 _logger.LogError("Command {0} Error additionalData is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (!(additionalData is XYCoords))
+                            else if (!(additionalData is XYCoords))
                             {
                                 _logger.LogError("Command {0} Error additionalData is missing XYCoords", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.Value.ToLower() == "x")
+                            else if (command.Value.ToLower() == "x")
                             {
                                 ADBSendKeys(((XYCoords)additionalData).X.ToString());
                             }
@@ -1020,279 +1056,360 @@ namespace BotEngineClient
                             if (command.ImageName == null)
                             {
                                 _logger.LogError("Command {0} Error ImageName is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (!FindStrings.ContainsKey(command.ImageName))
+                            else if (!FindStrings.ContainsKey(command.ImageName))
                             {
                                 _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.IgnoreMissing != null)
-                                ignoreMissing = (bool)command.IgnoreMissing;
-                            return FindClick(command.ImageName, FindStrings[command.ImageName], ignoreMissing);
+                            else
+                            {
+                                if (command.IgnoreMissing != null)
+                                {
+                                    ignoreMissing = (bool)command.IgnoreMissing;
+                                }
+                                results = FindClick(command.ImageName, FindStrings[command.ImageName], ignoreMissing);
+                            }
+                            break;
                         case ValidCommandIds.FindClickAndWait:
                             if (command.ImageName == null)
                             {
                                 _logger.LogError("Command {0} Error ImageName is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (!FindStrings.ContainsKey(command.ImageName))
+                            else if (!FindStrings.ContainsKey(command.ImageName))
                             {
                                 _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.TimeOut == null)
+                            else if (command.TimeOut == null)
                             {
                                 _logger.LogError("Command {0} Error Timeout is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            return FindClickAndWait(command.ImageName, FindStrings[command.ImageName], (int)command.TimeOut);
+                            else
+                            {
+                                results = FindClickAndWait(command.ImageName, FindStrings[command.ImageName], (int)command.TimeOut);
+                            }
+                            break;
                         case ValidCommandIds.IfExists:
                             if (command.Commands == null)
                             {
                                 _logger.LogError("Command {0} Error Commands is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.ImageName == null)
+                            else if (command.ImageName == null)
                             {
                                 _logger.LogError("Command {0} Error ImageName is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (!FindStrings.ContainsKey(command.ImageName))
+                            else if (!FindStrings.ContainsKey(command.ImageName))
                             {
                                 _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            return IfExists(command.ImageName, FindStrings[command.ImageName], command.Commands, additionalData);
+                            else
+                            {
+                                results = IfExists(command.ImageName, FindStrings[command.ImageName], command.Commands, additionalData);
+                            }
+                            break;
                         case ValidCommandIds.IfNotExists:
                             if (command.ImageName == null)
                             {
                                 _logger.LogError("Command {0} Error ImageName is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.Commands == null)
+                            else if (command.Commands == null)
                             {
                                 _logger.LogError("Command {0} Error Commands is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (!FindStrings.ContainsKey(command.ImageName))
+                            else if (!FindStrings.ContainsKey(command.ImageName))
                             {
                                 _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            return IfNotExists(command.ImageName, FindStrings[command.ImageName], command.Commands, additionalData);
+                            else
+                            {
+                                results = IfNotExists(command.ImageName, FindStrings[command.ImageName], command.Commands, additionalData);
+                            }
+                            break;
                         case ValidCommandIds.LoopCoordinates:
                             if (command.Coordinates == null)
                             {
                                 _logger.LogError("Command {0} Error Coordinates is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.Commands == null)
+                            else if (command.Commands == null)
                             {
                                 _logger.LogError("Command {0} Error Commands is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            return LoopCoordinates(command.Coordinates, command.Commands);
+                            else
+                            {
+                                results = LoopCoordinates(command.Coordinates, command.Commands);
+                            }
+                            break;
                         case ValidCommandIds.LoopUntilFound:
                             if ((command.ImageName == null) && (command.ImageNames == null))
                             {
                                 _logger.LogError("Command {0} Error ImageName or ImageNames is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.Commands == null)
+                            else if (command.Commands == null)
                             {
                                 _logger.LogError("Command {0} Error Commands is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.TimeOut == null)
+                            else if (command.TimeOut == null)
                             {
                                 _logger.LogError("Command {0} Error Timeout is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            imageNames = new List<string>();
-                            if (command.ImageName != null)
+                            else
                             {
-                                if (!FindStrings.ContainsKey(command.ImageName))
+                                imageNames = new List<string>();
+                                if (command.ImageName != null)
                                 {
-                                    _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
-                                    return CommandResults.InputError;
-                                }
-                                imageNames.Add(command.ImageName);
-                            }
-                            if (command.ImageNames != null)
-                            {
-                                foreach (string item in command.ImageNames)
-                                {
-                                    if (!FindStrings.ContainsKey(item))
+                                    if (!FindStrings.ContainsKey(command.ImageName))
                                     {
-                                        _logger.LogError("Command {0} Error ImageNames {1} doesn't exist in FindStrings", command.CommandId, item);
-                                        return CommandResults.InputError;
+                                        _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
+                                        results = CommandResults.InputError;
+                                        break;
                                     }
+                                    imageNames.Add(command.ImageName);
                                 }
-                                imageNames.AddRange(command.ImageNames);
+                                if (command.ImageNames != null)
+                                {
+                                    foreach (string item in command.ImageNames)
+                                    {
+                                        if (!FindStrings.ContainsKey(item))
+                                        {
+                                            _logger.LogError("Command {0} Error ImageNames {1} doesn't exist in FindStrings", command.CommandId, item);
+                                            results = CommandResults.InputError;
+                                            break;
+                                        }
+                                    }
+                                    imageNames.AddRange(command.ImageNames);
+                                }
+                                if (results == CommandResults.Ok)
+                                {
+                                    results = LoopUntilFound(imageNames, command.Commands, (int)command.TimeOut, additionalData);
+                                }
                             }
-                            return LoopUntilFound(imageNames, command.Commands, (int)command.TimeOut, additionalData);
+                            break;
                         case ValidCommandIds.LoopUntilNotFound:
                             if ((command.ImageName == null) && (command.ImageNames == null))
                             {
                                 _logger.LogError("Command {0} Error ImageName or ImageNames is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.Commands == null)
+                            else if (command.Commands == null)
                             {
                                 _logger.LogError("Command {0} Error Commands is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.TimeOut == null)
+                            else if (command.TimeOut == null)
                             {
                                 _logger.LogError("Command {0} Error Timeout is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            imageNames = new List<string>();
-                            if (command.ImageName != null)
+                            else
                             {
-                                if (!FindStrings.ContainsKey(command.ImageName))
+                                imageNames = new List<string>();
+                                if (command.ImageName != null)
                                 {
-                                    _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
-                                    return CommandResults.InputError;
-                                }
-                                imageNames.Add(command.ImageName);
-                            }
-                            if (command.ImageNames != null)
-                            {
-                                foreach (string item in command.ImageNames)
-                                {
-                                    if (!FindStrings.ContainsKey(item))
+                                    if (!FindStrings.ContainsKey(command.ImageName))
                                     {
-                                        _logger.LogError("Command {0} Error ImageNames {1} doesn't exist in FindStrings", command.CommandId, item);
-                                        return CommandResults.InputError;
+                                        _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
+                                        results = CommandResults.InputError;
+                                        break;
                                     }
+                                    imageNames.Add(command.ImageName);
                                 }
-                                imageNames.AddRange(command.ImageNames);
+                                if (command.ImageNames != null)
+                                {
+                                    foreach (string item in command.ImageNames)
+                                    {
+                                        if (!FindStrings.ContainsKey(item))
+                                        {
+                                            _logger.LogError("Command {0} Error ImageNames {1} doesn't exist in FindStrings", command.CommandId, item);
+                                            results = CommandResults.InputError;
+                                            break;
+                                        }
+                                    }
+                                    imageNames.AddRange(command.ImageNames);
+                                }
+                                if (results == CommandResults.Ok)
+                                {
+                                    results = LoopUntilNotFound(imageNames, command.Commands, (int)command.TimeOut, additionalData);
+                                }
                             }
-                            return LoopUntilNotFound(imageNames, command.Commands, (int)command.TimeOut, additionalData);
+                            break;
                         case ValidCommandIds.Restart:
-                            return CommandResults.Restart;
+                            results = CommandResults.Restart;
+                            break;
                         case ValidCommandIds.RunAction:
                             if (command.ActionName == null)
                             {
                                 _logger.LogError("Command {0} Error ActionName is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            return ExecuteAction(command.ActionName);
+                            else
+                            {
+                                results = ExecuteAction(command.ActionName);
+                            }
+                            break;
                         case ValidCommandIds.Sleep:
                             if (command.Delay == null)
-                                return CommandResults.InputError;
-                            Thread.Sleep((int)command.Delay);
+                            {
+                                results = CommandResults.InputError;
+                            }
+                            else
+                            {
+                                Thread.Sleep((int)command.Delay);
+                            }
                             break;
                         case ValidCommandIds.StartGame:
                             if (command.Value == null)
                             {
                                 _logger.LogError("Command {0} Error Value is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.TimeOut == null)
+                            else if (command.TimeOut == null)
                             {
                                 _logger.LogError("Command {0} Error Timeout is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            return ADBStartGame(command.Value, (int)command.TimeOut);
+                            else
+                            {
+                                results = ADBStartGame(command.Value, (int)command.TimeOut);
+                            }
+                            break;
                         case ValidCommandIds.StopGame:
                             if (command.Value == null)
                             {
                                 _logger.LogError("Command {0} Error Value is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.TimeOut == null)
+                            else if (command.TimeOut == null)
                             {
                                 _logger.LogError("Command {0} Error Timeout is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            return ADBStopGame(command.Value, (int)command.TimeOut);
+                            else
+                            {
+                                results = ADBStopGame(command.Value, (int)command.TimeOut);
+                            }
+                            break;
                         case ValidCommandIds.WaitFor:
                             if (command.ImageName == null)
                             {
                                 _logger.LogError("Command {0} Error ImageName is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (!FindStrings.ContainsKey(command.ImageName))
+                            else if (!FindStrings.ContainsKey(command.ImageName))
                             {
                                 _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.TimeOut == null)
+                            else if (command.TimeOut == null)
                             {
                                 _logger.LogError("Command {0} Error Timeout is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.IgnoreMissing != null)
-                                ignoreMissing = (bool)command.IgnoreMissing;
+                            else
+                            {
+                                if (command.IgnoreMissing != null)
+                                    ignoreMissing = (bool)command.IgnoreMissing;
 
-                            return WaitFor(command.ImageName, FindStrings[command.ImageName], ignoreMissing, (int)command.TimeOut);
+                                results = WaitFor(command.ImageName, FindStrings[command.ImageName], ignoreMissing, (int)command.TimeOut);
+                            }
+                            break;
                         case ValidCommandIds.WaitForThenClick:
                             if (command.ImageName == null)
                             {
                                 _logger.LogError("Command {0} Error ImageName is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (!FindStrings.ContainsKey(command.ImageName))
+                            else if (!FindStrings.ContainsKey(command.ImageName))
                             {
                                 _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.TimeOut == null)
+                            else if (command.TimeOut == null)
                             {
                                 _logger.LogError("Command {0} Error Timeout is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            return WaitForThenClick(command.ImageName, FindStrings[command.ImageName], (int)command.TimeOut);
+                            else
+                            {
+                                results = WaitForThenClick(command.ImageName, FindStrings[command.ImageName], (int)command.TimeOut);
+                            }
+                            break;
                         case ValidCommandIds.WaitForChange:
                             if (command.ChangeDetectArea == null)
                             {
                                 _logger.LogError("Command {0} Error ChangeDetectArea is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.ChangeDetectDifference == null)
+                            else if (command.ChangeDetectDifference == null)
                             {
                                 _logger.LogError("Command {0} Error ChangeDetectDifference is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.TimeOut == null)
+                            else if (command.TimeOut == null)
                             {
                                 _logger.LogError("Command {0} Error TimeOut is null", command.CommandId);
                                 return CommandResults.InputError;
                             }
-                            return WaitForChange(command.ChangeDetectArea, (float)command.ChangeDetectDifference, (int)command.TimeOut);
+                            else
+                            {
+                                results = WaitForChange(command.ChangeDetectArea, (float)command.ChangeDetectDifference, (int)command.TimeOut);
+                            }
+                            break;
                         case ValidCommandIds.WaitForNoChange:
                             if (command.ChangeDetectArea == null)
                             {
                                 _logger.LogError("Command {0} Error ChangeDetectArea is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.ChangeDetectDifference == null)
+                            else if (command.ChangeDetectDifference == null)
                             {
                                 _logger.LogError("Command {0} Error ChangeDetectDifference is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            if (command.TimeOut == null)
+                            else if (command.TimeOut == null)
                             {
                                 _logger.LogError("Command {0} Error TimeOut is null", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            return WaitForNoChange(command.ChangeDetectArea, (float)command.ChangeDetectDifference, (int)command.TimeOut);
+                            else
+                            {
+                                results = WaitForNoChange(command.ChangeDetectArea, (float)command.ChangeDetectDifference, (int)command.TimeOut);
+                            }
+                            break;
                         case ValidCommandIds.LoopCounter:
                             if (string.IsNullOrEmpty(command.Value))
                             {
                                 _logger.LogError("Command {0} Error Value is null or empty", command.CommandId);
-                                return CommandResults.InputError;
+                                results = CommandResults.InputError;
                             }
-                            int NumberOFLoops = 0;
-                            if (!int.TryParse(command.Value, out NumberOFLoops))
+                            else
                             {
-                                _logger.LogError("Command {0} Error Value {1} is not an integer", command.CommandId, command.Value);
-                                return CommandResults.InputError;
+                                int NumberOFLoops = 0;
+                                if (!int.TryParse(command.Value, out NumberOFLoops))
+                                {
+                                    _logger.LogError("Command {0} Error Value {1} is not an integer", command.CommandId, command.Value);
+                                    results = CommandResults.InputError;
+                                }
+                                else
+                                {
+                                    results = LoopCounter(NumberOFLoops, command.Commands, additionalData);
+                                }
                             }
-                            return LoopCounter(NumberOFLoops, command.Commands, additionalData);
+                            break;
                         default:
                             _logger.LogError("Valid but unhandled Command {0}", command.CommandId);
                             throw new Exception(string.Format("Valid but unhandled CommandId {0}", command.CommandId));
@@ -1303,7 +1420,8 @@ namespace BotEngineClient
                     _logger.LogError("Unrecognised Command {0}", command.CommandId);
                     throw new Exception(string.Format("Unrecognised CommandId {0}", command.CommandId));
                 }
-                return CommandResults.Ok;
+                activePath.Remove(activePath.Length - currentPath.Length, currentPath.Length);
+                return results;
             }
         }
 

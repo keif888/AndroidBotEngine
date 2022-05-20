@@ -398,11 +398,36 @@ namespace BotEngineClient
         /// Used to store what time of day a "ActionType = Daily" runs once after.
         /// </summary>
         public DateTime? DailyScheduledTime { get; set; }
+
+        /// <summary>
+        /// Used to store where a loop got up to, the last time it was executing.
+        /// This is used to restart where the loop was at, rather than starting from the beginning.
+        /// Very useful for LoopCounter, where an unexpected condition causes it to drop out.
+        /// 
+        /// The Key is the path to the loop.
+        /// The Value is the iteration that the loop was up to.
+        /// </summary>
+        public Dictionary<string,string>? CommandLoopStatus { get; set; }
+
+        /// <summary>
+        /// Used to store a value that can override the "Value" field within a Command.
+        /// 
+        /// The Key is the path to the Value field that is being overridden.  This is useful for LoopCounter.
+        /// eg.
+        /// ActionName/IfExists???  ToDo: Work out the path.
+        /// 
+        /// The Value is the value that will be used to replace the Value field.
+        /// </summary>
+        public Dictionary<string,string>? CommandValueOverride { get; set; }
+
         public void MarkStartupBot(int Frequency)
         {
             LastRun = DateTime.Now - TimeSpan.FromMinutes(Frequency);
         }
 
+        /// <summary>
+        /// Used to indicate that this action has been executed successfully, and to know when that was.
+        /// </summary>
         public void MarkExecuted()
         {
             LastRun = DateTime.Now;

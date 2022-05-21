@@ -874,6 +874,10 @@ namespace BotEngineClient
             {
                 CommandResults result = CommandResults.Ok;
                 int startAt = GetLastKnownLoopStatusFromActionActivity(numberOFLoops, actionActivity);
+                if (actionActivity.CommandValueOverride != null && actionActivity.CommandValueOverride.ContainsKey(activePath.ToString()))
+                {
+                    int.TryParse(actionActivity.CommandValueOverride[activePath.ToString()], out numberOFLoops);
+                }
                 for (int i = startAt; i < numberOFLoops; i++)
                 {
                     actionActivity.CommandLoopStatus[activePath.ToString()] = i.ToString();

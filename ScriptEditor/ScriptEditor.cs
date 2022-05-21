@@ -585,6 +585,7 @@ namespace ScriptEditor
             {
                 return;
             }
+            RefreshGameConfig();
             findTextValidate.SetupFindTextValidate(gameConfig, devicesList);
             findTextValidate.ShowDialog();
         }
@@ -1005,69 +1006,7 @@ namespace ScriptEditor
         /// </summary>
         private void SaveGameConfig()
         {
-            BOTConfig gameConfig = new BOTConfig
-            {
-                FileId = loadedFileType.ToString(),
-                FindStrings = new Dictionary<string, FindString>(),
-                SystemActions = new Dictionary<string, BotEngineClient.Action>(),
-                Actions = new Dictionary<string, BotEngineClient.Action>()
-            };
-            foreach (TreeNode parent in tvBotData.Nodes)
-            {
-                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "FindStrings")
-                {
-                    foreach (TreeNode child in parent.Nodes)
-                    {
-                        gameConfig.FindStrings.Add(child.Name, (FindString)child.Tag);
-                    }
-                }
-                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "SystemActions")
-                {
-                    foreach (TreeNode child in parent.Nodes)
-                    {
-                        BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
-                        BotEngineClient.Action newAction = new BotEngineClient.Action
-                        {
-                            ActionType = sourceAction.ActionType,
-                            AfterAction = sourceAction.AfterAction,
-                            BeforeAction = sourceAction.BeforeAction
-                        };
-                        if (child.Nodes.Count != 0)
-                        {
-                            int commandNumber = 10;
-                            List<Command> childCommands = new List<Command>();
-                            LoadCommandList(childCommands, child, ref commandNumber);
-                            newAction.Commands = childCommands;
-                        }
-                        newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
-                        newAction.Frequency = sourceAction.Frequency;
-                        gameConfig.SystemActions.Add(child.Name, newAction);
-                    }
-                }
-                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "Actions")
-                {
-                    foreach (TreeNode child in parent.Nodes)
-                    {
-                        BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
-                        BotEngineClient.Action newAction = new BotEngineClient.Action
-                        {
-                            ActionType = sourceAction.ActionType,
-                            AfterAction = sourceAction.AfterAction,
-                            BeforeAction = sourceAction.BeforeAction
-                        };
-                        if (child.Nodes.Count != 0)
-                        {
-                            int commandNumber = 10;
-                            List<Command> childCommands = new List<Command>();
-                            LoadCommandList(childCommands, child, ref commandNumber);
-                            newAction.Commands = childCommands;
-                        }
-                        newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
-                        newAction.Frequency = sourceAction.Frequency;
-                        gameConfig.Actions.Add(child.Name, newAction);
-                    }
-                }
-            }
+            RefreshGameConfig();
             try
             {
                 if (File.Exists(JsonFileName))
@@ -1654,6 +1593,73 @@ namespace ScriptEditor
         #endregion
 
         #region Helper Methods
+        /// <summary>
+        /// Reads the content in the tvBotData back into the global gameConfig
+        /// </summary>
+        private void RefreshGameConfig()
+        {
+            gameConfig = new BOTConfig {
+                FileId = loadedFileType.ToString(),
+                FindStrings = new Dictionary<string, FindString>(),
+                SystemActions = new Dictionary<string, BotEngineClient.Action>(),
+                Actions = new Dictionary<string, BotEngineClient.Action>()
+            };
+            foreach (TreeNode parent in tvBotData.Nodes)
+            {
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "FindStrings")
+                {
+                    foreach (TreeNode child in parent.Nodes)
+                    {
+                        gameConfig.FindStrings.Add(child.Name, (FindString)child.Tag);
+                    }
+                }
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "SystemActions")
+                {
+                    foreach (TreeNode child in parent.Nodes)
+                    {
+                        BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
+                        BotEngineClient.Action newAction = new BotEngineClient.Action {
+                            ActionType = sourceAction.ActionType,
+                            AfterAction = sourceAction.AfterAction,
+                            BeforeAction = sourceAction.BeforeAction
+                        };
+                        if (child.Nodes.Count != 0)
+                        {
+                            int commandNumber = 10;
+                            List<Command> childCommands = new List<Command>();
+                            LoadCommandList(childCommands, child, ref commandNumber);
+                            newAction.Commands = childCommands;
+                        }
+                        newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
+                        newAction.Frequency = sourceAction.Frequency;
+                        gameConfig.SystemActions.Add(child.Name, newAction);
+                    }
+                }
+                if (parent.Tag is null && parent.Nodes.Count > 0 && parent.Name == "Actions")
+                {
+                    foreach (TreeNode child in parent.Nodes)
+                    {
+                        BotEngineClient.Action sourceAction = (BotEngineClient.Action)child.Tag;
+                        BotEngineClient.Action newAction = new BotEngineClient.Action {
+                            ActionType = sourceAction.ActionType,
+                            AfterAction = sourceAction.AfterAction,
+                            BeforeAction = sourceAction.BeforeAction
+                        };
+                        if (child.Nodes.Count != 0)
+                        {
+                            int commandNumber = 10;
+                            List<Command> childCommands = new List<Command>();
+                            LoadCommandList(childCommands, child, ref commandNumber);
+                            newAction.Commands = childCommands;
+                        }
+                        newAction.DailyScheduledTime = sourceAction.DailyScheduledTime;
+                        newAction.Frequency = sourceAction.Frequency;
+                        gameConfig.Actions.Add(child.Name, newAction);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Connects ADB server (if not connected), and refreshes the device list.
         /// </summary>

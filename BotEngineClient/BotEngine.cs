@@ -659,7 +659,15 @@ namespace BotEngineClient
             }
         }
 
-
+        /// <summary>
+        /// Loops though a list of coordinates and executes each command for that set of coordinates.
+        /// If there is a failure, then each execution from then (until complete success) will start
+        /// from the point that the previous execution failed.
+        /// </summary>
+        /// <param name="CoordinateName"></param>
+        /// <param name="Commands"></param>
+        /// <param name="actionActivity"></param>
+        /// <returns></returns>
         private CommandResults LoopCoordinates(string CoordinateName, List<Command> Commands, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), CoordinateName)))
@@ -670,9 +678,16 @@ namespace BotEngineClient
                 if (!ListConfig.Coordinates.ContainsKey(CoordinateName))
                     return CommandResults.InputError;
                 List<XYCoords> coords = ListConfig.Coordinates[CoordinateName];
-
+                int startAt = GetLastKnownLoopStatusFromActionActivity(coords.Count, actionActivity);
+                int counter = 0;
                 foreach (XYCoords point in coords)
                 {
+                    if (startAt > counter)
+                    {
+                        counter++;
+                        continue;
+                    }
+                    actionActivity.CommandLoopStatus[activePath.ToString()] = counter.ToString();
                     foreach (Command command in Commands)
                     {
                         result = ExecuteCommand(command, point, actionActivity);
@@ -681,11 +696,23 @@ namespace BotEngineClient
                             return result;
                         }
                     }
+                    counter++;
                 }
                 return CommandResults.Ok;
             }
         }
 
+        #region Loop Until Found / Not Found
+
+        /// <summary>
+        /// Runs the Commands list, until all of the imageNames disappear.
+        /// </summary>
+        /// <param name="imageNames"></param>
+        /// <param name="Commands"></param>
+        /// <param name="timeOut"></param>
+        /// <param name="additionalData"></param>
+        /// <param name="actionActivity"></param>
+        /// <returns></returns>
         private CommandResults LoopUntilNotFound(List<string> imageNames, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
@@ -758,7 +785,15 @@ namespace BotEngineClient
             }
         }
 
-
+        /// <summary>
+        /// Runs the Commands list, until at least one of the imageNames shows up.
+        /// </summary>
+        /// <param name="imageNames"></param>
+        /// <param name="Commands"></param>
+        /// <param name="timeOut"></param>
+        /// <param name="additionalData"></param>
+        /// <param name="actionActivity"></param>
+        /// <returns></returns>
         private CommandResults LoopUntilFound(List<string> imageNames, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
@@ -824,6 +859,7 @@ namespace BotEngineClient
                 return result;
             }
         }
+        #endregion
 
         /// <summary>
         /// Calls the child commands in order, the number of loops specified.
@@ -837,33 +873,7 @@ namespace BotEngineClient
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
             {
                 CommandResults result = CommandResults.Ok;
-                int startAt = 0;
-                if (actionActivity.CommandLoopStatus == null)
-                {
-                    actionActivity.CommandLoopStatus = new Dictionary<string, string>();
-                    actionActivity.CommandLoopStatus.Add(activePath.ToString(), "0");
-                }
-                else
-                {
-                    if (actionActivity.CommandLoopStatus.ContainsKey(activePath.ToString()))
-                    {
-                        if (int.TryParse(actionActivity.CommandLoopStatus[activePath.ToString()], out startAt))
-                        {
-                            if (startAt >= numberOFLoops)
-                            {
-                                startAt = 0;
-                            }
-                        }
-                        else
-                        {
-                            startAt = 0;
-                        }
-                    }
-                    else
-                    {
-                        actionActivity.CommandLoopStatus.Add(activePath.ToString(), "0");
-                    }
-                }
+                int startAt = GetLastKnownLoopStatusFromActionActivity(numberOFLoops, actionActivity);
                 for (int i = startAt; i < numberOFLoops; i++)
                 {
                     actionActivity.CommandLoopStatus[activePath.ToString()] = i.ToString();
@@ -880,6 +890,46 @@ namespace BotEngineClient
                 }
                 return result;
             }
+        }
+
+        /// <summary>
+        /// Retrieves the loop number from CommandLoopStatus for the current active path.
+        /// </summary>
+        /// <param name="numberOFLoops">Set this to MaxInt if this isn't a counter operation</param>
+        /// <param name="actionActivity"></param>
+        /// <returns></returns>
+        private int GetLastKnownLoopStatusFromActionActivity(int numberOFLoops, ActionActivity actionActivity)
+        {
+            int startAt = 0;
+
+            if (actionActivity.CommandLoopStatus == null)
+            {
+                actionActivity.CommandLoopStatus = new Dictionary<string, string>();
+                actionActivity.CommandLoopStatus.Add(activePath.ToString(), "0");
+            }
+            else
+            {
+                if (actionActivity.CommandLoopStatus.ContainsKey(activePath.ToString()))
+                {
+                    if (int.TryParse(actionActivity.CommandLoopStatus[activePath.ToString()], out startAt))
+                    {
+                        if (startAt >= numberOFLoops)
+                        {
+                            startAt = 0;
+                        }
+                    }
+                    else
+                    {
+                        startAt = 0;
+                    }
+                }
+                else
+                {
+                    actionActivity.CommandLoopStatus.Add(activePath.ToString(), "0");
+                }
+            }
+
+            return startAt;
         }
 
         private CommandResults WaitForChange(SearchArea changeDetectArea, float changeDetectDifference, int timeOut)

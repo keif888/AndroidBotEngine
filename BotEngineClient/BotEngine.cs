@@ -837,8 +837,36 @@ namespace BotEngineClient
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
             {
                 CommandResults result = CommandResults.Ok;
-                for (int i = 0; i < numberOFLoops; i++)
+                int startAt = 0;
+                if (actionActivity.CommandLoopStatus == null)
                 {
+                    actionActivity.CommandLoopStatus = new Dictionary<string, string>();
+                    actionActivity.CommandLoopStatus.Add(activePath.ToString(), "0");
+                }
+                else
+                {
+                    if (actionActivity.CommandLoopStatus.ContainsKey(activePath.ToString()))
+                    {
+                        if (int.TryParse(actionActivity.CommandLoopStatus[activePath.ToString()], out startAt))
+                        {
+                            if (startAt >= numberOFLoops)
+                            {
+                                startAt = 0;
+                            }
+                        }
+                        else
+                        {
+                            startAt = 0;
+                        }
+                    }
+                    else
+                    {
+                        actionActivity.CommandLoopStatus.Add(activePath.ToString(), "0");
+                    }
+                }
+                for (int i = startAt; i < numberOFLoops; i++)
+                {
+                    actionActivity.CommandLoopStatus[activePath.ToString()] = i.ToString();
                     foreach (Command command in commands)
                     {
                         _logger.LogDebug("Executing Loop {0} command {1}", i, command.CommandId);

@@ -181,9 +181,10 @@ namespace ScriptEditor
             BotEngine.CommandResults cr;
             threadCTS = new CancellationTokenSource();
             Thread botThread;
+            ActionActivity actionActivity = new ActionActivity();
             if (action.BeforeAction != null)
             {
-                bot.SetThreadingCommand(action.BeforeAction, ResultCallback);
+                bot.SetThreadingCommand(action.BeforeAction, ResultCallback, actionActivity);
                 botThread = new Thread(bot.InitiateThreadingCommand);
                 botThread.Start(threadCTS.Token);
                 botThread.Join();
@@ -193,7 +194,7 @@ namespace ScriptEditor
                     return cr;
                 }
             }
-            bot.SetThreadingCommand(actionName, ResultCallback);
+            bot.SetThreadingCommand(actionName, ResultCallback, actionActivity);
             botThread = new Thread(bot.InitiateThreadingCommand);
             botThread.Start(threadCTS.Token);
             botThread.Join();
@@ -205,7 +206,7 @@ namespace ScriptEditor
             }
             if (action.AfterAction != null)
             {
-                bot.SetThreadingCommand(action.AfterAction, ResultCallback);
+                bot.SetThreadingCommand(action.AfterAction, ResultCallback, actionActivity);
                 botThread = new Thread(bot.InitiateThreadingCommand);
                 botThread.Start(threadCTS.Token);
                 botThread.Join();

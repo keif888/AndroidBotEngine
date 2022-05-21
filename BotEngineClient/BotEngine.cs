@@ -34,6 +34,7 @@ namespace BotEngineClient
         private BOTListConfig ListConfig;
         private readonly string EmulatorName;
         private string ThreadActionName;
+        private ActionActivity ThreadActionActivity;
         private BotEngineCallback callback;
         private CancellationToken cancellationToken;
         private bool isThreading;
@@ -80,9 +81,10 @@ namespace BotEngineClient
             WaitForNoChange
         }
 
-        public void SetThreadingCommand(string ActionName, BotEngineCallback callbackDelegate)
+        public void SetThreadingCommand(string ActionName, BotEngineCallback callbackDelegate, ActionActivity actionActivity)
         {
             ThreadActionName = ActionName;
+            ThreadActionActivity = actionActivity;
             callback = callbackDelegate;
         }
 
@@ -92,7 +94,7 @@ namespace BotEngineClient
             if (ThreadActionName != null)
             {
                 isThreading = true;
-                CommandResults result = ExecuteAction(ThreadActionName);
+                CommandResults result = ExecuteAction(ThreadActionName, ThreadActionActivity);
                 if (callback != null)
                 {
                     callback(result);
@@ -176,7 +178,7 @@ namespace BotEngineClient
             activePath = new StringBuilder();
         }
 
-        public CommandResults ExecuteAction(string actionName)
+        public CommandResults ExecuteAction(string actionName, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(string.Format("{0}:{1}({2})", EmulatorName,Helpers.CurrentMethodName(), actionName)))
             {
@@ -200,7 +202,7 @@ namespace BotEngineClient
                 CommandResults result = CommandResults.Ok;
                 foreach (Command item in action.Commands)
                 {
-                    result = ExecuteCommand(item, null);
+                    result = ExecuteCommand(item, null, actionActivity);
                     if (result == CommandResults.Exit)
                     {
                         _logger.LogDebug("Resetting Exit result to Ok for Action {0}", actionName);
@@ -399,7 +401,7 @@ namespace BotEngineClient
             }
         }
 
-        private CommandResults IfExists(string searchName, FindString findString, List<Command> Commands, Object? additionalData)
+        private CommandResults IfExists(string searchName, FindString findString, List<Command> Commands, Object? additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))
             {
@@ -419,7 +421,7 @@ namespace BotEngineClient
                     result = CommandResults.Ok;
                     foreach (Command command in Commands)
                     {
-                        result = ExecuteCommand(command, additionalData);
+                        result = ExecuteCommand(command, additionalData, actionActivity);
                         if (result != CommandResults.Ok)
                         {
                             return result;
@@ -436,7 +438,7 @@ namespace BotEngineClient
             }
         }
 
-        private CommandResults IfNotExists(string searchName, FindString findString, List<Command> Commands, Object? additionalData)
+        private CommandResults IfNotExists(string searchName, FindString findString, List<Command> Commands, Object? additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))
             {
@@ -461,7 +463,7 @@ namespace BotEngineClient
                     result = CommandResults.Ok;
                     foreach (Command command in Commands)
                     {
-                        result = ExecuteCommand(command, additionalData);
+                        result = ExecuteCommand(command, additionalData, actionActivity);
                         if (result != CommandResults.Ok)
                         {
                             return result;
@@ -658,7 +660,7 @@ namespace BotEngineClient
         }
 
 
-        private CommandResults LoopCoordinates(string CoordinateName, List<Command> Commands)
+        private CommandResults LoopCoordinates(string CoordinateName, List<Command> Commands, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), CoordinateName)))
             {
@@ -673,7 +675,7 @@ namespace BotEngineClient
                 {
                     foreach (Command command in Commands)
                     {
-                        result = ExecuteCommand(command, point);
+                        result = ExecuteCommand(command, point, actionActivity);
                         if (result != CommandResults.Ok)
                         {
                             return result;
@@ -684,7 +686,7 @@ namespace BotEngineClient
             }
         }
 
-        private CommandResults LoopUntilNotFound(List<string> imageNames, List<Command> Commands, int timeOut, Object? additionalData)
+        private CommandResults LoopUntilNotFound(List<string> imageNames, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
             {
@@ -733,7 +735,7 @@ namespace BotEngineClient
                         _logger.LogDebug("Search Successful, found {0}", dataresult[0].Id);
                         foreach (Command command in Commands)
                         {
-                            result = ExecuteCommand(command, additionalData);
+                            result = ExecuteCommand(command, additionalData, actionActivity);
                             if (result != CommandResults.Ok)
                             {
                                 return result;
@@ -757,7 +759,7 @@ namespace BotEngineClient
         }
 
 
-        private CommandResults LoopUntilFound(List<string> imageNames, List<Command> Commands, int timeOut, Object? additionalData)
+        private CommandResults LoopUntilFound(List<string> imageNames, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
             {
@@ -803,7 +805,7 @@ namespace BotEngineClient
                         _logger.LogDebug("Search Unsuccessful, Execute Commands");
                         foreach (Command command in Commands)
                         {
-                            result = ExecuteCommand(command, additionalData);
+                            result = ExecuteCommand(command, additionalData, actionActivity);
                             if (result != CommandResults.Ok)
                             {
                                 return result;
@@ -830,7 +832,7 @@ namespace BotEngineClient
         /// <param name="commands"></param>
         /// <param name="additionalData"></param>
         /// <returns></returns>
-        private CommandResults LoopCounter(int numberOFLoops, List<Command> commands, object additionalData)
+        private CommandResults LoopCounter(int numberOFLoops, List<Command> commands, object additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
             {
@@ -840,7 +842,7 @@ namespace BotEngineClient
                     foreach (Command command in commands)
                     {
                         _logger.LogDebug("Executing Loop {0} command {1}", i, command.CommandId);
-                        result = ExecuteCommand(command, additionalData);
+                        result = ExecuteCommand(command, additionalData, actionActivity);
                         if (result != CommandResults.Ok)
                         {
                             _logger.LogWarning("Exiting on Loop {0} command {1} due to result {2}", i, command.CommandId, result);
@@ -954,8 +956,9 @@ namespace BotEngineClient
         /// </summary>
         /// <param name="command"></param>
         /// <param name="additionalData"></param>
+        /// <param name="actionActivity"></param>
         /// <returns></returns>
-        private CommandResults ExecuteCommand(Command command, Object? additionalData)
+        private CommandResults ExecuteCommand(Command command, Object? additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), command.CommandId)))
             {
@@ -1111,7 +1114,7 @@ namespace BotEngineClient
                             }
                             else
                             {
-                                results = IfExists(command.ImageName, FindStrings[command.ImageName], command.Commands, additionalData);
+                                results = IfExists(command.ImageName, FindStrings[command.ImageName], command.Commands, additionalData, actionActivity);
                             }
                             break;
                         case ValidCommandIds.IfNotExists:
@@ -1132,7 +1135,7 @@ namespace BotEngineClient
                             }
                             else
                             {
-                                results = IfNotExists(command.ImageName, FindStrings[command.ImageName], command.Commands, additionalData);
+                                results = IfNotExists(command.ImageName, FindStrings[command.ImageName], command.Commands, additionalData, actionActivity);
                             }
                             break;
                         case ValidCommandIds.LoopCoordinates:
@@ -1148,7 +1151,7 @@ namespace BotEngineClient
                             }
                             else
                             {
-                                results = LoopCoordinates(command.Coordinates, command.Commands);
+                                results = LoopCoordinates(command.Coordinates, command.Commands, actionActivity);
                             }
                             break;
                         case ValidCommandIds.LoopUntilFound:
@@ -1195,7 +1198,7 @@ namespace BotEngineClient
                                 }
                                 if (results == CommandResults.Ok)
                                 {
-                                    results = LoopUntilFound(imageNames, command.Commands, (int)command.TimeOut, additionalData);
+                                    results = LoopUntilFound(imageNames, command.Commands, (int)command.TimeOut, additionalData, actionActivity);
                                 }
                             }
                             break;
@@ -1243,7 +1246,7 @@ namespace BotEngineClient
                                 }
                                 if (results == CommandResults.Ok)
                                 {
-                                    results = LoopUntilNotFound(imageNames, command.Commands, (int)command.TimeOut, additionalData);
+                                    results = LoopUntilNotFound(imageNames, command.Commands, (int)command.TimeOut, additionalData, actionActivity);
                                 }
                             }
                             break;
@@ -1258,7 +1261,7 @@ namespace BotEngineClient
                             }
                             else
                             {
-                                results = ExecuteAction(command.ActionName);
+                                results = ExecuteAction(command.ActionName, actionActivity);
                             }
                             break;
                         case ValidCommandIds.Sleep:
@@ -1406,7 +1409,7 @@ namespace BotEngineClient
                                 }
                                 else
                                 {
-                                    results = LoopCounter(NumberOFLoops, command.Commands, additionalData);
+                                    results = LoopCounter(NumberOFLoops, command.Commands, additionalData, actionActivity);
                                 }
                             }
                             break;

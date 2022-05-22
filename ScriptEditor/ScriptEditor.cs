@@ -2095,6 +2095,10 @@ namespace ScriptEditor
                                 else
                                 {
                                     commandCopy.ImageName = null;
+                                    if (commandCopy.ImageNames == null)
+                                    {
+                                        commandCopy.ImageNames = new List<string>();
+                                    }
                                     foreach (string item in lbImageNames.Items)
                                     {
                                         commandCopy.ImageNames.Add(item);

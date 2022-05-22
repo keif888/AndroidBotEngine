@@ -751,7 +751,6 @@ namespace BotEngine
                             }
                             break;
                         case ValidActionType.Always:
-                            break;
                         case ValidActionType.Daily:
                         case ValidActionType.Scheduled:
                             if (!botDeviceConfig.LastActionTaken.ContainsKey(item.Key))

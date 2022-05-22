@@ -1406,17 +1406,7 @@ namespace BotEngineClient
                             }
                             break;
                         case ValidCommandIds.WaitFor:
-                            if (command.ImageName == null)
-                            {
-                                _logger.LogError("Command {0} Error ImageName is null", command.CommandId);
-                                results = CommandResults.InputError;
-                            }
-                            else if (!FindStrings.ContainsKey(command.ImageName))
-                            {
-                                _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
-                                results = CommandResults.InputError;
-                            }
-                            else if (command.TimeOut == null)
+                            if (command.TimeOut == null)
                             {
                                 _logger.LogError("Command {0} Error Timeout is null", command.CommandId);
                                 results = CommandResults.InputError;
@@ -1449,7 +1439,10 @@ namespace BotEngineClient
                                     }
                                     imageNames.AddRange(command.ImageNames);
                                 }
-                                results = WaitFor(imageNames, ignoreMissing, (int)command.TimeOut);
+                                if (results == CommandResults.Ok)
+                                {
+                                    results = WaitFor(imageNames, ignoreMissing, (int)command.TimeOut);
+                                }
                             }
                             break;
                         case ValidCommandIds.WaitForThenClick:

@@ -8,8 +8,8 @@
     <Version>0.0.1.18</Version>
     <Authors>Keif888</Authors>
     <Description>Android BotEngine</Description>
-    <AssemblyVersion>0.0.1.48</AssemblyVersion>
-    <FileVersion>0.0.1.48</FileVersion>
+    <AssemblyVersion>0.0.1.50</AssemblyVersion>
+    <FileVersion>0.0.1.50</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

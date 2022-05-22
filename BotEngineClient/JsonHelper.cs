@@ -513,6 +513,22 @@ namespace BotEngineClient
                                 ValidateJsonValue(location, listItemName, "Value", commandsObject, JsonValueKind.String);
                                 break;
                             case BotEngine.ValidCommandIds.WaitFor:
+                                if (commandsObject.ContainsKey("ImageNames"))
+                                {
+                                    if (ValidateJsonValue(location, listItemName, "ImageNames", commandsObject, "JsonArray", "with one or more Strings"))
+                                    {
+                                        foreach (JsonNode imageItem in commandsObject["ImageNames"].AsArray())
+                                        {
+                                            ValidateJsonValue(location, listItemName, imageItem, "JsonValueKind.String", string.Empty);
+                                        }
+                                    }
+                                }
+                                else
+                                    ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
+                                ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);
+                                if (commandsObject.ContainsKey("IgnoreMissing"))
+                                    ValidateJsonValue(location, listItemName, "IgnoreMissing", commandsObject, JsonValueKind.True);
+                                break;
                             case BotEngine.ValidCommandIds.WaitForThenClick:
                                 ValidateJsonValue(location, listItemName, "ImageName", commandsObject, JsonValueKind.String);
                                 ValidateJsonValue(location, listItemName, "TimeOut", commandsObject, JsonValueKind.Number);

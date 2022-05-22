@@ -30,6 +30,8 @@ namespace ScriptEditor
             foundDone = false;
         }
 
+        // ToDo: Update the FindText tester, so that you can tweak settings, and copy/paste them back
+
         /// <summary>
         /// Grab a frame from the selected ADB.  And put it on the panel.
         /// </summary>

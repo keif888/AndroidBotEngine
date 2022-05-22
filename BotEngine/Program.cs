@@ -97,6 +97,9 @@ namespace BotEngine
 
         }
 
+        // ToDo: Add Execute Adhoc in Command Line
+        // ToDo: Add Exception Handling SharpAdbClient.Exceptions.AdbException
+
         static int Main(string[] args)
         {
             int result = 0;

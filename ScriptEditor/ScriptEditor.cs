@@ -78,6 +78,11 @@ namespace ScriptEditor
 
         #endregion
 
+        // ToDo: Add GrabWindow, that isn't Modal, so you can get Coords etc from it
+        // ToDo: Add Defer Command which sets a scheduled task to retry n minutes in the future.This should incorporate restart from where it was
+        // ToDo: Add Insert Above/Below for FindString
+        // ToDo: Fix ComboBoxes when Delete/Rename items
+
         #region File Menu
         /// <summary>
         /// Menu method to allow the opening of a json file and then loading it into the tvBotData.
@@ -600,7 +605,6 @@ namespace ScriptEditor
         /// <param name="e"></param>
         private void TestToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //ToDo: Implement Test of an Action Capability.
             string listConfigName;
             string saveTitle = openFileDialog1.Title;
 

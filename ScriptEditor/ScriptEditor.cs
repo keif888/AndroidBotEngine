@@ -1351,22 +1351,27 @@ namespace ScriptEditor
                             gbAppName.Visible = true;
                             break;
                         case ValidCommandIds.WaitFor:
+                            lbImageNames.Items.Clear();
+                            if (commandCopy.ImageNames != null)
+                                foreach (string item in commandCopy.ImageNames)
+                                {
+                                    lbImageNames.Items.Add(item);
+                                }
                             if (!string.IsNullOrEmpty(commandCopy.ImageName))
-                                cbImageNameWithWait.SelectedItem = commandCopy.ImageName;
-                            else
-                                cbImageNameWithWait.SelectedIndex = -1;
+                                lbImageNames.Items.Add(commandCopy.ImageName);
                             if (commandCopy.TimeOut != null)
-                                tbTimeout.Text = commandCopy.TimeOut.ToString();
+                                tbImageNamesWait.Text = commandCopy.TimeOut.ToString();
                             else
-                                tbTimeout.Text = "";
+                                tbImageNamesWait.Text = "";
                             if (commandCopy.IgnoreMissing != null)
-                                cbImageNameMissingOk.Checked = (bool)commandCopy.IgnoreMissing;
+                                cbImageNamesMissingOk.Checked = (bool)commandCopy.IgnoreMissing;
                             else
-                                cbImageNameMissingOk.Checked = false;
-                            cbImageNameMissingOk.Enabled = true;
-                            cbImageNameMissingOk.Visible = true;
-                            gbImageNameAndWait.Enabled = true;
-                            gbImageNameAndWait.Visible = true;
+                                cbImageNamesMissingOk.Checked = false;
+                            gbImageNames.Enabled = true;
+                            gbImageNames.Visible = true;
+                            cbImageNamesMissingOk.Enabled = true;
+                            cbImageNamesMissingOk.Visible = true;
+                            addCommandToolStripMenuItem.Enabled = true;
                             break;
                         case ValidCommandIds.WaitForThenClick:
                             if (!string.IsNullOrEmpty(commandCopy.ImageName))
@@ -2160,15 +2165,35 @@ namespace ScriptEditor
                                 commandCopy.TimeOut = int.Parse(tbImageNamesWait.Text);
                                 break;
                             case ValidCommandIds.WaitFor:
-                                if (tbTimeout.Text.Length == 0)
+                                if (tbImageNamesWait.Text.Length == 0)
                                 {
                                     MessageBox.Show("Required fields aren't populated.");
                                     return;
                                 }
-
-                                commandCopy.ImageName = (string)cbImageNameWithWait.SelectedItem;
-                                commandCopy.TimeOut = int.Parse(tbTimeout.Text);
-                                commandCopy.IgnoreMissing = cbImageNameMissingOk.Checked;
+                                if (lbImageNames.Items.Count == 0)
+                                {
+                                    commandCopy.ImageName = null;
+                                    commandCopy.ImageNames = null;
+                                }
+                                else if (lbImageNames.Items.Count == 1)
+                                {
+                                    commandCopy.ImageName = (string)lbImageNames.Items[0];
+                                    commandCopy.ImageNames = null;
+                                }
+                                else
+                                {
+                                    commandCopy.ImageName = null;
+                                    if (commandCopy.ImageNames == null)
+                                    {
+                                        commandCopy.ImageNames = new List<string>();
+                                    }
+                                    foreach (string item in lbImageNames.Items)
+                                    {
+                                        commandCopy.ImageNames.Add(item);
+                                    }
+                                }
+                                commandCopy.TimeOut = int.Parse(tbImageNamesWait.Text);
+                                commandCopy.IgnoreMissing = cbImageNamesMissingOk.Checked;
                                 break;
                             case ValidCommandIds.WaitForThenClick:
                                 if (tbTimeout.Text.Length == 0)

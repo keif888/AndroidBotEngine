@@ -317,16 +317,15 @@ namespace BotEngineClient
         }
 
         /// <summary>
-        /// Waits until the image indicated by searchName appears on the screen.
+        /// Waits until one of the images indicated by searchNames appears on the screen.
         /// </summary>
-        /// <param name="searchName"></param>
-        /// <param name="searchString"></param>
+        /// <param name="searchNames"></param>
         /// <param name="ignoreMissing">Set to true if it is not a Missing state if the timeout has expired.</param>
         /// <param name="timeOut"></param>
         /// <returns></returns>
-        private CommandResults WaitFor(string searchName, FindString searchString, bool ignoreMissing, int timeOut)
+        private CommandResults WaitFor(List<string> searchNames, bool ignoreMissing, int timeOut)
         {
-            using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))
+            using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchNames[0])))
             {
                 CommandResults result = CommandResults.TimeOut;
                 System.Threading.CancellationToken cancellationToken = default;
@@ -340,12 +339,30 @@ namespace BotEngineClient
                     {
                         findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                     }
-
-                    List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X+searchString.SearchArea.Width, searchString.SearchArea.Y+searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
-                    if (dataresult != null)
+                    foreach (string searchName in searchNames)
                     {
-                        result = CommandResults.Ok;
-                        _logger.LogDebug("Search Successful, found {0} whilst looking for {1}", dataresult[0].Id, searchName);
+                        if (!FindStrings.ContainsKey(searchName))
+                        {
+                            _logger.LogError("FindString {0} is missing from json file", searchName);
+                            return CommandResults.InputError;
+                        }
+                        _logger.LogDebug("Searching for {0}", searchName);
+                        FindString searchString = FindStrings[searchName];
+
+                        List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X + searchString.SearchArea.Width, searchString.SearchArea.Y + searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
+                        if (dataresult != null)
+                        {
+                            result = CommandResults.Ok;
+                            _logger.LogDebug("Search Successful, found {0} whilst looking for {1}", dataresult[0].Id, searchName);
+                            break;
+                        }
+                        else
+                        {
+                            _logger.LogDebug("Search Unsuccessful, found nothing whilst looking for {0}", searchName);
+                        }
+                    }
+                    if (result == CommandResults.Ok)
+                    {
                         break;
                     }
                     Thread.Sleep(50);
@@ -353,11 +370,11 @@ namespace BotEngineClient
                 stopWatch.Stop();
                 if (result != CommandResults.Ok && !ignoreMissing)
                 {
-                    _logger.LogWarning("Search Unsuccessful with {0} whilst looking for {1}", result.ToString(), searchName);
+                    _logger.LogWarning("Search Unsuccessful with {0} whilst looking for {1}", result.ToString(), searchNames[0]);
                 }
                 else if (result != CommandResults.Ok)
                 {
-                    _logger.LogDebug("Search Unsuccessful with {0} whilst looking for {1}, but ignoreMissing = true", result.ToString(), searchName);
+                    _logger.LogDebug("Search Unsuccessful with {0} whilst looking for {1}, but ignoreMissing = true", result.ToString(), searchNames[0]);
                     result = CommandResults.Ok;
                 }
                 return result;
@@ -1408,8 +1425,31 @@ namespace BotEngineClient
                             {
                                 if (command.IgnoreMissing != null)
                                     ignoreMissing = (bool)command.IgnoreMissing;
-
-                                results = WaitFor(command.ImageName, FindStrings[command.ImageName], ignoreMissing, (int)command.TimeOut);
+                                imageNames = new List<string>();
+                                if (command.ImageName != null)
+                                {
+                                    if (!FindStrings.ContainsKey(command.ImageName))
+                                    {
+                                        _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
+                                        results = CommandResults.InputError;
+                                        break;
+                                    }
+                                    imageNames.Add(command.ImageName);
+                                }
+                                if (command.ImageNames != null)
+                                {
+                                    foreach (string item in command.ImageNames)
+                                    {
+                                        if (!FindStrings.ContainsKey(item))
+                                        {
+                                            _logger.LogError("Command {0} Error ImageNames {1} doesn't exist in FindStrings", command.CommandId, item);
+                                            results = CommandResults.InputError;
+                                            break;
+                                        }
+                                    }
+                                    imageNames.AddRange(command.ImageNames);
+                                }
+                                results = WaitFor(imageNames, ignoreMissing, (int)command.TimeOut);
                             }
                             break;
                         case ValidCommandIds.WaitForThenClick:

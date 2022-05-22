@@ -2,7 +2,7 @@
   "profiles": {
     "BotEngine": {
       "commandName": "Project",
-      "commandLineArgs": "-t -p d:\\adb\\adb.exe"
+      "commandLineArgs": "-p \"C:\\Program Files\\AndroidBot\\ADB\\adb.exe\" -g D:\\keith\\Documents\\Repos\\MarchOfEmpiresConfig\\moeBotConfig.json -i D:\\keith\\Documents\\Repos\\MarchOfEmpiresConfig\\moeXXGConfig.json -c d:\\MoEBotConfig\\GameConfig\\Psyched.json -l information -d \"emulator-5556          device product:Psyched model:Psyched device:aosp transport_id:2\""
     }
   }
 }

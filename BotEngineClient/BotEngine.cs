@@ -934,7 +934,7 @@ namespace BotEngineClient
                 {
                     if (int.TryParse(actionActivity.CommandLoopStatus[activePath.ToString()], out startAt))
                     {
-                        if (startAt >= numberOFLoops)
+                        if (startAt >= numberOFLoops - 1)  // Zero based, so subtract 1...
                         {
                             startAt = 0;
                         }

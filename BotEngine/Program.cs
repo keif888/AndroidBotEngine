@@ -19,7 +19,7 @@ namespace BotEngine
 {
     class Program
     {
-        public static IServiceProvider ServiceProvider { get; set; }
+        public static ServiceProvider ServiceProvider { get; set; }
         private static ILogger _logger;
         private static BOTConfig botGameConfig;
         private static bool reloadBOTGameConfig;
@@ -143,6 +143,20 @@ namespace BotEngine
             {
                 deviceWatcher.EnableRaisingEvents = false;
                 deviceWatcher.Dispose();
+            }
+
+            if (ServiceProvider != null)
+            {
+                try
+                {
+                    ILoggerFactory loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
+                    loggerFactory.Dispose();
+                }
+                catch (Exception)
+                {
+                    // Who cares, we are trying to get out of here anyway.
+                }
+                ServiceProvider.Dispose();
             }
             return result;
         }
@@ -882,7 +896,7 @@ namespace BotEngine
             return true;
         }
 
-        public static IServiceProvider ConfigureServices(Options opt)
+        public static ServiceProvider ConfigureServices(Options opt)
         {
             //services.Clear();
             LogLevel logLevel = LogLevel.Warning;

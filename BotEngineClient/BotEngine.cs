@@ -184,6 +184,7 @@ namespace BotEngineClient
             {
                 _logger.LogInformation("Starting Action");
                 string currentPath = string.Format("{0}/", actionName);
+                string savePath = activePath.ToString();
                 activePath.Append(currentPath);
                 Action action;
                 if (SystemActions.ContainsKey(actionName))
@@ -220,7 +221,8 @@ namespace BotEngineClient
                         break;
                     }
                 }
-                activePath.Remove(activePath.Length - currentPath.Length, currentPath.Length);
+                activePath.Clear();
+                activePath.Append(savePath);
                 return result;
             }
         }
@@ -1073,6 +1075,7 @@ namespace BotEngineClient
                 }
                 _logger.LogDebug("Starting Command Execution");
                 currentPath = string.Format("{0}.{1}/", command.CommandId, command.CommandNumber);
+                string savePath = activePath.ToString();
                 activePath.Append(currentPath);
 
                 if (Enum.TryParse(command.CommandId, true, out ValidCommandIds validCommandIds))
@@ -1538,7 +1541,8 @@ namespace BotEngineClient
                     _logger.LogError("Unrecognised Command {0}", command.CommandId);
                     throw new Exception(string.Format("Unrecognised CommandId {0}", command.CommandId));
                 }
-                activePath.Remove(activePath.Length - currentPath.Length, currentPath.Length);
+                activePath.Clear();
+                activePath.Append(savePath);
                 return results;
             }
         }

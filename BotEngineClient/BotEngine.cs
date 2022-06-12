@@ -625,7 +625,6 @@ namespace BotEngineClient
                     using (Image localImage = adbFrameBuffer.ToImage())
                     {
                         findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
-                        localImage.Save(@"D:\Temp\SaveImage.png");
                     }
 
                     int x1 = int.MaxValue, y1 = int.MaxValue, x2 = int.MinValue, y2 = int.MinValue;

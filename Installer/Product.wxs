@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<?define ProductVersion = "0.3.3.54"?>
+	<?define ProductVersion = "0.3.4.57"?>
 	<?define UpgradeCode = "8E9EA5AE-CD4E-4D6D-9159-6DD92918047D"?>
 	<?define Manufacturer = "Keith Martin"?>
 	<?define PackageCode = "*"?>
 
-	<Product Id="*" Name="Android Bot" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
+	<Product Id="*" Name="Android Bot $(var.ProductVersion)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
 		<Package Id="$(var.PackageCode)"
 				 Description="Android BOT Engine and Editor"
 				 Comments="Installs the programs to allow editing config and executing commands against Android phones via ADB."

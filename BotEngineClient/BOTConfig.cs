@@ -321,6 +321,11 @@ namespace BotEngineClient
         public SearchArea? ChangeDetectArea { get; set; }
         public float? ChangeDetectDifference { get; set; }
 
+        /// <summary>
+        /// Provides the Identifier that is used when applying an override to a value
+        /// </summary>
+        public string? OverrideId { get; set; }
+
         public Command ShallowCopy()
         {
             return (Command)this.MemberwiseClone();

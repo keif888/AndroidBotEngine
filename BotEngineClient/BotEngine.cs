@@ -892,10 +892,10 @@ namespace BotEngineClient
             {
                 CommandResults result = CommandResults.Ok;
                 int startAt = GetLastKnownLoopStatusFromActionActivity(numberOFLoops, actionActivity);
-                if (actionActivity.CommandValueOverride != null && actionActivity.CommandValueOverride.ContainsKey(activePath.ToString()))
-                {
-                    int.TryParse(actionActivity.CommandValueOverride[activePath.ToString()], out numberOFLoops);
-                }
+                //if (actionActivity.CommandValueOverride != null && actionActivity.CommandValueOverride.ContainsKey(activePath.ToString()))
+                //{
+                //    int.TryParse(actionActivity.CommandValueOverride[activePath.ToString()], out numberOFLoops);
+                //}
                 for (int i = startAt; i < numberOFLoops; i++)
                 {
                     actionActivity.CommandLoopStatus[activePath.ToString()] = i.ToString();
@@ -1524,7 +1524,18 @@ namespace BotEngineClient
                                     _logger.LogError("Command {0} Error Value {1} is not an integer", command.CommandId, command.Value);
                                     results = CommandResults.InputError;
                                 }
-                                else
+                                if (actionActivity.CommandValueOverride != null && command.OverrideId != null)
+                                {
+                                    if (actionActivity.CommandValueOverride.ContainsKey(command.OverrideId))
+                                    {
+                                        if (!int.TryParse(actionActivity.CommandValueOverride[command.OverrideId], out NumberOFLoops))
+                                        {
+                                            _logger.LogError("CommandValueOverride {0} Value {1} is not an integer", command.OverrideId, actionActivity.CommandValueOverride[command.OverrideId]);
+                                            results = CommandResults.InputError;
+                                        }
+                                    }
+                                }
+                                if (NumberOFLoops > 0)
                                 {
                                     results = LoopCounter(NumberOFLoops, command.Commands, additionalData, actionActivity);
                                 }

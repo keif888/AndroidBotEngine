@@ -711,6 +711,12 @@ namespace BotEngine
             _logger.LogWarning(sb.ToString());
         }
 
+        /// <summary>
+        /// Action the key pressed on the keyboard
+        /// </summary>
+        /// <param name="actions"></param>
+        /// <param name="lastActionTaken"></param>
+        /// <returns></returns>
         private static ConsoleKeyPressEnum HandleConsoleKeyBoard(Dictionary<string, BotEngineClient.Action> actions, Dictionary<string, ActionActivity> lastActionTaken)
         {
             ConsoleKeyPressEnum result = ConsoleKeyPressEnum.Nothing;
@@ -718,9 +724,14 @@ namespace BotEngine
             {
                 switch (Console.ReadKey(true).KeyChar)
                 {
+                    case 'a':
+                    case 'A':
+                        ChooseAdhocAction(actions, lastActionTaken);
+                        result = ConsoleKeyPressEnum.Nothing;
+                        break;
                     case 'h':
                     case 'H':
-                        _logger.LogWarning("In Console Help:\r\nh/H : Help\r\np/P : Pause\r\ns/S : Execution Status\r\nx/X : Exit");
+                        _logger.LogWarning("In Console Help:\r\na/A : Adhoc\r\nh/H : Help\r\np/P : Pause\r\ns/S : Execution Status\r\nx/X : Exit");
                         Thread.Sleep(2000);
                         result = ConsoleKeyPressEnum.Nothing;
                         break;
@@ -746,6 +757,57 @@ namespace BotEngine
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Allow the user to choose which Adhoc action is to be enabled to be run.
+        /// </summary>
+        /// <param name="actions"></param>
+        /// <param name="lastActionTaken"></param>
+        private static void ChooseAdhocAction(Dictionary<string, BotEngineClient.Action> Actions, Dictionary<string, ActionActivity> lastActionTaken)
+        {
+            StringBuilder sb = new StringBuilder();
+            List<string> adhocActions = new List<string>();
+            int i = 0;
+            string inputText;
+            sb.AppendLine();
+            sb.AppendLine("Choose the action to activate from the list below");
+            foreach (KeyValuePair<string, BotEngineClient.Action> item in Actions)
+            {
+                if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType validActionType))
+                {
+                    switch (validActionType)
+                    {
+                        case ValidActionType.Adhoc:
+                            adhocActions.Add(item.Key);
+                            sb.AppendFormat("[{0}] - {1}", i++, item.Key);
+                            sb.AppendLine();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    _logger.LogError("Action {0} has invalid ActionType {1}", item.Key, item.Value.ActionType);
+                }
+            }
+            sb.AppendLine("Enter the number of the Action to activate, and press enter");
+            sb.AppendLine("Any other text will return to normal operation");
+            // Log as Warning, so that it will show by default.
+            _logger.LogWarning(sb.ToString());
+            inputText = Console.ReadLine();
+            int selectedOption;
+            if (int.TryParse(inputText, out selectedOption))
+            {
+                if (selectedOption >= 0 && selectedOption < i)
+                {
+                    if (lastActionTaken.ContainsKey(adhocActions[selectedOption]))
+                    {
+                        lastActionTaken[adhocActions[selectedOption]].ActionEnabled = true;
+                    }
+                }
+            }
         }
 
         private static void ValidateAndUpdateDeviceConfig(BOTDeviceConfig botDeviceConfig, BOTConfig botGameConfig)

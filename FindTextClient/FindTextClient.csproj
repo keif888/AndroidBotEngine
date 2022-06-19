@@ -4,8 +4,8 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 	  <UseWindowsForms>true</UseWindowsForms>
 	  <Nullable>annotations</Nullable>
-	  <AssemblyVersion>1.0.0.14</AssemblyVersion>
-	  <FileVersion>1.0.0.14</FileVersion>
+	  <AssemblyVersion>1.0.0.16</AssemblyVersion>
+	  <FileVersion>1.0.0.16</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

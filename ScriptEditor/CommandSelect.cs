@@ -57,19 +57,19 @@ namespace ScriptEditor
                 case ValidCommandIds.EnterLoopCoordinate:
                     rtbCommandHelp.Rtf = @"{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang3081{\fonttbl{\f0\fnil\fcharset0 Calibri;}}\viewkind4\uc1\pard\sa200\sl276\slmult1
 \b\fs32 Enter Loop Coordinate\par
-\b0\fs22 This command will enter the text associated with the coordinate part (X/Y) from the list selected via \b Loop Coordiantes\b0 .\par
+\b0\fs22 This command will enter the text associated with the coordinate part (X/Y) from the list selected via \b Loop Coordinates\b0 .\par
 }";
                     break;
                 case ValidCommandIds.FindClick:
                     rtbCommandHelp.Rtf = @"{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang3081{\fonttbl{\f0\fnil\fcharset0 Calibri;}}\viewkind4\uc1\pard\sa200\sl276\slmult1
 \b\fs32 Find Click\par
-\b0\fs22 This command will search for a specified Image, and then click onhte centre of it if found.\par
+\b0\fs22 This command will search for a specified Image, and then click on the centre of it if found.\par
 }";
                     break;
                 case ValidCommandIds.FindClickAndWait:
                     rtbCommandHelp.Rtf = @"{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang3081{\fonttbl{\f0\fnil\fcharset0 Calibri;}}\viewkind4\uc1\pard\sa200\sl276\slmult1
 \b\fs32 Find Click and Wait\par
-\b0\fs22 This command will search for a specified Image, and then click onhte centre of it if found.  It will then wait for the button to be removed from the screen.  If this wait times out (configurable) then the Action will be marked as failed, and retried.\par
+\b0\fs22 This command will search for a specified Image, and then click on the centre of it if found.  It will then wait for the button to be removed from the screen.  If this wait times out (configurable) then the Action will be marked as failed, and retried.\par
 }";
                     break;
                 case ValidCommandIds.IfExists:
@@ -125,7 +125,7 @@ namespace ScriptEditor
 \b\fs32 Start Game\par
 \b0\fs22 This command will start the Android Application specified.\par
 To find the list of packages available on your device, use the ADB command:\par
-\f1 ADB shell p list packages \par
+\f1 adb shell p list packages \par
 \f0 Once you know the name of the package then edit the following command to get the main activity.  You may need to guess based on the output.\par
 \f1 adb shell\par
 dumpsys package | grep -Eo ""^[[:space:]]+[0-9a-f]+[[:space:]]+\highlight1\b com.android.chrome\highlight0\b0 /[^[:space:]]+"" | grep -oE ""[^[:space:]]+$""\f0\par

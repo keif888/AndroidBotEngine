@@ -5,7 +5,7 @@
 	<?define Manufacturer = "Keith Martin"?>
 	<?define PackageCode = "*"?>
 
-	<Product Id="*" Name="Android Bot $(var.ProductVersion)" Language="1033" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
+	<Product Id="*" Name="Android Bot !(bind.FileVersion.FScriptEditorEXE)" Language="1033" Version="!(bind.FileVersion.FScriptEditorEXE)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
 		<Package Id="$(var.PackageCode)"
 				 Description="Android BOT Engine and Editor"
 				 Comments="Installs the programs to allow editing config and executing commands against Android phones via ADB."

@@ -30,6 +30,9 @@ namespace ScriptEditor
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
+            "Ov1",
+            "1500"}, -1);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScriptEditor));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -62,6 +65,8 @@ namespace ScriptEditor
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tvBotData = new System.Windows.Forms.TreeView();
             this.gbLoops = new System.Windows.Forms.GroupBox();
+            this.tbLoopsOverrideId = new System.Windows.Forms.TextBox();
+            this.label39 = new System.Windows.Forms.Label();
             this.label38 = new System.Windows.Forms.Label();
             this.tbLoopsCounter = new System.Windows.Forms.MaskedTextBox();
             this.gbList = new System.Windows.Forms.GroupBox();
@@ -81,6 +86,14 @@ namespace ScriptEditor
             this.label30 = new System.Windows.Forms.Label();
             this.cbImageAreasImage = new System.Windows.Forms.ComboBox();
             this.gbActionOverride = new System.Windows.Forms.GroupBox();
+            this.lvActionOverridesOverride = new System.Windows.Forms.ListView();
+            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.tbActionOverrideValue = new System.Windows.Forms.TextBox();
+            this.label41 = new System.Windows.Forms.Label();
+            this.btActionOverridesRemove = new System.Windows.Forms.Button();
+            this.btActionOverridesAdd = new System.Windows.Forms.Button();
+            this.tbActionOverrideOverrideId = new System.Windows.Forms.TextBox();
+            this.label40 = new System.Windows.Forms.Label();
             this.label29 = new System.Windows.Forms.Label();
             this.dtpActionOverrideLastRun = new System.Windows.Forms.DateTimePicker();
             this.tbActionOverrideEnabled = new System.Windows.Forms.CheckBox();
@@ -182,9 +195,9 @@ namespace ScriptEditor
             this.tbPointY = new System.Windows.Forms.MaskedTextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.tbLoopsOverrideId = new System.Windows.Forms.TextBox();
-            this.label39 = new System.Windows.Forms.Label();
             this.scriptEditorToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
+            this.btActionOverridesEdit = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -220,7 +233,7 @@ namespace ScriptEditor
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1387, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(1689, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -475,7 +488,7 @@ namespace ScriptEditor
             this.splitContainer1.Panel2.Controls.Add(this.gbDrag);
             this.splitContainer1.Panel2.Controls.Add(this.gbClick);
             this.splitContainer1.Panel2.Cursor = System.Windows.Forms.Cursors.Default;
-            this.splitContainer1.Size = new System.Drawing.Size(1387, 631);
+            this.splitContainer1.Size = new System.Drawing.Size(1689, 631);
             this.splitContainer1.SplitterDistance = 142;
             this.splitContainer1.TabIndex = 1;
             // 
@@ -497,13 +510,33 @@ namespace ScriptEditor
             this.gbLoops.Controls.Add(this.label38);
             this.gbLoops.Controls.Add(this.tbLoopsCounter);
             this.gbLoops.Enabled = false;
-            this.gbLoops.Location = new System.Drawing.Point(898, 409);
+            this.gbLoops.Location = new System.Drawing.Point(661, 424);
             this.gbLoops.Name = "gbLoops";
             this.gbLoops.Size = new System.Drawing.Size(331, 95);
             this.gbLoops.TabIndex = 102;
             this.gbLoops.TabStop = false;
             this.gbLoops.Text = "Loops";
             this.gbLoops.Visible = false;
+            // 
+            // tbLoopsOverrideId
+            // 
+            this.tbLoopsOverrideId.Location = new System.Drawing.Point(80, 51);
+            this.tbLoopsOverrideId.Name = "tbLoopsOverrideId";
+            this.tbLoopsOverrideId.Size = new System.Drawing.Size(154, 23);
+            this.tbLoopsOverrideId.TabIndex = 13;
+            this.scriptEditorToolTip.SetToolTip(this.tbLoopsOverrideId, "Enter the unique identifier within this action\r\nthat will will be used to allow t" +
+        "he number of\r\nloops to be executed, to be overridden with\r\nthe Device Config fil" +
+        "e.");
+            this.tbLoopsOverrideId.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Location = new System.Drawing.Point(9, 54);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(65, 15);
+            this.label39.TabIndex = 12;
+            this.label39.Text = "Override Id";
             // 
             // label38
             // 
@@ -529,7 +562,7 @@ namespace ScriptEditor
             this.gbList.Controls.Add(this.tbListName);
             this.gbList.Controls.Add(this.label34);
             this.gbList.Enabled = false;
-            this.gbList.Location = new System.Drawing.Point(174, 535);
+            this.gbList.Location = new System.Drawing.Point(974, 78);
             this.gbList.Name = "gbList";
             this.gbList.Size = new System.Drawing.Size(255, 48);
             this.gbList.TabIndex = 101;
@@ -692,6 +725,14 @@ namespace ScriptEditor
             // 
             // gbActionOverride
             // 
+            this.gbActionOverride.Controls.Add(this.btActionOverridesEdit);
+            this.gbActionOverride.Controls.Add(this.lvActionOverridesOverride);
+            this.gbActionOverride.Controls.Add(this.tbActionOverrideValue);
+            this.gbActionOverride.Controls.Add(this.label41);
+            this.gbActionOverride.Controls.Add(this.btActionOverridesRemove);
+            this.gbActionOverride.Controls.Add(this.btActionOverridesAdd);
+            this.gbActionOverride.Controls.Add(this.tbActionOverrideOverrideId);
+            this.gbActionOverride.Controls.Add(this.label40);
             this.gbActionOverride.Controls.Add(this.label29);
             this.gbActionOverride.Controls.Add(this.dtpActionOverrideLastRun);
             this.gbActionOverride.Controls.Add(this.tbActionOverrideEnabled);
@@ -702,13 +743,93 @@ namespace ScriptEditor
             this.gbActionOverride.Controls.Add(this.tbActionOverrideFrequency);
             this.gbActionOverride.Controls.Add(this.label28);
             this.gbActionOverride.Enabled = false;
-            this.gbActionOverride.Location = new System.Drawing.Point(12, 362);
+            this.gbActionOverride.Location = new System.Drawing.Point(1158, 143);
             this.gbActionOverride.Name = "gbActionOverride";
-            this.gbActionOverride.Size = new System.Drawing.Size(236, 164);
+            this.gbActionOverride.Size = new System.Drawing.Size(364, 392);
             this.gbActionOverride.TabIndex = 24;
             this.gbActionOverride.TabStop = false;
             this.gbActionOverride.Text = "Action Overrides";
             this.gbActionOverride.Visible = false;
+            // 
+            // lvActionOverridesOverride
+            // 
+            this.lvActionOverridesOverride.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader3,
+            this.columnHeader1});
+            this.lvActionOverridesOverride.HideSelection = false;
+            this.lvActionOverridesOverride.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            listViewItem1});
+            this.lvActionOverridesOverride.Location = new System.Drawing.Point(94, 156);
+            this.lvActionOverridesOverride.MultiSelect = false;
+            this.lvActionOverridesOverride.Name = "lvActionOverridesOverride";
+            this.lvActionOverridesOverride.ShowGroups = false;
+            this.lvActionOverridesOverride.Size = new System.Drawing.Size(264, 140);
+            this.lvActionOverridesOverride.TabIndex = 22;
+            this.lvActionOverridesOverride.UseCompatibleStateImageBehavior = false;
+            this.lvActionOverridesOverride.View = System.Windows.Forms.View.Details;
+            this.lvActionOverridesOverride.SelectedIndexChanged += new System.EventHandler(this.lvActionOverridesOverride_SelectedIndexChanged);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Value";
+            // 
+            // tbActionOverrideValue
+            // 
+            this.tbActionOverrideValue.Location = new System.Drawing.Point(94, 334);
+            this.tbActionOverrideValue.Name = "tbActionOverrideValue";
+            this.tbActionOverrideValue.Size = new System.Drawing.Size(154, 23);
+            this.tbActionOverrideValue.TabIndex = 21;
+            this.scriptEditorToolTip.SetToolTip(this.tbActionOverrideValue, "Enter the unique identifier within this action\r\nthat will will be used to allow t" +
+        "he number of\r\nloops to be executed, to be overridden with\r\nthe Device Config fil" +
+        "e.");
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(7, 337);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(35, 15);
+            this.label41.TabIndex = 20;
+            this.label41.Text = "Value";
+            // 
+            // btActionOverridesRemove
+            // 
+            this.btActionOverridesRemove.Location = new System.Drawing.Point(170, 362);
+            this.btActionOverridesRemove.Name = "btActionOverridesRemove";
+            this.btActionOverridesRemove.Size = new System.Drawing.Size(75, 23);
+            this.btActionOverridesRemove.TabIndex = 19;
+            this.btActionOverridesRemove.Text = "Remove";
+            this.btActionOverridesRemove.UseVisualStyleBackColor = true;
+            this.btActionOverridesRemove.Click += new System.EventHandler(this.btActionOverridesRemove_Click);
+            // 
+            // btActionOverridesAdd
+            // 
+            this.btActionOverridesAdd.Location = new System.Drawing.Point(8, 362);
+            this.btActionOverridesAdd.Name = "btActionOverridesAdd";
+            this.btActionOverridesAdd.Size = new System.Drawing.Size(75, 23);
+            this.btActionOverridesAdd.TabIndex = 18;
+            this.btActionOverridesAdd.Text = "Add";
+            this.btActionOverridesAdd.UseVisualStyleBackColor = true;
+            this.btActionOverridesAdd.Click += new System.EventHandler(this.btActionOverridesAdd_Click);
+            // 
+            // tbActionOverrideOverrideId
+            // 
+            this.tbActionOverrideOverrideId.Location = new System.Drawing.Point(94, 303);
+            this.tbActionOverrideOverrideId.Name = "tbActionOverrideOverrideId";
+            this.tbActionOverrideOverrideId.Size = new System.Drawing.Size(154, 23);
+            this.tbActionOverrideOverrideId.TabIndex = 15;
+            this.scriptEditorToolTip.SetToolTip(this.tbActionOverrideOverrideId, "Enter the unique identifier within this action\r\nthat will will be used to allow t" +
+        "he number of\r\nloops to be executed, to be overridden with\r\nthe Device Config fil" +
+        "e.");
+            // 
+            // label40
+            // 
+            this.label40.AutoSize = true;
+            this.label40.Location = new System.Drawing.Point(7, 306);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(65, 15);
+            this.label40.TabIndex = 14;
+            this.label40.Text = "Override Id";
             // 
             // label29
             // 
@@ -723,7 +844,7 @@ namespace ScriptEditor
             // 
             this.dtpActionOverrideLastRun.CustomFormat = "dd/MM/yyyy HH:mm:ss";
             this.dtpActionOverrideLastRun.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dtpActionOverrideLastRun.Location = new System.Drawing.Point(76, 47);
+            this.dtpActionOverrideLastRun.Location = new System.Drawing.Point(94, 47);
             this.dtpActionOverrideLastRun.Name = "dtpActionOverrideLastRun";
             this.dtpActionOverrideLastRun.Size = new System.Drawing.Size(154, 23);
             this.dtpActionOverrideLastRun.TabIndex = 3;
@@ -764,7 +885,7 @@ namespace ScriptEditor
             // 
             // tbActionOverrideName
             // 
-            this.tbActionOverrideName.Location = new System.Drawing.Point(76, 18);
+            this.tbActionOverrideName.Location = new System.Drawing.Point(94, 18);
             this.tbActionOverrideName.Name = "tbActionOverrideName";
             this.tbActionOverrideName.ReadOnly = true;
             this.tbActionOverrideName.Size = new System.Drawing.Size(154, 23);
@@ -806,7 +927,7 @@ namespace ScriptEditor
             this.gbAppName.Controls.Add(this.label24);
             this.gbAppName.Controls.Add(this.tbAppNameAppId);
             this.gbAppName.Enabled = false;
-            this.gbAppName.Location = new System.Drawing.Point(460, 526);
+            this.gbAppName.Location = new System.Drawing.Point(329, 518);
             this.gbAppName.Name = "gbAppName";
             this.gbAppName.Size = new System.Drawing.Size(438, 84);
             this.gbAppName.TabIndex = 23;
@@ -855,7 +976,7 @@ namespace ScriptEditor
             this.gbPickAction.Controls.Add(this.cbPickActionAction);
             this.gbPickAction.Controls.Add(this.label23);
             this.gbPickAction.Enabled = false;
-            this.gbPickAction.Location = new System.Drawing.Point(909, 525);
+            this.gbPickAction.Location = new System.Drawing.Point(773, 536);
             this.gbPickAction.Name = "gbPickAction";
             this.gbPickAction.Size = new System.Drawing.Size(293, 58);
             this.gbPickAction.TabIndex = 22;
@@ -889,7 +1010,7 @@ namespace ScriptEditor
             this.gbAppControl.Controls.Add(this.tbAppControlName);
             this.gbAppControl.Controls.Add(this.label19);
             this.gbAppControl.Enabled = false;
-            this.gbAppControl.Location = new System.Drawing.Point(568, 413);
+            this.gbAppControl.Location = new System.Drawing.Point(329, 412);
             this.gbAppControl.Name = "gbAppControl";
             this.gbAppControl.Size = new System.Drawing.Size(324, 100);
             this.gbAppControl.TabIndex = 21;
@@ -1242,7 +1363,7 @@ namespace ScriptEditor
             this.gbAction.Controls.Add(this.tbActionFrequency);
             this.gbAction.Controls.Add(this.label7);
             this.gbAction.Enabled = false;
-            this.gbAction.Location = new System.Drawing.Point(254, 323);
+            this.gbAction.Location = new System.Drawing.Point(5, 344);
             this.gbAction.Name = "gbAction";
             this.gbAction.Size = new System.Drawing.Size(308, 206);
             this.gbAction.TabIndex = 17;
@@ -1562,7 +1683,7 @@ namespace ScriptEditor
             this.gbImageName.Controls.Add(this.cbIgnoreMissing);
             this.gbImageName.Controls.Add(this.cbImageNameNoWait);
             this.gbImageName.Enabled = false;
-            this.gbImageName.Location = new System.Drawing.Point(568, 293);
+            this.gbImageName.Location = new System.Drawing.Point(329, 316);
             this.gbImageName.Name = "gbImageName";
             this.gbImageName.Size = new System.Drawing.Size(244, 90);
             this.gbImageName.TabIndex = 12;
@@ -1778,31 +1899,26 @@ namespace ScriptEditor
             this.saveFileDialog1.DefaultExt = "json";
             this.saveFileDialog1.Filter = "json files|*.json|All files|*.*";
             // 
-            // tbLoopsOverrideId
+            // columnHeader3
             // 
-            this.tbLoopsOverrideId.Location = new System.Drawing.Point(80, 51);
-            this.tbLoopsOverrideId.Name = "tbLoopsOverrideId";
-            this.tbLoopsOverrideId.Size = new System.Drawing.Size(154, 23);
-            this.tbLoopsOverrideId.TabIndex = 13;
-            this.tbLoopsOverrideId.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
-            this.scriptEditorToolTip.SetToolTip(this.tbLoopsOverrideId, "Enter the unique identifier within this action\r\nthat will will be used to allow t" +
-        "he number of\r\nloops to be executed, to be overridden with\r\nthe Device Config fil" +
-        "e.");
+            this.columnHeader3.Text = "Override Id";
+            this.columnHeader3.Width = 180;
             // 
-            // label39
+            // btActionOverridesEdit
             // 
-            this.label39.AutoSize = true;
-            this.label39.Location = new System.Drawing.Point(9, 54);
-            this.label39.Name = "label39";
-            this.label39.Size = new System.Drawing.Size(65, 15);
-            this.label39.TabIndex = 12;
-            this.label39.Text = "Override Id";
+            this.btActionOverridesEdit.Location = new System.Drawing.Point(90, 362);
+            this.btActionOverridesEdit.Name = "btActionOverridesEdit";
+            this.btActionOverridesEdit.Size = new System.Drawing.Size(75, 23);
+            this.btActionOverridesEdit.TabIndex = 23;
+            this.btActionOverridesEdit.Text = "Edit";
+            this.btActionOverridesEdit.UseVisualStyleBackColor = true;
+            this.btActionOverridesEdit.Click += new System.EventHandler(this.btActionOverridesEdit_Click);
             // 
             // ScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1387, 655);
+            this.ClientSize = new System.Drawing.Size(1689, 655);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -2012,6 +2128,16 @@ namespace ScriptEditor
         private System.Windows.Forms.TextBox tbLoopsOverrideId;
         private System.Windows.Forms.Label label39;
         private System.Windows.Forms.ToolTip scriptEditorToolTip;
+        private System.Windows.Forms.ListView lvActionOverridesOverride;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.TextBox tbActionOverrideValue;
+        private System.Windows.Forms.Label label41;
+        private System.Windows.Forms.Button btActionOverridesRemove;
+        private System.Windows.Forms.Button btActionOverridesAdd;
+        private System.Windows.Forms.TextBox tbActionOverrideOverrideId;
+        private System.Windows.Forms.Label label40;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.Button btActionOverridesEdit;
     }
 }
 

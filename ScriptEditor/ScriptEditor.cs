@@ -1560,6 +1560,21 @@ namespace ScriptEditor
                 {
                     tbActionFrequency.Text = string.Empty;
                 }
+                lvActionOverridesOverride.Items.Clear();
+                if (actionActivity.CommandValueOverride != null)
+                {
+                    foreach (KeyValuePair<string, string> item in actionActivity.CommandValueOverride)
+                    {
+                        ListViewItem lvItem = new ListViewItem();
+                        lvItem.Text = item.Key;
+                        ListViewItem.ListViewSubItem lvSubItem = new ListViewItem.ListViewSubItem();
+                        lvSubItem.Text = item.Value;
+                        lvItem.SubItems.Add(lvSubItem);
+                        lvActionOverridesOverride.Items.Add(lvItem);
+                    }
+                }
+                tbActionOverrideOverrideId.Text = string.Empty;
+                tbActionOverrideValue.Text = string.Empty;
                 gbActionOverride.Enabled = true;
                 gbActionOverride.Visible = true;
             }
@@ -2277,6 +2292,22 @@ namespace ScriptEditor
                         actionActivity.DailyScheduledTime = dtptbActionOverrideTimeOfDay.Value;
                     else
                         actionActivity.DailyScheduledTime = null;
+                    if (lvActionOverridesOverride.Items.Count > 0)
+                    {
+                        if (actionActivity.CommandValueOverride == null)
+                        {
+                            actionActivity.CommandValueOverride = new Dictionary<string, string>();
+                        }
+                        actionActivity.CommandValueOverride.Clear();
+                        foreach (ListViewItem item in lvActionOverridesOverride.Items)
+                        {
+                            actionActivity.CommandValueOverride.Add(item.Text, item.SubItems[1].Text);
+                        }
+                    }
+                    else
+                    {
+                        actionActivity.CommandValueOverride = null;
+                    }
                     ActiveTreeNode.Text = string.Format("{0} - {1}", tbActionOverrideName.Text, actionActivity.ActionEnabled ? "Enabled" : "Disabled");
                 }
                 else if (selectedTag is XYCoords coords)
@@ -2505,6 +2536,65 @@ namespace ScriptEditor
                 tbImageAreasW.Text = values[2];
                 tbImageAreasH.Text = values[3];
             }
+        }
+
+        /// <summary>
+        /// When the selected item changes in lvActionOverridesOverride, update the edit boxes.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void lvActionOverridesOverride_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lvActionOverridesOverride.SelectedItems.Count > 0)
+            {
+                tbActionOverrideOverrideId.Text = lvActionOverridesOverride.SelectedItems[0].Text;
+                tbActionOverrideValue.Text = lvActionOverridesOverride.SelectedItems[0].SubItems[1].Text;
+            }
+        }
+
+        /// <summary>
+        /// Add the values from the text boxes into lvActionOverridesOverride
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btActionOverridesAdd_Click(object sender, EventArgs e)
+        {
+            ListViewItem lvItem = new ListViewItem();
+            lvItem.Text = tbActionOverrideOverrideId.Text;
+            ListViewItem.ListViewSubItem lvSubItem = new ListViewItem.ListViewSubItem();
+            lvSubItem.Text = tbActionOverrideValue.Text;
+            lvItem.SubItems.Add(lvSubItem);
+            lvActionOverridesOverride.Items.Add(lvItem);
+            SetChangePending();
+        }
+
+        /// <summary>
+        /// Apply the changes into the selected item in lvActionOverridesOverride
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btActionOverridesEdit_Click(object sender, EventArgs e)
+        {
+            if (lvActionOverridesOverride.SelectedItems.Count > 0)
+            {
+                lvActionOverridesOverride.SelectedItems[0].Text = tbActionOverrideOverrideId.Text;
+                lvActionOverridesOverride.SelectedItems[0].SubItems[1].Text = tbActionOverrideValue.Text;
+            }
+            SetChangePending();
+        }
+
+        /// <summary>
+        /// Remove the active record from lvActionOverridesOverride
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btActionOverridesRemove_Click(object sender, EventArgs e)
+        {
+            if (lvActionOverridesOverride.SelectedItems.Count > 0)
+            {
+                lvActionOverridesOverride.SelectedItems[0].Remove();
+            }
+            SetChangePending();
         }
 
         #endregion

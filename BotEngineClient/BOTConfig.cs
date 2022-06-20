@@ -298,6 +298,7 @@ namespace BotEngineClient
                     break;
                 case BotEngine.ValidCommandIds.LoopCounter:
                     Value = string.Empty;
+                    OverrideId = string.Empty;
                     break;
                 default:
                     break;

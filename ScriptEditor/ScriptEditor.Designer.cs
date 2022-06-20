@@ -29,6 +29,7 @@ namespace ScriptEditor
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScriptEditor));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -148,6 +149,7 @@ namespace ScriptEditor
             this.label5 = new System.Windows.Forms.Label();
             this.tbDelay = new System.Windows.Forms.MaskedTextBox();
             this.gbImageNames = new System.Windows.Forms.GroupBox();
+            this.cbImageNamesMissingOk = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
             this.tbImageNamesWait = new System.Windows.Forms.MaskedTextBox();
             this.btnRemoveImageNames = new System.Windows.Forms.Button();
@@ -180,7 +182,9 @@ namespace ScriptEditor
             this.tbPointY = new System.Windows.Forms.MaskedTextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.cbImageNamesMissingOk = new System.Windows.Forms.CheckBox();
+            this.tbLoopsOverrideId = new System.Windows.Forms.TextBox();
+            this.label39 = new System.Windows.Forms.Label();
+            this.scriptEditorToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -488,12 +492,14 @@ namespace ScriptEditor
             // 
             // gbLoops
             // 
+            this.gbLoops.Controls.Add(this.tbLoopsOverrideId);
+            this.gbLoops.Controls.Add(this.label39);
             this.gbLoops.Controls.Add(this.label38);
             this.gbLoops.Controls.Add(this.tbLoopsCounter);
             this.gbLoops.Enabled = false;
-            this.gbLoops.Location = new System.Drawing.Point(579, 298);
+            this.gbLoops.Location = new System.Drawing.Point(898, 409);
             this.gbLoops.Name = "gbLoops";
-            this.gbLoops.Size = new System.Drawing.Size(195, 62);
+            this.gbLoops.Size = new System.Drawing.Size(331, 95);
             this.gbLoops.TabIndex = 102;
             this.gbLoops.TabStop = false;
             this.gbLoops.Text = "Loops";
@@ -510,7 +516,7 @@ namespace ScriptEditor
             // 
             // tbLoopsCounter
             // 
-            this.tbLoopsCounter.Location = new System.Drawing.Point(94, 22);
+            this.tbLoopsCounter.Location = new System.Drawing.Point(80, 22);
             this.tbLoopsCounter.Mask = "#00000";
             this.tbLoopsCounter.Name = "tbLoopsCounter";
             this.tbLoopsCounter.Size = new System.Drawing.Size(71, 23);
@@ -1424,6 +1430,18 @@ namespace ScriptEditor
             this.gbImageNames.Text = "Image Names";
             this.gbImageNames.Visible = false;
             // 
+            // cbImageNamesMissingOk
+            // 
+            this.cbImageNamesMissingOk.AutoSize = true;
+            this.cbImageNamesMissingOk.Location = new System.Drawing.Point(9, 249);
+            this.cbImageNamesMissingOk.Name = "cbImageNamesMissingOk";
+            this.cbImageNamesMissingOk.Size = new System.Drawing.Size(90, 19);
+            this.cbImageNamesMissingOk.TabIndex = 6;
+            this.cbImageNamesMissingOk.Text = "Missing Ok?";
+            this.cbImageNamesMissingOk.UseVisualStyleBackColor = true;
+            this.cbImageNamesMissingOk.Visible = false;
+            this.cbImageNamesMissingOk.CheckedChanged += new System.EventHandler(this.AllFields_TextChanged);
+            // 
             // label6
             // 
             this.label6.AutoSize = true;
@@ -1544,7 +1562,7 @@ namespace ScriptEditor
             this.gbImageName.Controls.Add(this.cbIgnoreMissing);
             this.gbImageName.Controls.Add(this.cbImageNameNoWait);
             this.gbImageName.Enabled = false;
-            this.gbImageName.Location = new System.Drawing.Point(895, 421);
+            this.gbImageName.Location = new System.Drawing.Point(568, 293);
             this.gbImageName.Name = "gbImageName";
             this.gbImageName.Size = new System.Drawing.Size(244, 90);
             this.gbImageName.TabIndex = 12;
@@ -1760,17 +1778,25 @@ namespace ScriptEditor
             this.saveFileDialog1.DefaultExt = "json";
             this.saveFileDialog1.Filter = "json files|*.json|All files|*.*";
             // 
-            // cbImageNamesMissingOk
+            // tbLoopsOverrideId
             // 
-            this.cbImageNamesMissingOk.AutoSize = true;
-            this.cbImageNamesMissingOk.Location = new System.Drawing.Point(9, 249);
-            this.cbImageNamesMissingOk.Name = "cbImageNamesMissingOk";
-            this.cbImageNamesMissingOk.Size = new System.Drawing.Size(90, 19);
-            this.cbImageNamesMissingOk.TabIndex = 6;
-            this.cbImageNamesMissingOk.Text = "Missing Ok?";
-            this.cbImageNamesMissingOk.UseVisualStyleBackColor = true;
-            this.cbImageNamesMissingOk.Visible = false;
-            this.cbImageNamesMissingOk.CheckedChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbLoopsOverrideId.Location = new System.Drawing.Point(80, 51);
+            this.tbLoopsOverrideId.Name = "tbLoopsOverrideId";
+            this.tbLoopsOverrideId.Size = new System.Drawing.Size(154, 23);
+            this.tbLoopsOverrideId.TabIndex = 13;
+            this.tbLoopsOverrideId.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.scriptEditorToolTip.SetToolTip(this.tbLoopsOverrideId, "Enter the unique identifier within this action\r\nthat will will be used to allow t" +
+        "he number of\r\nloops to be executed, to be overridden with\r\nthe Device Config fil" +
+        "e.");
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Location = new System.Drawing.Point(9, 54);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(65, 15);
+            this.label39.TabIndex = 12;
+            this.label39.Text = "Override Id";
             // 
             // ScriptEditor
             // 
@@ -1983,6 +2009,9 @@ namespace ScriptEditor
         private System.Windows.Forms.ToolStripMenuItem closeToolStripMenuItem;
         private System.Windows.Forms.CheckBox cbImageNameMissingOk;
         private System.Windows.Forms.CheckBox cbImageNamesMissingOk;
+        private System.Windows.Forms.TextBox tbLoopsOverrideId;
+        private System.Windows.Forms.Label label39;
+        private System.Windows.Forms.ToolTip scriptEditorToolTip;
     }
 }
 

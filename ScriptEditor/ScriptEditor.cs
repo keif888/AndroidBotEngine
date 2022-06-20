@@ -1065,6 +1065,7 @@ namespace ScriptEditor
                 newCommand.Swipe = childCommand.Swipe;
                 newCommand.TimeOut = childCommand.TimeOut;
                 newCommand.Value = childCommand.Value;
+                newCommand.OverrideId = childCommand.OverrideId;
                 commands.Add(newCommand);
             }
         }
@@ -1423,6 +1424,10 @@ namespace ScriptEditor
                         case ValidCommandIds.LoopCounter:
                             if (int.TryParse(commandCopy.Value, out _))
                                 tbLoopsCounter.Text = commandCopy.Value;
+                            if (commandCopy.OverrideId != null)
+                                tbLoopsOverrideId.Text = commandCopy.OverrideId;
+                            else
+                                tbLoopsOverrideId.Text = string.Empty;
                             addCommandToolStripMenuItem.Enabled = true;
                             gbLoops.Enabled = true;
                             gbLoops.Visible = true;
@@ -2237,6 +2242,14 @@ namespace ScriptEditor
                                     return;
                                 }
                                 commandCopy.Value = tbLoopsCounter.Text;
+                                if (tbLoopsOverrideId.Text.Length > 0)
+                                {
+                                    commandCopy.OverrideId = tbLoopsOverrideId.Text;
+                                }
+                                else
+                                {
+                                    commandCopy.OverrideId = null;
+                                }
                                 break;
                             default:
                                 MessageBox.Show(string.Format("CommandId {0} hasn't been implmented in Editor", commandCopy.CommandId));

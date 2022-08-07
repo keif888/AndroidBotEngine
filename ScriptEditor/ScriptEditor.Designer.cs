@@ -64,6 +64,11 @@ namespace ScriptEditor
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tvBotData = new System.Windows.Forms.TreeView();
+            this.gbEnterText = new System.Windows.Forms.GroupBox();
+            this.tbEnterTextText = new System.Windows.Forms.TextBox();
+            this.tbEnterTextOverideId = new System.Windows.Forms.TextBox();
+            this.label42 = new System.Windows.Forms.Label();
+            this.label43 = new System.Windows.Forms.Label();
             this.gbLoops = new System.Windows.Forms.GroupBox();
             this.tbLoopsOverrideId = new System.Windows.Forms.TextBox();
             this.label39 = new System.Windows.Forms.Label();
@@ -86,7 +91,9 @@ namespace ScriptEditor
             this.label30 = new System.Windows.Forms.Label();
             this.cbImageAreasImage = new System.Windows.Forms.ComboBox();
             this.gbActionOverride = new System.Windows.Forms.GroupBox();
+            this.btActionOverridesEdit = new System.Windows.Forms.Button();
             this.lvActionOverridesOverride = new System.Windows.Forms.ListView();
+            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
             this.tbActionOverrideValue = new System.Windows.Forms.TextBox();
             this.label41 = new System.Windows.Forms.Label();
@@ -196,13 +203,12 @@ namespace ScriptEditor
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.scriptEditorToolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
-            this.btActionOverridesEdit = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.gbEnterText.SuspendLayout();
             this.gbLoops.SuspendLayout();
             this.gbList.SuspendLayout();
             this.gbImageArea.SuspendLayout();
@@ -469,6 +475,7 @@ namespace ScriptEditor
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.gbEnterText);
             this.splitContainer1.Panel2.Controls.Add(this.gbLoops);
             this.splitContainer1.Panel2.Controls.Add(this.gbList);
             this.splitContainer1.Panel2.Controls.Add(this.gbImageArea);
@@ -503,6 +510,61 @@ namespace ScriptEditor
             this.tvBotData.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.TvBotData_BeforeSelect);
             this.tvBotData.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.TvBotData_AfterSelect);
             // 
+            // gbEnterText
+            // 
+            this.gbEnterText.Controls.Add(this.tbEnterTextText);
+            this.gbEnterText.Controls.Add(this.tbEnterTextOverideId);
+            this.gbEnterText.Controls.Add(this.label42);
+            this.gbEnterText.Controls.Add(this.label43);
+            this.gbEnterText.Enabled = false;
+            this.gbEnterText.Location = new System.Drawing.Point(681, 424);
+            this.gbEnterText.Name = "gbEnterText";
+            this.gbEnterText.Size = new System.Drawing.Size(254, 80);
+            this.gbEnterText.TabIndex = 103;
+            this.gbEnterText.TabStop = false;
+            this.gbEnterText.Text = "Enter Text";
+            this.gbEnterText.Visible = false;
+            // 
+            // tbEnterTextText
+            // 
+            this.tbEnterTextText.Location = new System.Drawing.Point(80, 22);
+            this.tbEnterTextText.Name = "tbEnterTextText";
+            this.tbEnterTextText.Size = new System.Drawing.Size(154, 23);
+            this.tbEnterTextText.TabIndex = 1;
+            this.scriptEditorToolTip.SetToolTip(this.tbEnterTextText, "Enter the unique identifier within this action\r\nthat will will be used to allow t" +
+        "he number of\r\nloops to be executed, to be overridden with\r\nthe Device Config fil" +
+        "e.");
+            this.tbEnterTextText.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            // 
+            // tbEnterTextOverideId
+            // 
+            this.tbEnterTextOverideId.Location = new System.Drawing.Point(80, 51);
+            this.tbEnterTextOverideId.Name = "tbEnterTextOverideId";
+            this.tbEnterTextOverideId.Size = new System.Drawing.Size(154, 23);
+            this.tbEnterTextOverideId.TabIndex = 2;
+            this.scriptEditorToolTip.SetToolTip(this.tbEnterTextOverideId, "Enter the unique identifier within this action\r\nthat will will be used to allow t" +
+        "he number of\r\nloops to be executed, to be overridden with\r\nthe Device Config fil" +
+        "e.");
+            this.tbEnterTextOverideId.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            // 
+            // label42
+            // 
+            this.label42.AutoSize = true;
+            this.label42.Location = new System.Drawing.Point(9, 54);
+            this.label42.Name = "label42";
+            this.label42.Size = new System.Drawing.Size(65, 15);
+            this.label42.TabIndex = 12;
+            this.label42.Text = "Override Id";
+            // 
+            // label43
+            // 
+            this.label43.AutoSize = true;
+            this.label43.Location = new System.Drawing.Point(9, 25);
+            this.label43.Name = "label43";
+            this.label43.Size = new System.Drawing.Size(28, 15);
+            this.label43.TabIndex = 10;
+            this.label43.Text = "Text";
+            // 
             // gbLoops
             // 
             this.gbLoops.Controls.Add(this.tbLoopsOverrideId);
@@ -510,9 +572,9 @@ namespace ScriptEditor
             this.gbLoops.Controls.Add(this.label38);
             this.gbLoops.Controls.Add(this.tbLoopsCounter);
             this.gbLoops.Enabled = false;
-            this.gbLoops.Location = new System.Drawing.Point(661, 424);
+            this.gbLoops.Location = new System.Drawing.Point(576, 323);
             this.gbLoops.Name = "gbLoops";
-            this.gbLoops.Size = new System.Drawing.Size(331, 95);
+            this.gbLoops.Size = new System.Drawing.Size(254, 80);
             this.gbLoops.TabIndex = 102;
             this.gbLoops.TabStop = false;
             this.gbLoops.Text = "Loops";
@@ -751,6 +813,16 @@ namespace ScriptEditor
             this.gbActionOverride.Text = "Action Overrides";
             this.gbActionOverride.Visible = false;
             // 
+            // btActionOverridesEdit
+            // 
+            this.btActionOverridesEdit.Location = new System.Drawing.Point(90, 362);
+            this.btActionOverridesEdit.Name = "btActionOverridesEdit";
+            this.btActionOverridesEdit.Size = new System.Drawing.Size(75, 23);
+            this.btActionOverridesEdit.TabIndex = 23;
+            this.btActionOverridesEdit.Text = "Edit";
+            this.btActionOverridesEdit.UseVisualStyleBackColor = true;
+            this.btActionOverridesEdit.Click += new System.EventHandler(this.btActionOverridesEdit_Click);
+            // 
             // lvActionOverridesOverride
             // 
             this.lvActionOverridesOverride.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
@@ -768,6 +840,11 @@ namespace ScriptEditor
             this.lvActionOverridesOverride.UseCompatibleStateImageBehavior = false;
             this.lvActionOverridesOverride.View = System.Windows.Forms.View.Details;
             this.lvActionOverridesOverride.SelectedIndexChanged += new System.EventHandler(this.lvActionOverridesOverride_SelectedIndexChanged);
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Override Id";
+            this.columnHeader3.Width = 180;
             // 
             // columnHeader1
             // 
@@ -1899,21 +1976,6 @@ namespace ScriptEditor
             this.saveFileDialog1.DefaultExt = "json";
             this.saveFileDialog1.Filter = "json files|*.json|All files|*.*";
             // 
-            // columnHeader3
-            // 
-            this.columnHeader3.Text = "Override Id";
-            this.columnHeader3.Width = 180;
-            // 
-            // btActionOverridesEdit
-            // 
-            this.btActionOverridesEdit.Location = new System.Drawing.Point(90, 362);
-            this.btActionOverridesEdit.Name = "btActionOverridesEdit";
-            this.btActionOverridesEdit.Size = new System.Drawing.Size(75, 23);
-            this.btActionOverridesEdit.TabIndex = 23;
-            this.btActionOverridesEdit.Text = "Edit";
-            this.btActionOverridesEdit.UseVisualStyleBackColor = true;
-            this.btActionOverridesEdit.Click += new System.EventHandler(this.btActionOverridesEdit_Click);
-            // 
             // ScriptEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1932,6 +1994,8 @@ namespace ScriptEditor
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.gbEnterText.ResumeLayout(false);
+            this.gbEnterText.PerformLayout();
             this.gbLoops.ResumeLayout(false);
             this.gbLoops.PerformLayout();
             this.gbList.ResumeLayout(false);
@@ -2138,6 +2202,11 @@ namespace ScriptEditor
         private System.Windows.Forms.Label label40;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.Button btActionOverridesEdit;
+        private System.Windows.Forms.GroupBox gbEnterText;
+        private System.Windows.Forms.TextBox tbEnterTextText;
+        private System.Windows.Forms.TextBox tbEnterTextOverideId;
+        private System.Windows.Forms.Label label42;
+        private System.Windows.Forms.Label label43;
     }
 }
 

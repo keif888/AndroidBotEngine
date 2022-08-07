@@ -64,6 +64,7 @@ namespace ScriptEditor
             ResetGroupBox(gbImageArea);
             ResetGroupBox(gbList);
             ResetGroupBox(gbLoops);
+            ResetGroupBox(gbEnterText);
 
             this.Size = new Size(800, 485);
             splitContainer1.SplitterDistance = 320;
@@ -1242,6 +1243,26 @@ namespace ScriptEditor
                             gbLoopCoordinate.Enabled = true;
                             gbLoopCoordinate.Visible = true;
                             break;
+                        case ValidCommandIds.EnterText:
+                            if (commandCopy.Value != null)
+                            {
+                                tbEnterTextText.Text = commandCopy.Value;
+                            }
+                            else
+                            {
+                                tbEnterTextText.Text = string.Empty;
+                            }
+                            if (commandCopy.OverrideId != null)
+                            {
+                                tbEnterTextOverideId.Text = commandCopy.OverrideId;
+                            }
+                            else
+                            {
+                                tbEnterTextOverideId.Text = string.Empty;
+                            }
+                            gbEnterText.Enabled = true;
+                            gbEnterText.Visible = true;
+                            break;
                         case ValidCommandIds.FindClick:
                             if (!string.IsNullOrEmpty(commandCopy.ImageName))
                                 cbImageNameNoWait.SelectedItem = commandCopy.ImageName;
@@ -1804,6 +1825,7 @@ namespace ScriptEditor
                             childText = string.Format("{0} ({1}, {2}) - ({3}, {4})", command.CommandId, command.Swipe.X1, command.Swipe.Y1, command.Swipe.X2, command.Swipe.Y2);
                         break;
                     case ValidCommandIds.EnterLoopCoordinate:
+                    case ValidCommandIds.EnterText:
                         if (command.Value != null)
                             childText = string.Format("{0} ({1})", command.CommandId, command.Value);
                         break;
@@ -1905,6 +1927,8 @@ namespace ScriptEditor
             btnUpdate.Enabled = false;
             gbLoops.Enabled = false;
             gbLoops.Visible = false;
+            gbEnterText.Enabled = false;
+            gbEnterText.Visible = false;
         }
 
         /// <summary>
@@ -2091,6 +2115,17 @@ namespace ScriptEditor
                                 else
                                 {
                                     commandCopy.Value = "Y";
+                                }
+                                break;
+                            case ValidCommandIds.EnterText:
+                                commandCopy.Value = tbEnterTextText.Text;
+                                if (tbEnterTextOverideId.Text.Length > 0)
+                                {
+                                    commandCopy.OverrideId = tbEnterTextOverideId.Text;
+                                }
+                                else
+                                {
+                                    commandCopy.OverrideId = null;
                                 }
                                 break;
                             case ValidCommandIds.FindClick:

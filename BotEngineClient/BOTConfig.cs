@@ -250,6 +250,9 @@ namespace BotEngineClient
                 case BotEngine.ValidCommandIds.EnterLoopCoordinate:
                     Value = string.Empty;
                     break;
+                case BotEngine.ValidCommandIds.EnterText:
+                    Value = String.Empty;
+                    break;
                 case BotEngine.ValidCommandIds.FindClick:
                     ImageName = String.Empty;
                     IgnoreMissing = false;

@@ -89,7 +89,7 @@ namespace TestBotEngineClient
 
             Assert.IsFalse(jsonHelper.ValidateGameConfigStructure(fileName));
             Assert.IsNotNull(jsonHelper.Errors);
-            Assert.AreEqual<int>(57, jsonHelper.Errors.Count);
+            Assert.AreEqual<int>(58, jsonHelper.Errors.Count);
             
             CollectionAssert.Contains(jsonHelper.Errors, "FindStrings list item \"BadFindString\" at path $.FindStrings.BadFindString.SearchString is of the wrong type.  Was expecting String but found System.Text.Json.Nodes.JsonArray");
             CollectionAssert.Contains(jsonHelper.Errors, "FindStrings list item \"MissingFindString\" at path $.FindStrings.MissingFindString is missing required field \"SearchString\"");
@@ -161,6 +161,8 @@ namespace TestBotEngineClient
             CollectionAssert.Contains(jsonHelper.Errors, "SystemActions list item \"IfExistsImageNameWrongType\" at path $.SystemActions.IfExistsImageNameWrongType.Commands[0].ImageName is of the wrong type.  Was expecting String but found False");
             CollectionAssert.Contains(jsonHelper.Errors, "SystemActions list item \"IfNotExistsCommandsMissing\" at path $.SystemActions.IfNotExistsCommandsMissing.Commands[0] is missing required field \"Commands\"");
             CollectionAssert.Contains(jsonHelper.Errors, "SystemActions list item \"IfExistsCommandsWrongType\" at path $.SystemActions.IfExistsCommandsWrongType.Commands[0].Commands is of the wrong type.  Was expecting JsonArray with one or more Command objects but found String");
+
+            CollectionAssert.Contains(jsonHelper.Errors, "SystemActions list item \"EnterTextWrongType\" at path $.SystemActions.EnterTextWrongType.Commands[0].Value is of the wrong type.  Was expecting String but found Number");
 
         }
 

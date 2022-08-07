@@ -58,6 +58,11 @@
               "CommandId": "StartGame",
               "TimeOut": 120000,
               "Value": "com.android.chrome/com.android.chrome/com.google.android.apps.chrome.Main"
+            },
+            {
+              "CommandNumber": 1020,
+              "CommandId": "EnterText",
+              "Value": "Text To Enter"
             }
           ]
         }

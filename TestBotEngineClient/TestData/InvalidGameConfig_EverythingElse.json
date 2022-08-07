@@ -524,6 +524,17 @@
           "ImageName": "ValidFindString"
         }
       ]
+    },
+    "EnterTextWrongType": {
+      "Frequency": 1,
+      "ActionType": "System",
+      "Commands": [
+        {
+          "CommandNumber": 10,
+          "CommandId": "EnterText",
+          "Value": 0
+        }
+      ]
     }
   },
   "actions": {

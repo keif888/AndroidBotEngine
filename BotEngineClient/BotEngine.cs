@@ -62,6 +62,7 @@ namespace BotEngineClient
             Drag,
             Exit,
             EnterLoopCoordinate,
+            EnterText,
             FindClick,
             FindClickAndWait,
             IfExists,
@@ -1155,6 +1156,23 @@ namespace BotEngineClient
                             {
                                 ADBSendKeys(((XYCoords)additionalData).Y.ToString());
                             }
+                            break;
+                        case ValidCommandIds.EnterText:
+                            if (command.Value == null)
+                            {
+                                _logger.LogError("Command {0} Error Value is null", command.CommandId);
+                                results = CommandResults.InputError;
+                            }
+                            string commandValue = command.Value;
+                            if (actionActivity.CommandValueOverride != null && command.OverrideId != null)
+                            {
+                                if (actionActivity.CommandValueOverride.ContainsKey(command.OverrideId))
+                                {
+                                    if (actionActivity.CommandValueOverride[command.OverrideId] != null)
+                                        commandValue = actionActivity.CommandValueOverride[command.OverrideId];
+                                }
+                            }
+                            ADBSendKeys(commandValue);
                             break;
                         case ValidCommandIds.FindClick:
                             if (command.ImageName == null)

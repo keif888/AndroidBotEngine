@@ -45,6 +45,7 @@ namespace ScriptEditor
             "Drag",
             "Exit",
             "EnterLoopCoordinate",
+            "EnterText",
             "FindClick",
             "FindClickAndWait",
             "IfExists",

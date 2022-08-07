@@ -60,6 +60,12 @@ namespace ScriptEditor
 \b0\fs22 This command will enter the text associated with the coordinate part (X/Y) from the list selected via \b Loop Coordinates\b0 .\par
 }";
                     break;
+                case ValidCommandIds.EnterText:
+                    rtbCommandHelp.Rtf = @"{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang3081{\fonttbl{\f0\fnil\fcharset0 Calibri;}}\viewkind4\uc1\pard\sa200\sl276\slmult1
+\b\fs32 Enter Text\par
+\b0\fs22 This command will enter the text that you assign via the Android Keyboard.\par
+}";
+                    break;
                 case ValidCommandIds.FindClick:
                     rtbCommandHelp.Rtf = @"{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang3081{\fonttbl{\f0\fnil\fcharset0 Calibri;}}\viewkind4\uc1\pard\sa200\sl276\slmult1
 \b\fs32 Find Click\par

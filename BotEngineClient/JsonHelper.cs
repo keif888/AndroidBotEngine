@@ -450,6 +450,7 @@ namespace BotEngineClient
                             case BotEngine.ValidCommandIds.Exit:
                                 break;
                             case BotEngine.ValidCommandIds.EnterLoopCoordinate:
+                            case BotEngine.ValidCommandIds.EnterText:
                                 ValidateJsonValue(location, listItemName, "Value", commandsObject, JsonValueKind.String);
                                 break;
                             case BotEngine.ValidCommandIds.FindClick:

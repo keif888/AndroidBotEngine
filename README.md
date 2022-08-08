@@ -35,6 +35,8 @@ The list of commands to date are:
 	- Supports nested Commands
 1. EnterLoopCoordinate
 	- Takes the specified X/Y coordinate from a configured list (via Command LoopCoordinates) and sends them to the Android Device as keyboard data entry
+1. EnterText
+    - Takes a string, and sends it to the Android Device as keyboard data entry
 1. FindClick
 	- Searches for a specified image, and clicks on it when found
 1. FindClickAndWait
@@ -86,3 +88,6 @@ The list of commands to date are:
 
 2022-05-13 - 0.3.1.14_beta released.  
 Known issues with LDPlayer versions greater than 4.0.76 due to ADB retrieval of FrameBuffer being unstable  
+2022-08-07 - 0.4.4.63_beta released.  
+Known issues with LDPlayer versions greater than 4.0.76 due to ADB retrieval of FrameBuffer being unstable  
+Adds EnterText command, ability within bot engine to start Adhoc Actions (hit A on the keyboard)  

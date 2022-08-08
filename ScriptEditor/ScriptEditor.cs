@@ -43,6 +43,9 @@ namespace ScriptEditor
         public ScriptEditor()
         {
             InitializeComponent();
+            // For some mysterious reason Visual Studio keeps deleting this from the ScriptEditor.Designer.cs file.
+            tvBotData.Cursor = System.Windows.Forms.Cursors.Default;
+
             gameConfig = new BOTConfig();
             deviceConfig = new BOTDeviceConfig();
             listConfig = new BOTListConfig();

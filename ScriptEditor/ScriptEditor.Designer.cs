@@ -501,7 +501,6 @@ namespace ScriptEditor
             // 
             // tvBotData
             // 
-            this.tvBotData.Cursor = System.Windows.Forms.Cursors.Default;
             this.tvBotData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tvBotData.Location = new System.Drawing.Point(0, 0);
             this.tvBotData.Name = "tvBotData";
@@ -1863,6 +1862,7 @@ namespace ScriptEditor
             this.tbDragTime.Size = new System.Drawing.Size(71, 23);
             this.tbDragTime.TabIndex = 7;
             this.tbDragTime.ValidatingType = typeof(int);
+            this.tbDragTime.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
             // 
             // tbDragX1
             // 

@@ -421,11 +421,20 @@ namespace BotEngine
                                     switch (validActionType)
                                     {
                                         case ValidActionType.Adhoc:
-                                            ActionActivity adhocActionActivity = new ActionActivity
-                                            {
+                                            ActionActivity adhocActionActivity = new ActionActivity {
                                                 LastRun = DateTime.MinValue,
-                                                ActionEnabled = false
+                                                ActionEnabled = false,
+                                                CommandValueOverride = new Dictionary<string, string?>()
                                             };
+                                            if (item.Value.Commands != null)
+                                                foreach (Command commandItem in item.Value.Commands)
+                                                {
+                                                    GatherOverrides(adhocActionActivity.CommandValueOverride, commandItem);
+                                                }
+                                            if (adhocActionActivity.CommandValueOverride.Count == 0)
+                                            {
+                                                adhocActionActivity.CommandValueOverride = null;
+                                            }
                                             botDeviceConfig.LastActionTaken.Add(item.Key, adhocActionActivity);
                                             break;
                                         case ValidActionType.Always:
@@ -435,8 +444,18 @@ namespace BotEngine
                                             ActionActivity dailyActionActivity = new ActionActivity
                                             {
                                                 LastRun = DateTime.MinValue,
-                                                ActionEnabled = true
+                                                ActionEnabled = true,
+                                                CommandValueOverride= new Dictionary<string, string?>()
                                             };
+                                            if (item.Value.Commands != null)
+                                                foreach (Command commandItem in item.Value.Commands)
+                                                {
+                                                    GatherOverrides(dailyActionActivity.CommandValueOverride, commandItem);
+                                                }
+                                            if (dailyActionActivity.CommandValueOverride.Count == 0)
+                                            {
+                                                dailyActionActivity.CommandValueOverride = null;
+                                            }
                                             botDeviceConfig.LastActionTaken.Add(item.Key, dailyActionActivity);
                                             break;
                                         case ValidActionType.System:
@@ -625,6 +644,24 @@ namespace BotEngine
                 }
                 return exitCode;
             }
+        }
+
+        /// <summary>
+        /// Recurse through the command to get all the overrides available.
+        /// </summary>
+        /// <param name="overrides"></param>
+        /// <param name="command"></param>
+        private static void GatherOverrides(Dictionary<string,string?> overrides, Command command)
+        {
+            if (command.OverrideId != null)
+            {
+                overrides.Add(command.OverrideId, null);
+            }
+            if (command.Commands != null)
+                foreach (Command commandItem in command.Commands)
+                {
+                    GatherOverrides(overrides, commandItem);
+                }
         }
 
         private static ActionActivity? GetOverride(Dictionary<string, ActionActivity> actionActivity, string key)
@@ -823,8 +860,18 @@ namespace BotEngine
                                 ActionActivity actionActivty = new ActionActivity
                                 {
                                     ActionEnabled = false,
-                                    LastRun = DateTime.MinValue
+                                    LastRun = DateTime.MinValue,
+                                    CommandValueOverride = new Dictionary<string, string?>()
                                 };
+                                if (item.Value.Commands != null)
+                                    foreach (Command commandItem in item.Value.Commands)
+                                    {
+                                        GatherOverrides(actionActivty.CommandValueOverride, commandItem);
+                                    }
+                                if (actionActivty.CommandValueOverride.Count == 0)
+                                {
+                                    actionActivty.CommandValueOverride = null;
+                                }
                                 botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
                             }
                             break;
@@ -836,8 +883,18 @@ namespace BotEngine
                                 ActionActivity actionActivty = new ActionActivity
                                 {
                                     ActionEnabled = true,
-                                    LastRun = DateTime.MinValue
+                                    LastRun = DateTime.MinValue,
+                                    CommandValueOverride = new Dictionary<string, string?>()
                                 };
+                                if (item.Value.Commands != null)
+                                    foreach (Command commandItem in item.Value.Commands)
+                                    {
+                                        GatherOverrides(actionActivty.CommandValueOverride, commandItem);
+                                    }
+                                if (actionActivty.CommandValueOverride.Count == 0)
+                                {
+                                    actionActivty.CommandValueOverride = null;
+                                }
                                 botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
                             }
                             break;

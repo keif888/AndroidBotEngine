@@ -427,7 +427,7 @@ namespace BotEngineClient
         /// 
         /// The Value is the value that will be used to replace the Value field.
         /// </summary>
-        public Dictionary<string,string>? CommandValueOverride { get; set; }
+        public Dictionary<string,string?>? CommandValueOverride { get; set; }
 
         public void MarkStartupBot(int Frequency)
         {

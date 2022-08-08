@@ -1587,12 +1587,15 @@ namespace ScriptEditor
                 lvActionOverridesOverride.Items.Clear();
                 if (actionActivity.CommandValueOverride != null)
                 {
-                    foreach (KeyValuePair<string, string> item in actionActivity.CommandValueOverride)
+                    foreach (KeyValuePair<string, string?> item in actionActivity.CommandValueOverride)
                     {
                         ListViewItem lvItem = new ListViewItem();
                         lvItem.Text = item.Key;
                         ListViewItem.ListViewSubItem lvSubItem = new ListViewItem.ListViewSubItem();
-                        lvSubItem.Text = item.Value;
+                        if (item.Value != null)
+                            lvSubItem.Text = item.Value;
+                        else
+                            lvSubItem.Text = string.Empty;
                         lvItem.SubItems.Add(lvSubItem);
                         lvActionOverridesOverride.Items.Add(lvItem);
                     }
@@ -2334,7 +2337,7 @@ namespace ScriptEditor
                     {
                         if (actionActivity.CommandValueOverride == null)
                         {
-                            actionActivity.CommandValueOverride = new Dictionary<string, string>();
+                            actionActivity.CommandValueOverride = new Dictionary<string, string?>();
                         }
                         actionActivity.CommandValueOverride.Clear();
                         foreach (ListViewItem item in lvActionOverridesOverride.Items)

@@ -881,6 +881,7 @@ namespace BotEngineClient
                                     if (lastActionItem.Value.AsObject().ContainsKey("Frequency"))
                                         ValidateJsonValue("LastActionTaken", lastActionItem.Key, "Frequency", lastActionItem.Value.AsObject(), JsonValueKind.Number);
                                     if (lastActionItem.Value.AsObject().ContainsKey("DailyScheduledTime"))
+                                    {
                                         if (ValidateJsonValue("LastActionTaken", lastActionItem.Key, "DailyScheduledTime", lastActionItem.Value.AsObject(), JsonValueKind.String))
                                         {
                                             if (lastActionItem.Value.AsObject()["DailyScheduledTime"] != null)
@@ -891,6 +892,39 @@ namespace BotEngineClient
                                                 }
                                             }
                                         }
+                                    }
+                                    if (lastActionItem.Value.AsObject().ContainsKey("CommandLoopStatus"))
+                                    {
+                                        JsonNode commandStatusNode = lastActionItem.Value.AsObject()["CommandLoopStatus"];
+                                        if (commandStatusNode is JsonObject commandStatusObject)
+                                        {
+                                            foreach (KeyValuePair<string, JsonNode?> commandStatusItem in commandStatusObject)
+                                            {
+                                                ValidateJsonValue("LastActionTaken", lastActionItem.Key, commandStatusItem.Key, commandStatusObject, JsonValueKind.String);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (commandStatusNode != null)
+                                                Errors.Add("Optional field \"CommandStatus\" is of the wrong type.  Expecting an Object with one or more named objects");
+                                        }
+                                    }
+                                    if (lastActionItem.Value.AsObject().ContainsKey("CommandValueOverride"))
+                                    {
+                                        JsonNode commandValueOverrideNode = lastActionItem.Value.AsObject()["CommandValueOverride"];
+                                        if (commandValueOverrideNode is JsonObject commandStatusObject)
+                                        {
+                                            foreach (KeyValuePair<string, JsonNode?> commandValueOverrideItem in commandStatusObject)
+                                            {
+                                                ValidateJsonValue("LastActionTaken", lastActionItem.Key, commandValueOverrideItem.Key, commandStatusObject, JsonValueKind.String);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (commandValueOverrideNode != null)
+                                                Errors.Add("Optional field \"CommandStatus\" is of the wrong type.  Expecting an Object with one or more named objects");
+                                        }
+                                    }
                                 }
                             }
                         }

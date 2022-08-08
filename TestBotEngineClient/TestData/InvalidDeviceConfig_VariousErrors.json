@@ -14,21 +14,19 @@
       "LastRun": "2022-04-15T22:53:32.6077396+10:00",
       "ActionEnabled": false,
       "Frequency": null,
-      "DailyScheduledTime": "1900-01-01T20:01:00.0000000+10:00",
-      "CommandLoopStatus": null,
-      "CommandValueOverride" :  null
+      "DailyScheduledTime": "1900-01-01T20:01:00.0000000+10:00"
     },
     "TransferBread": {
       "LastRun": "0001-01-01T00:00:00",
       "ActionEnabled": false,
       "Frequency": null,
-      "DailyScheduledTime": null,
+      "DailyScheduledTime": 1,
       "CommandLoopStatus": {
-        "TransferBread/Loops.10/": "9"
+        "TransferBread": 9
       },
       "CommandValueOverride": {
-        "CoordX": null,
-        "CoordY": "123",
+        "CoordX": 1,
+        "CoordY": null,
         "Loops": null
       }
     }

@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Nullable>annotations</Nullable>
-    <AssemblyVersion>1.2.1.43</AssemblyVersion>
-    <FileVersion>1.2.1.43</FileVersion>
+    <AssemblyVersion>1.2.1.44</AssemblyVersion>
+    <FileVersion>1.2.1.44</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

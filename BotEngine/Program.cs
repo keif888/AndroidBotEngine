@@ -17,7 +17,7 @@ using SharpAdbClient;
 
 namespace BotEngine
 {
-    class Program
+    partial class Program
     {
         public static ServiceProvider ServiceProvider { get; set; }
         private static ILogger _logger;
@@ -30,6 +30,7 @@ namespace BotEngine
         private static bool reloadBOTDeviceConfig;
         private static Options options;
         private static bool cancelRequested;
+        private static bool exitRequested;
         private static FileSystemWatcher gameConfigWatcher;
         private static string gameConfigFileName;
         private static FileSystemWatcher listWatcher;
@@ -37,6 +38,9 @@ namespace BotEngine
         private static FileSystemWatcher deviceWatcher;
         private static string deviceConfigFileName;
         private static ServiceCollection services;
+
+        private static BotEngineClient.BotEngine.CommandResults threadResult;
+        private static CancellationTokenSource threadCTS;
 
 
         private enum ConsoleKeyPressEnum
@@ -46,63 +50,13 @@ namespace BotEngine
             Exit
         }
 
-        interface IGameOptions
-        {
-            [Option('d', "Device", SetName = "GameOptions", Required = false, HelpText = "The device string that is returned by ADB.exe.  At least the following is required \"emulator-5556 device\".")]
-            string DeviceString { get; set; }
-
-            [Option('g', "GameConfig", SetName = "GameOptions", Required = true, HelpText = "The name of the json file that contains the Search Strings and Actions.")]
-            string ConfigFileName { get; set; }
-
-            [Option('i', "ListConfig", SetName = "GameOptions", Required = true, HelpText = "The name of the json file that contains the List Settings.")]
-            string ListConfigFileName { get; set; }
-
-            [Option('c', "DeviceConfig", SetName = "GameOptions", Required = true, HelpText = "The name of the json file that contains the last time actions were taken for a device.  If the file doesn't exist it will be created.")]
-            string DeviceFileName { get; set; }
-
-            [Option('s', "SleepTime", SetName = "GameOptions", Required = false, HelpText = "The number of milliseconds to sleep between each loop of Actions.", Default = 500)]
-            int SleepTime { get; set; }
-
-            [Option('l', "LogLevel", Required = false, HelpText = "The level of output from the logger (None, Critical, Error, Warning, Information, Debug, Trace).", Default = "Warning")]
-            public string LogLevel { get; set; }
-
-        }
-
-        interface IListOptions
-        {
-            [Option('t', "ListDevices", SetName = "ListOptions", Required = true, HelpText = "Returns a list of all the devices available.")]
-            bool ListDevices { get; set; }
-
-        }
-
-
-        public class Options : IGameOptions, IListOptions
-        {
-            public string DeviceString { get; set; }
-
-            public string ConfigFileName { get; set; }
-
-            public string ListConfigFileName { get; set; }
-
-            public string DeviceFileName { get; set; }
-
-            public int SleepTime { get; set; }
-
-            public bool ListDevices { get; set; }
-
-            [Option('p', "ADBPath", Required = true, HelpText = "The path to where you have ADB.exe")]
-            public string ADBPath { get; set; }
-
-            public string LogLevel { get; set; }
-
-        }
-
         // ToDo: Add Exception Handling SharpAdbClient.Exceptions.AdbException
 
         static int Main(string[] args)
         {
             int result = 0;
             cancelRequested = false;
+            exitRequested = false;
             reloadBOTListConfig = false;
             reloadBOTDeviceConfig = false;
             reloadBOTGameConfig = false;
@@ -110,6 +64,7 @@ namespace BotEngine
             botListConfig = new BOTListConfig();
             botDeviceConfig = new BOTDeviceConfig();
             botDeviceConfigNew = new BOTDeviceConfig();
+            threadCTS = null;
 
             services = new ServiceCollection();
 
@@ -205,6 +160,10 @@ namespace BotEngine
         protected static void CancelHandler(object sender, ConsoleCancelEventArgs args)
         {
             _logger.LogCritical("Control C Captured");
+            if (threadCTS != null)
+            {
+                threadCTS.Cancel();
+            }
             args.Cancel = true;
             cancelRequested = true;
         }
@@ -544,6 +503,9 @@ namespace BotEngine
                         BotEngineClient.BotEngine.CommandResults cr = BotEngineClient.BotEngine.CommandResults.Ok;
                         DateTime tenMinuteDateTime = DateTime.Now;
                         bool paused = false;
+                        threadCTS = new CancellationTokenSource();
+                        Thread botThread;
+
                         do
                         {
                             if (reloadBOTListConfig)
@@ -595,21 +557,29 @@ namespace BotEngine
                                             {
                                                 if (item.Value.BeforeAction != null)
                                                 {
-                                                    // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                                    cr = bot.ExecuteAction(item.Value.BeforeAction, botDeviceConfig.LastActionTaken[item.Key]);
-                                                    if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                                    bot.SetThreadingCommand(item.Value.BeforeAction, ResultCallback, botDeviceConfig.LastActionTaken[item.Key]);
+                                                    botThread = new Thread(bot.InitiateThreadingCommand);
+                                                    botThread.Start(threadCTS.Token);
+                                                    botThread.Join();
+                                                    cr = threadResult;
+                                                    if (cr == BotEngineClient.BotEngine.CommandResults.ADBError || cr == BotEngineClient.BotEngine.CommandResults.Cancelled)
                                                         break;
                                                 }
                                                 _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
                                                 if (cancelRequested || paused)
                                                     break;
-                                                // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                                cr = bot.ExecuteAction(item.Key, botDeviceConfig.LastActionTaken[item.Key]);
+
+                                                bot.SetThreadingCommand(item.Key, ResultCallback, botDeviceConfig.LastActionTaken[item.Key]);
+                                                botThread = new Thread(bot.InitiateThreadingCommand);
+                                                botThread.Start(threadCTS.Token);
+                                                botThread.Join();
+                                                cr = threadResult;
+
                                                 _logger.LogInformation(string.Format("Action result was {0}", cr));
                                                 _ = HandleKeyboard(Actions, botDeviceConfig.LastActionTaken, ref paused);
                                                 if (cancelRequested || paused)
                                                     break;
-                                                if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                                if (cr == BotEngineClient.BotEngine.CommandResults.ADBError || cr == BotEngineClient.BotEngine.CommandResults.Cancelled)
                                                     break;
                                                 if (cr == BotEngineClient.BotEngine.CommandResults.Ok)
                                                 {
@@ -619,31 +589,55 @@ namespace BotEngine
                                                 }
                                                 if (item.Value.AfterAction != null)
                                                 {
-                                                    // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                                    cr = bot.ExecuteAction(item.Value.AfterAction, botDeviceConfig.LastActionTaken[item.Key]);
-                                                    if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                                    bot.SetThreadingCommand(item.Value.AfterAction, ResultCallback, botDeviceConfig.LastActionTaken[item.Key]);
+                                                    botThread = new Thread(bot.InitiateThreadingCommand);
+                                                    botThread.Start(threadCTS.Token);
+                                                    botThread.Join();
+                                                    cr = threadResult;
+                                                    if (cr == BotEngineClient.BotEngine.CommandResults.ADBError || cr == BotEngineClient.BotEngine.CommandResults.Cancelled)
                                                         break;
                                                 }
                                             }
                                         }
                                         else if (validActionType == ValidActionType.Always && botDeviceConfig.LastActionTaken[item.Key].ActionEnabled)
                                         {
-                                            // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
-                                            cr = bot.ExecuteAction(item.Key, botDeviceConfig.LastActionTaken[item.Key]);
-                                            if (cr == BotEngineClient.BotEngine.CommandResults.ADBError)
+                                            bot.SetThreadingCommand(item.Key, ResultCallback, botDeviceConfig.LastActionTaken[item.Key]);
+                                            botThread = new Thread(bot.InitiateThreadingCommand);
+                                            botThread.Start(threadCTS.Token);
+                                            botThread.Join();
+                                            cr = threadResult;
+                                            if (cr == BotEngineClient.BotEngine.CommandResults.ADBError || cr == BotEngineClient.BotEngine.CommandResults.Cancelled)
                                                 break;
                                         }
                                     }
                                 }
                             }
-                            if (!cancelRequested)
+                            // On Cancel detected, cleanup, show status, and go into pause mode.
+                            if (cancelRequested)
+                            {
+                                cancelRequested = false;
+                                threadCTS.Dispose();
+                                threadCTS = new CancellationTokenSource();
+                                paused = true;
+                                ShowBotStatus(Actions, botDeviceConfig.LastActionTaken);
+                            }
+                            if (!exitRequested)
                                 Thread.Sleep(options.SleepTime);
                         }
-                        while ((cr != BotEngineClient.BotEngine.CommandResults.ADBError) && (cancelRequested == false));
+                        while ((cr != BotEngineClient.BotEngine.CommandResults.ADBError)  && (exitRequested == false));
                     }
                 }
                 return exitCode;
             }
+        }
+
+        /// <summary>
+        /// Call back from a bot thread with the results of the bot action.
+        /// </summary>
+        /// <param name="result"></param>
+        public static void ResultCallback(BotEngineClient.BotEngine.CommandResults result)
+        {
+            threadResult = result;
         }
 
         /// <summary>
@@ -706,7 +700,7 @@ namespace BotEngine
                 }
                 else if (consoleStatus == ConsoleKeyPressEnum.Exit)
                 {
-                    cancelRequested = true;
+                    exitRequested = true;
                 }
             }
 

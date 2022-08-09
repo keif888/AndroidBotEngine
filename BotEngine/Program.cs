@@ -626,7 +626,7 @@ namespace BotEngine
                                                 }
                                             }
                                         }
-                                        else if (validActionType == ValidActionType.Always)
+                                        else if (validActionType == ValidActionType.Always && botDeviceConfig.LastActionTaken[item.Key].ActionEnabled)
                                         {
                                             // ToDo: Make these Async, and support Cancelation Tokens, so Pause etc. can stop execution
                                             cr = bot.ExecuteAction(item.Key, botDeviceConfig.LastActionTaken[item.Key]);
@@ -765,9 +765,19 @@ namespace BotEngine
                         ChooseAdhocAction(actions, lastActionTaken);
                         result = ConsoleKeyPressEnum.Nothing;
                         break;
+                    case 'd':
+                    case 'D':
+                        ChooseDisableAction(actions, lastActionTaken);
+                        result = ConsoleKeyPressEnum.Nothing;
+                        break;
+                    case 'e':
+                    case 'E':
+                        ChooseEnableAction(actions, lastActionTaken);
+                        result = ConsoleKeyPressEnum.Nothing;
+                        break;
                     case 'h':
                     case 'H':
-                        _logger.LogWarning("In Console Help:\r\na/A : Adhoc\r\nh/H : Help\r\np/P : Pause\r\ns/S : Execution Status\r\nx/X : Exit");
+                        _logger.LogWarning("In Console Help:\r\na/A : Adhoc\r\nd/D : Disable\r\ne/E : Enable\r\nh/H : Help\r\np/P : Pause\r\ns/S : Execution Status\r\nx/X : Exit");
                         Thread.Sleep(2000);
                         result = ConsoleKeyPressEnum.Nothing;
                         break;
@@ -841,6 +851,92 @@ namespace BotEngine
                     if (lastActionTaken.ContainsKey(adhocActions[selectedOption]))
                     {
                         lastActionTaken[adhocActions[selectedOption]].ActionEnabled = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Allow the user to choose which action is to be Disabled from running.
+        /// </summary>
+        /// <param name="actions"></param>
+        /// <param name="lastActionTaken"></param>
+        private static void ChooseDisableAction(Dictionary<string, BotEngineClient.Action> Actions, Dictionary<string, ActionActivity> lastActionTaken)
+        {
+            StringBuilder sb = new StringBuilder();
+            List<string> activeActions = new List<string>();
+            int i = 0;
+            string inputText;
+            sb.AppendLine();
+            sb.AppendLine("Choose the action to Disable from the list below");
+            foreach (KeyValuePair<string, BotEngineClient.Action> item in Actions)
+            {
+                if (lastActionTaken.ContainsKey(item.Key))
+                {
+                    if (lastActionTaken[item.Key].ActionEnabled == true)
+                    {
+                        activeActions.Add(item.Key);
+                        sb.AppendFormat("[{0}] - {1}", i++, item.Key);
+                        sb.AppendLine();
+                    }
+                }
+            }
+            sb.AppendLine("Enter the number of the Action to Disable, and press enter");
+            sb.AppendLine("Any other text will return to normal operation");
+            // Log as Warning, so that it will show by default.
+            _logger.LogWarning(sb.ToString());
+            inputText = Console.ReadLine();
+            int selectedOption;
+            if (int.TryParse(inputText, out selectedOption))
+            {
+                if (selectedOption >= 0 && selectedOption < i)
+                {
+                    if (lastActionTaken.ContainsKey(activeActions[selectedOption]))
+                    {
+                        lastActionTaken[activeActions[selectedOption]].ActionEnabled = false;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Allow the user to choose which Disabled action is to be enabled to be run.
+        /// </summary>
+        /// <param name="actions"></param>
+        /// <param name="lastActionTaken"></param>
+        private static void ChooseEnableAction(Dictionary<string, BotEngineClient.Action> Actions, Dictionary<string, ActionActivity> lastActionTaken)
+        {
+            StringBuilder sb = new StringBuilder();
+            List<string> activeActions = new List<string>();
+            int i = 0;
+            string inputText;
+            sb.AppendLine();
+            sb.AppendLine("Choose the action to Enable from the list below");
+            foreach (KeyValuePair<string, BotEngineClient.Action> item in Actions)
+            {
+                if (lastActionTaken.ContainsKey(item.Key))
+                {
+                    if (lastActionTaken[item.Key].ActionEnabled == false)
+                    {
+                        activeActions.Add(item.Key);
+                        sb.AppendFormat("[{0}] - {1}", i++, item.Key);
+                        sb.AppendLine();
+                    }
+                }
+            }
+            sb.AppendLine("Enter the number of the Action to Enable, and press enter");
+            sb.AppendLine("Any other text will return to normal operation");
+            // Log as Warning, so that it will show by default.
+            _logger.LogWarning(sb.ToString());
+            inputText = Console.ReadLine();
+            int selectedOption;
+            if (int.TryParse(inputText, out selectedOption))
+            {
+                if (selectedOption >= 0 && selectedOption < i)
+                {
+                    if (lastActionTaken.ContainsKey(activeActions[selectedOption]))
+                    {
+                        lastActionTaken[activeActions[selectedOption]].ActionEnabled = true;
                     }
                 }
             }

@@ -936,6 +936,11 @@ namespace BotEngine
             }
         }
 
+        /// <summary>
+        /// Updates a device config file to match the latest available from the game config file.
+        /// </summary>
+        /// <param name="botDeviceConfig"></param>
+        /// <param name="botGameConfig"></param>
         private static void ValidateAndUpdateDeviceConfig(BOTDeviceConfig botDeviceConfig, BOTConfig botGameConfig)
         {
             foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.Actions)
@@ -964,6 +969,45 @@ namespace BotEngine
                                 }
                                 botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
                             }
+                            else
+                            {
+                                ActionActivity actionActivty = botDeviceConfig.LastActionTaken[item.Key];
+                                Dictionary<string, string?> commandValueOverride = new Dictionary<string, string?>();
+                                // Update CommandValueOverride
+                                if (item.Value.Commands != null)
+                                    foreach (Command commandItem in item.Value.Commands)
+                                    {
+                                        GatherOverrides(commandValueOverride, commandItem);
+                                    }
+                                if (commandValueOverride.Count == 0)
+                                {
+                                    actionActivty.CommandValueOverride = null;
+                                }
+                                else
+                                {
+                                    if (actionActivty.CommandValueOverride == null)
+                                    {
+                                        actionActivty.CommandValueOverride = commandValueOverride;
+                                    }
+                                    else
+                                    {
+                                        Dictionary<string, string?> replacementCommandValueOverride = new Dictionary<string, string?>();
+                                        foreach (KeyValuePair<string, string?> cvoItem in commandValueOverride)
+                                        {
+                                            if (actionActivty.CommandValueOverride.ContainsKey(cvoItem.Key))
+                                            {
+                                                replacementCommandValueOverride.Add(cvoItem.Key, actionActivty.CommandValueOverride[cvoItem.Key]);
+                                            }
+                                            else
+                                            {
+                                                replacementCommandValueOverride.Add(cvoItem.Key, null);
+                                            }
+                                        }
+                                        actionActivty.CommandValueOverride = replacementCommandValueOverride;
+                                    }
+                                    botDeviceConfig.LastActionTaken[item.Key] = actionActivty;
+                                }
+                            }
                             break;
                         case ValidActionType.Always:
                         case ValidActionType.Daily:
@@ -986,6 +1030,45 @@ namespace BotEngine
                                     actionActivty.CommandValueOverride = null;
                                 }
                                 botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
+                            }
+                            else
+                            {
+                                ActionActivity actionActivty = botDeviceConfig.LastActionTaken[item.Key];
+                                Dictionary<string, string?> commandValueOverride = new Dictionary<string, string?>();
+                                // Update CommandValueOverride
+                                if (item.Value.Commands != null)
+                                    foreach (Command commandItem in item.Value.Commands)
+                                    {
+                                        GatherOverrides(commandValueOverride, commandItem);
+                                    }
+                                if (commandValueOverride.Count == 0)
+                                {
+                                    actionActivty.CommandValueOverride = null;
+                                }
+                                else
+                                {
+                                    if (actionActivty.CommandValueOverride == null)
+                                    {
+                                        actionActivty.CommandValueOverride = commandValueOverride;
+                                    }
+                                    else
+                                    {
+                                        Dictionary<string, string?> replacementCommandValueOverride = new Dictionary<string, string?>();
+                                        foreach (KeyValuePair<string, string?> cvoItem in commandValueOverride)
+                                        {
+                                            if (actionActivty.CommandValueOverride.ContainsKey(cvoItem.Key))
+                                            {
+                                                replacementCommandValueOverride.Add(cvoItem.Key, actionActivty.CommandValueOverride[cvoItem.Key]);
+                                            }
+                                            else
+                                            {
+                                                replacementCommandValueOverride.Add(cvoItem.Key, null);
+                                            }
+                                        }
+                                        actionActivty.CommandValueOverride = replacementCommandValueOverride;
+                                    }
+                                    botDeviceConfig.LastActionTaken[item.Key] = actionActivty;
+                                }
                             }
                             break;
                         case ValidActionType.System:

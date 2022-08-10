@@ -894,6 +894,15 @@ namespace BotEngine
             }
         }
 
+        /// <summary>
+        /// Generates the message to show when updating Overrides.
+        /// </summary>
+        /// <param name="lastActionTaken"></param>
+        /// <param name="sb"></param>
+        /// <param name="adhocActions"></param>
+        /// <param name="selectedOption"></param>
+        /// <param name="cvoIdentifiers"></param>
+        /// <returns></returns>
         private static int DefineAdhocOverrideMessage(Dictionary<string, ActionActivity> lastActionTaken, StringBuilder sb, List<string> adhocActions, int selectedOption, Dictionary<int, string> cvoIdentifiers)
         {
             int i;

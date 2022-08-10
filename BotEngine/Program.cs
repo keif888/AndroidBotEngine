@@ -844,10 +844,73 @@ namespace BotEngine
                 {
                     if (lastActionTaken.ContainsKey(adhocActions[selectedOption]))
                     {
+                        // Allow changing of Overrides if there
+                        if (lastActionTaken[adhocActions[selectedOption]].CommandValueOverride != null)
+                        {
+                            Dictionary<int, string> cvoIdentifiers = new Dictionary<int, string>();
+                            int selectedOverride = 0;
+                            i = DefineAdhocOverrideMessage(lastActionTaken, sb, adhocActions, selectedOption, cvoIdentifiers);
+                            bool exitWhile = false;
+                            selectedOverride = -1;
+                            do
+                            {
+                                // Log as Warning, so that it will show by default.
+                                _logger.LogWarning(sb.ToString());
+                                inputText = Console.ReadLine();
+                                if (int.TryParse(inputText, out selectedOverride))
+                                {
+                                    if (selectedOverride == 0)
+                                    {
+                                        exitWhile = true;
+                                    }
+                                    else if (cvoIdentifiers.ContainsKey(selectedOverride))
+                                    {
+                                        _logger.LogWarning("Enter new value for {0}: ", cvoIdentifiers[selectedOverride]);
+                                        inputText = Console.ReadLine();
+                                        lastActionTaken[adhocActions[selectedOption]].CommandValueOverride[cvoIdentifiers[selectedOverride]] = inputText;
+                                        i = DefineAdhocOverrideMessage(lastActionTaken, sb, adhocActions, selectedOption, cvoIdentifiers);
+                                    }
+                                    else
+                                    {
+                                        _logger.LogWarning("Value {0} is not in list, try again:", selectedOverride);
+                                    }
+                                }
+                                else
+                                {
+                                    selectedOverride = -1;
+                                    exitWhile = true;
+                                }
+                            }
+                            while (!exitWhile);
+                            if (selectedOverride == 0)
+                            {
+                                // Don't execute this, just get out of here.
+                                return;
+                            }
+                        }
                         lastActionTaken[adhocActions[selectedOption]].ActionEnabled = true;
                     }
                 }
             }
+        }
+
+        private static int DefineAdhocOverrideMessage(Dictionary<string, ActionActivity> lastActionTaken, StringBuilder sb, List<string> adhocActions, int selectedOption, Dictionary<int, string> cvoIdentifiers)
+        {
+            int i;
+            sb.Clear();
+            cvoIdentifiers.Clear();
+            sb.AppendLine("Choose the Override to edit from the list below:");
+            sb.AppendLine("[0] - Abort Adhoc Execution");
+            i = 1;
+            foreach (KeyValuePair<string, string?> cvoItem in lastActionTaken[adhocActions[selectedOption]].CommandValueOverride)
+            {
+                cvoIdentifiers.Add(i, cvoItem.Key);
+                sb.AppendFormat("[{0}] - {1} = {2}", i++, cvoItem.Key, cvoItem.Value);
+                sb.AppendLine();  // add the newline
+            }
+            sb.AppendLine("Enter the number of the Override to edit, and press enter");
+            sb.AppendLine("Any other text will start the Adhoc Action");
+            return i;
         }
 
         /// <summary>

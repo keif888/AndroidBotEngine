@@ -425,6 +425,22 @@ namespace BotEngine
                                                         break;
                                                 }
                                             }
+
+                                            // Run all the Always actions
+                                            foreach (KeyValuePair<string, BotEngineClient.Action> alwaysItems in Actions)
+                                            {
+                                                if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType alwaysValidActionType))
+                                                    if (alwaysValidActionType == ValidActionType.Always && botDeviceConfig.LastActionTaken[alwaysItems.Key].ActionEnabled)
+                                                    {
+                                                        bot.SetThreadingCommand(alwaysItems.Key, ResultCallback, botDeviceConfig.LastActionTaken[alwaysItems.Key]);
+                                                        botThread = new Thread(bot.InitiateThreadingCommand);
+                                                        botThread.Start(threadCTS.Token);
+                                                        botThread.Join();
+                                                        cr = threadResult;
+                                                        if (cr == BotEngineClient.BotEngine.CommandResults.ADBError || cr == BotEngineClient.BotEngine.CommandResults.Cancelled)
+                                                            break;
+                                                    }
+                                            }
                                         }
                                         else if (validActionType == ValidActionType.Always && botDeviceConfig.LastActionTaken[item.Key].ActionEnabled)
                                         {

@@ -2030,8 +2030,8 @@ namespace ScriptEditor
                     ActiveTreeNode.Text = tbActionName.Text;
 
                     botAction.ActionType = cbActionType.Text;
-                    botAction.AfterAction = cbActionAfter.Text;
-                    botAction.BeforeAction = cbActionBefore.Text;
+                    botAction.AfterAction = cbActionAfter.Text.Length == 0 ? null: cbActionAfter.Text;
+                    botAction.BeforeAction = cbActionBefore.Text.Length == 0 ? null : cbActionBefore.Text;
                     botAction.Frequency = null;
                     botAction.DailyScheduledTime = null;
                     if (Enum.TryParse(botAction.ActionType, true, out ValidActionType validActionType))

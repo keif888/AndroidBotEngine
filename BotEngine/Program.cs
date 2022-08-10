@@ -52,6 +52,14 @@ namespace BotEngine
 
         // ToDo: Add Exception Handling SharpAdbClient.Exceptions.AdbException
 
+
+        #region Main Control Logic
+
+        /// <summary>
+        /// The entry point to the entire 
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         static int Main(string[] args)
         {
             int result = 0;
@@ -118,55 +126,6 @@ namespace BotEngine
             return result;
         }
 
-        private static void SaveDeviceConfigJson()
-        {
-            if (botDeviceConfig != null && botDeviceConfig.FileId != null && botDeviceConfig.LastActionTaken != null)
-            {
-                if (botDeviceConfig.LastActionTaken.Count > 0)
-                {
-                    try
-                    {
-                        if (deviceWatcher != null) deviceWatcher.EnableRaisingEvents = false;
-                        string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(botDeviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false });
-                        File.WriteAllText(options.DeviceFileName, jsonData);
-                        _logger.LogInformation("Device JSON file {0} Saved", options.DeviceFileName);
-                        if (deviceWatcher != null) deviceWatcher.EnableRaisingEvents = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Exception thrown when writing {0}", options.DeviceFileName);
-                    }
-                }
-            }
-            else
-            {
-                _logger.LogWarning("Attempt to save device config file {0}, when it hasn't been loaded.", options.DeviceFileName);
-            }
-        }
-
-        private static int ReconfigureLogging(Options opt)
-        {
-            ServiceProvider = ConfigureServices(opt);
-            _logger = (ILogger)ServiceProvider.GetService(typeof(ILogger));
-            return 0;
-        }
-
-        /// <summary>
-        /// Event handler for Ctrl-C or Break.
-        /// Sets that a cancel has been requested, and prevents the program from auto exiting.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        protected static void CancelHandler(object sender, ConsoleCancelEventArgs args)
-        {
-            _logger.LogCritical("Control C Captured");
-            if (threadCTS != null)
-            {
-                threadCTS.Cancel();
-            }
-            args.Cancel = true;
-            cancelRequested = true;
-        }
 
         /// <summary>
         /// Core execution engine for the bot.
@@ -181,53 +140,14 @@ namespace BotEngine
                 var exitCode = 0;
                 if (o.ListDevices)
                 {
-                    AdbServer adbServer = new AdbServer();
-                    StartServerResult result = adbServer.StartServer(o.ADBPath, restartServerIfNewer: true);
-                    _logger.LogInformation("Starting ADB Server status {0}", result.ToString());
-                    if (result != StartServerResult.AlreadyRunning)
-                    {
-                        Thread.Sleep(1500);
-                        AdbServerStatus status = adbServer.GetStatus();
-                        _logger.LogDebug("ADB Server status {0}", status.ToString());
-                        if (!status.IsRunning)
-                        {
-                            _logger.LogError("Unable to start ADB Server");
-                            throw new Exception("Unable to start ADB server");
-                        }
-                    }
-                    AdbClient client = new AdbClient();
-                    List<DeviceData> devices = new List<DeviceData>();
-                    for (int i = 0; i < 5; i++)
-                    {
-                        devices = client.GetDevices();
-                        if (devices.Count > 0)
-                            break;
-                        _logger.LogWarning("No ADB Clients Found");
-                        Thread.Sleep(1500);
-                    }
-                    if (devices.Count == 0)
-                    {
-                        _logger.LogError("No ADB Clients Found");
-                        exitCode = -2;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Start Device Strings found");
-                        Console.WriteLine("-----------------------------------------------------------------------");
-                        foreach (DeviceData device in devices)
-                        {
-                            string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
-                            string deviceId = String.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
-                            Console.WriteLine("\"{0}\"", deviceId);
-                        }
-                        Console.WriteLine("-----------------------------------------------------------------------");
-                        Console.WriteLine("End Device Strings found");
-                    }
+                    exitCode = ListDevicesThatADBCanSee(o, exitCode);
                 }
                 else
                 {
                     JsonHelper jsonHelper = new JsonHelper();
                     JsonHelper.ConfigFileType fileType;
+
+                    #region Validate Files
                     _logger.LogDebug("Ensure that files exist");
                     if (!File.Exists(o.ConfigFileName))
                     {
@@ -302,7 +222,9 @@ namespace BotEngine
                             }
                         }
                     }
+                    #endregion
 
+                    #region Startup ADB
                     _logger.LogDebug("Device String is {0}", o.DeviceString);
                     AdbServer adbServer = new AdbServer();
                     StartServerResult result = adbServer.StartServer(o.ADBPath, restartServerIfNewer: true);
@@ -328,6 +250,8 @@ namespace BotEngine
                         _logger.LogWarning("No ADB Clients Found");
                         Thread.Sleep(1500);
                     }
+                    #endregion
+
                     if (devices.Count == 0)
                     {
                         _logger.LogError("No ADB Clients Found");
@@ -335,121 +259,23 @@ namespace BotEngine
                     }
                     else
                     {
-                        string deviceId;
-                        if (o.DeviceString is null)
-                        {
-                            DeviceData device = devices[0];
-                            string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
-                            deviceId = String.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
-                        }
-                        else
-                        {
-                            deviceId = o.DeviceString;
-                        }
-                        string jsonString = string.Empty;
-                        try
-                        {
-                            jsonString = File.ReadAllText(o.ConfigFileName);
-                            botGameConfig = JsonSerializer.Deserialize<BOTConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
-                        }
-                        catch (JsonException jse)
-                        {
-                            _logger.LogError(jse, "JSON file format error reading {0}", o.ConfigFileName);
-                            return -2;
-                        }
-
-                        try
-                        {
-                            jsonString = File.ReadAllText(o.ListConfigFileName);
-                            botListConfig = JsonSerializer.Deserialize<BOTListConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
-                        }
-                        catch (JsonException jse)
-                        {
-                            _logger.LogError(jse, "JSON file format error reading {0}", o.ListConfigFileName);
-                            return -2;
-                        }
-
-                        if (!File.Exists(o.DeviceFileName))
-                        {
-                            botDeviceConfig.FileId = "DeviceConfig";
-                            botDeviceConfig.LastActionTaken = new Dictionary<string, ActionActivity>();
-                            foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.Actions)
-                            {
-                                if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType validActionType))
-                                {
-                                    switch (validActionType)
-                                    {
-                                        case ValidActionType.Adhoc:
-                                            ActionActivity adhocActionActivity = new ActionActivity {
-                                                LastRun = DateTime.MinValue,
-                                                ActionEnabled = false,
-                                                CommandValueOverride = new Dictionary<string, string?>()
-                                            };
-                                            if (item.Value.Commands != null)
-                                                foreach (Command commandItem in item.Value.Commands)
-                                                {
-                                                    GatherOverrides(adhocActionActivity.CommandValueOverride, commandItem);
-                                                }
-                                            if (adhocActionActivity.CommandValueOverride.Count == 0)
-                                            {
-                                                adhocActionActivity.CommandValueOverride = null;
-                                            }
-                                            botDeviceConfig.LastActionTaken.Add(item.Key, adhocActionActivity);
-                                            break;
-                                        case ValidActionType.Always:
-                                            break;
-                                        case ValidActionType.Daily:
-                                        case ValidActionType.Scheduled:
-                                            ActionActivity dailyActionActivity = new ActionActivity
-                                            {
-                                                LastRun = DateTime.MinValue,
-                                                ActionEnabled = true,
-                                                CommandValueOverride= new Dictionary<string, string?>()
-                                            };
-                                            if (item.Value.Commands != null)
-                                                foreach (Command commandItem in item.Value.Commands)
-                                                {
-                                                    GatherOverrides(dailyActionActivity.CommandValueOverride, commandItem);
-                                                }
-                                            if (dailyActionActivity.CommandValueOverride.Count == 0)
-                                            {
-                                                dailyActionActivity.CommandValueOverride = null;
-                                            }
-                                            botDeviceConfig.LastActionTaken.Add(item.Key, dailyActionActivity);
-                                            break;
-                                        case ValidActionType.System:
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    _logger.LogError("Action {0} has an incorrect ActionType of {1}", item.Key, item.Value.ActionType);
-                                }
-                            }
-                            string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(botDeviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false });
-                            File.WriteAllText(o.DeviceFileName, jsonData);
-                            _logger.LogInformation("Device JSON file {0} Saved", o.DeviceFileName);
-                        }
-                        else
-                        {
-                            try
-                            {
-                                jsonString = File.ReadAllText(o.DeviceFileName);
-                                botDeviceConfig = JsonSerializer.Deserialize<BOTDeviceConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
-                            }
-                            catch (JsonException jse)
-                            {
-                                _logger.LogError(jse, "JSON file format error reading {0}", o.DeviceFileName);
-                                return -2;
-                            }
-                        }
+                        int returnValue = 0;
+                        
+                        returnValue = LoadGameConfig(o);
+                        if (returnValue != 0)
+                            return returnValue;
+                        returnValue = LoadListConfig(o);
+                        if (returnValue != 0)
+                            return returnValue;
+                        returnValue = LoadOrBuildDeviceConfig(o);
+                        if (returnValue != 0)
+                            return returnValue;
 
                         ValidateAndUpdateDeviceConfig(botDeviceConfig, botGameConfig);
 
-                        gameConfigWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ConfigFileName))
-                        {
+                        #region Setup File Watchers
+
+                        gameConfigWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ConfigFileName)) {
                             NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
                             Filter = "*.json"
                         };
@@ -458,8 +284,7 @@ namespace BotEngine
                         gameConfigWatcher.Renamed += ReloadJSONConfig;
                         gameConfigWatcher.EnableRaisingEvents = true;
 
-                        listWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ListConfigFileName))
-                        {
+                        listWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.ListConfigFileName)) {
                             NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
                             Filter = Path.GetFileName(o.ListConfigFileName)
                         };
@@ -468,8 +293,7 @@ namespace BotEngine
                         listWatcher.Renamed += ReloadJSONConfig;
                         listWatcher.EnableRaisingEvents = true;
 
-                        deviceWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.DeviceFileName))
-                        {
+                        deviceWatcher = new FileSystemWatcher(Path.GetDirectoryName(o.DeviceFileName)) {
                             NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.Attributes,
                             Filter = Path.GetFileName(o.DeviceFileName)
                         };
@@ -477,7 +301,9 @@ namespace BotEngine
                         deviceWatcher.Changed += ReloadJSONConfig;
                         deviceWatcher.Renamed += ReloadJSONConfig;
                         deviceWatcher.EnableRaisingEvents = true;
+                        #endregion
 
+                        #region Validate the loaded Actions
                         Dictionary<string, BotEngineClient.Action> Actions = botGameConfig.Actions;
                         // Validate the BeforeAction and AfterActions...
 
@@ -498,8 +324,9 @@ namespace BotEngine
 
                         if (configErrors)
                             return -2;
+                        #endregion
 
-                        BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, o.ADBPath, deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig);
+                        BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, o.ADBPath, GetDeviceId(o, devices), botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig);
                         BotEngineClient.BotEngine.CommandResults cr = BotEngineClient.BotEngine.CommandResults.Ok;
                         DateTime tenMinuteDateTime = DateTime.Now;
                         bool paused = false;
@@ -624,89 +451,124 @@ namespace BotEngine
                             if (!exitRequested)
                                 Thread.Sleep(options.SleepTime);
                         }
-                        while ((cr != BotEngineClient.BotEngine.CommandResults.ADBError)  && (exitRequested == false));
+                        while ((cr != BotEngineClient.BotEngine.CommandResults.ADBError) && (exitRequested == false));
                     }
                 }
                 return exitCode;
             }
         }
 
-        /// <summary>
-        /// Call back from a bot thread with the results of the bot action.
-        /// </summary>
-        /// <param name="result"></param>
-        public static void ResultCallback(BotEngineClient.BotEngine.CommandResults result)
-        {
-            threadResult = result;
-        }
+        
 
-        /// <summary>
-        /// Recurse through the command to get all the overrides available.
-        /// </summary>
-        /// <param name="overrides"></param>
-        /// <param name="command"></param>
-        private static void GatherOverrides(Dictionary<string,string?> overrides, Command command)
-        {
-            if (command.OverrideId != null)
-            {
-                overrides.Add(command.OverrideId, null);
-            }
-            if (command.Commands != null)
-                foreach (Command commandItem in command.Commands)
-                {
-                    GatherOverrides(overrides, commandItem);
-                }
-        }
 
-        private static ActionActivity? GetOverride(Dictionary<string, ActionActivity> actionActivity, string key)
+        #region GetDeviceId
+        /// <summary>
+        /// Creates the string that identifies the device, or gets it from the passed in parameters.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="devices"></param>
+        /// <returns></returns>
+        private static string GetDeviceId(Options o, List<DeviceData> devices)
         {
-            if (actionActivity != null && actionActivity.ContainsKey(key))
+            string deviceId;
+            if (o.DeviceString is null)
             {
-                return actionActivity[key];
+                DeviceData device = devices[0];
+                string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
+                deviceId = String.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
             }
             else
             {
-                return null;
+                deviceId = o.DeviceString;
             }
-        }
 
-        private static void ReloadJSONConfig(object sender, FileSystemEventArgs e)
-        {
-            if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(gameConfigFileName).ToLower())
-            {
-                ReloadGameConfig(sender, e);
-            }
-            else if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(listConfigFileName).ToLower())
-            {
-                ReloadListConfig(sender, e);
-            }
-            else if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(deviceConfigFileName).ToLower())
-            {
-                ReloadDevice(sender, e);
-            }
+            return deviceId;
         }
+        #endregion
 
-        private static ConsoleKeyPressEnum HandleKeyboard(Dictionary<string, BotEngineClient.Action> Actions, Dictionary<string, ActionActivity> lastActionTaken, ref bool paused)
+        #region ListDevicesThatADBCanSee
+        /// <summary>
+        /// Lists all the devices that ADB has visibility of
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="exitCode"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        private static int ListDevicesThatADBCanSee(Options o, int exitCode)
         {
-            ConsoleKeyPressEnum consoleStatus = HandleConsoleKeyBoard(Actions, lastActionTaken);
-            if (consoleStatus != ConsoleKeyPressEnum.Nothing)
+            // List out all the devices that ADB can see
+            AdbServer adbServer = new AdbServer();
+            StartServerResult result = adbServer.StartServer(o.ADBPath, restartServerIfNewer: true);
+            _logger.LogInformation("Starting ADB Server status {0}", result.ToString());
+            if (result != StartServerResult.AlreadyRunning)
             {
-                if (consoleStatus == ConsoleKeyPressEnum.Pause)
+                Thread.Sleep(1500);
+                AdbServerStatus status = adbServer.GetStatus();
+                _logger.LogDebug("ADB Server status {0}", status.ToString());
+                if (!status.IsRunning)
                 {
-                    paused = !paused;
-                    // Save the device status when Pausing, so that it's clean for an external to update it.
-                    if (paused)
-                        SaveDeviceConfigJson();
-                }
-                else if (consoleStatus == ConsoleKeyPressEnum.Exit)
-                {
-                    exitRequested = true;
+                    _logger.LogError("Unable to start ADB Server");
+                    throw new Exception("Unable to start ADB server");
                 }
             }
+            AdbClient client = new AdbClient();
+            List<DeviceData> devices = new List<DeviceData>();
+            for (int i = 0; i < 5; i++)
+            {
+                devices = client.GetDevices();
+                if (devices.Count > 0)
+                    break;
+                _logger.LogWarning("No ADB Clients Found");
+                Thread.Sleep(1500);
+            }
+            if (devices.Count == 0)
+            {
+                _logger.LogError("No ADB Clients Found");
+                exitCode = -2;
+            }
+            else
+            {
+                Console.WriteLine("Start Device Strings found");
+                Console.WriteLine("-----------------------------------------------------------------------");
+                foreach (DeviceData device in devices)
+                {
+                    string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
+                    string deviceId = String.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
+                    Console.WriteLine("\"{0}\"", deviceId);
+                }
+                Console.WriteLine("-----------------------------------------------------------------------");
+                Console.WriteLine("End Device Strings found");
+            }
 
-            return consoleStatus;
+            return exitCode;
         }
+        #endregion
 
+        #endregion
+
+
+
+
+        //ToDo: Remove this if it's not used
+        //private static ActionActivity? GetOverride(Dictionary<string, ActionActivity> actionActivity, string key)
+        //{
+        //    if (actionActivity != null && actionActivity.ContainsKey(key))
+        //    {
+        //        return actionActivity[key];
+        //    }
+        //    else
+        //    {
+        //        return null;
+        //    }
+        //}
+
+
+        #region User Intitiated Action Handling
+        /// <summary>
+        /// Display the status of all Daily and Schedules Actions.
+        /// </summary>
+        /// <param name="Actions"></param>
+        /// <param name="lastActionTaken"></param>
         private static void ShowBotStatus(Dictionary<string, BotEngineClient.Action> Actions, Dictionary<string, ActionActivity> lastActionTaken)
         {
             StringBuilder sb = new StringBuilder();
@@ -741,63 +603,7 @@ namespace BotEngine
             _logger.LogWarning(sb.ToString());
         }
 
-        /// <summary>
-        /// Action the key pressed on the keyboard
-        /// </summary>
-        /// <param name="actions"></param>
-        /// <param name="lastActionTaken"></param>
-        /// <returns></returns>
-        private static ConsoleKeyPressEnum HandleConsoleKeyBoard(Dictionary<string, BotEngineClient.Action> actions, Dictionary<string, ActionActivity> lastActionTaken)
-        {
-            ConsoleKeyPressEnum result = ConsoleKeyPressEnum.Nothing;
-            if (Console.KeyAvailable)
-            {
-                switch (Console.ReadKey(true).KeyChar)
-                {
-                    case 'a':
-                    case 'A':
-                        ChooseAdhocAction(actions, lastActionTaken);
-                        result = ConsoleKeyPressEnum.Nothing;
-                        break;
-                    case 'd':
-                    case 'D':
-                        ChooseDisableAction(actions, lastActionTaken);
-                        result = ConsoleKeyPressEnum.Nothing;
-                        break;
-                    case 'e':
-                    case 'E':
-                        ChooseEnableAction(actions, lastActionTaken);
-                        result = ConsoleKeyPressEnum.Nothing;
-                        break;
-                    case 'h':
-                    case 'H':
-                        _logger.LogWarning("In Console Help:\r\na/A : Adhoc\r\nd/D : Disable\r\ne/E : Enable\r\nh/H : Help\r\np/P : Pause\r\ns/S : Execution Status\r\nx/X : Exit");
-                        Thread.Sleep(2000);
-                        result = ConsoleKeyPressEnum.Nothing;
-                        break;
-                    case 'p':
-                    case 'P':
-                        _logger.LogWarning("In Console Command Pause Received");
-                        result = ConsoleKeyPressEnum.Pause;
-                        break;
-                    case 's':
-                    case 'S':
-                        ShowBotStatus(actions, lastActionTaken);
-                        Thread.Sleep(1000);
-                        result = ConsoleKeyPressEnum.Nothing;
-                        break;
-                    case 'x':
-                    case 'X':
-                        _logger.LogWarning("In Console Command Exit Received");
-                        result = ConsoleKeyPressEnum.Exit;
-                        break;
-                    default:
-                        result = ConsoleKeyPressEnum.Nothing;
-                        break;
-                }
-            }
-            return result;
-        }
+
 
         /// <summary>
         /// Allow the user to choose which Adhoc action is to be enabled to be run.
@@ -1007,7 +813,27 @@ namespace BotEngine
                 }
             }
         }
+        #endregion
 
+        #region Config Processing
+        /// <summary>
+        /// Recurse through the command to get all the overrides available.
+        /// </summary>
+        /// <param name="overrides"></param>
+        /// <param name="command"></param>
+        private static void GatherOverrides(Dictionary<string, string?> overrides, Command command)
+        {
+            if (command.OverrideId != null)
+            {
+                overrides.Add(command.OverrideId, null);
+            }
+            if (command.Commands != null)
+                foreach (Command commandItem in command.Commands)
+                {
+                    GatherOverrides(overrides, commandItem);
+                }
+        }
+        
         /// <summary>
         /// Updates a device config file to match the latest available from the game config file.
         /// </summary>
@@ -1156,6 +982,12 @@ namespace BotEngine
             }
         }
 
+        /// <summary>
+        /// Takes the in flight device config, and the on disk device config, and merges them together
+        /// Result is the latest of each...
+        /// </summary>
+        /// <param name="botDeviceConfig"></param>
+        /// <param name="botDeviceConfigNew"></param>
         private static void RefreshDeviceConfig(BOTDeviceConfig botDeviceConfig, BOTDeviceConfig botDeviceConfigNew)
         {
             foreach (KeyValuePair<string, ActionActivity> item in botDeviceConfigNew.LastActionTaken)
@@ -1185,7 +1017,318 @@ namespace BotEngine
                 }
             }
         }
+        #endregion
 
+        #region File handling
+
+        #region Device Files
+
+        /// <summary>
+        /// Loads an existing Device Config file if it exists, or creates a new one in memory.
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        private static int LoadOrBuildDeviceConfig(Options o)
+        {
+            string jsonString = string.Empty;
+            if (!File.Exists(o.DeviceFileName))
+            {
+                botDeviceConfig.FileId = "DeviceConfig";
+                botDeviceConfig.LastActionTaken = new Dictionary<string, ActionActivity>();
+                foreach (KeyValuePair<string, BotEngineClient.Action> item in botGameConfig.Actions)
+                {
+                    if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType validActionType))
+                    {
+                        switch (validActionType)
+                        {
+                            case ValidActionType.Adhoc:
+                                ActionActivity adhocActionActivity = new ActionActivity {
+                                    LastRun = DateTime.MinValue,
+                                    ActionEnabled = false,
+                                    CommandValueOverride = new Dictionary<string, string?>()
+                                };
+                                if (item.Value.Commands != null)
+                                    foreach (Command commandItem in item.Value.Commands)
+                                    {
+                                        GatherOverrides(adhocActionActivity.CommandValueOverride, commandItem);
+                                    }
+                                if (adhocActionActivity.CommandValueOverride.Count == 0)
+                                {
+                                    adhocActionActivity.CommandValueOverride = null;
+                                }
+                                botDeviceConfig.LastActionTaken.Add(item.Key, adhocActionActivity);
+                                break;
+                            case ValidActionType.Always:
+                                break;
+                            case ValidActionType.Daily:
+                            case ValidActionType.Scheduled:
+                                ActionActivity dailyActionActivity = new ActionActivity {
+                                    LastRun = DateTime.MinValue,
+                                    ActionEnabled = true,
+                                    CommandValueOverride = new Dictionary<string, string?>()
+                                };
+                                if (item.Value.Commands != null)
+                                    foreach (Command commandItem in item.Value.Commands)
+                                    {
+                                        GatherOverrides(dailyActionActivity.CommandValueOverride, commandItem);
+                                    }
+                                if (dailyActionActivity.CommandValueOverride.Count == 0)
+                                {
+                                    dailyActionActivity.CommandValueOverride = null;
+                                }
+                                botDeviceConfig.LastActionTaken.Add(item.Key, dailyActionActivity);
+                                break;
+                            case ValidActionType.System:
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogError("Action {0} has an incorrect ActionType of {1}", item.Key, item.Value.ActionType);
+                    }
+                }
+                string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(botDeviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false });
+                File.WriteAllText(o.DeviceFileName, jsonData);
+                _logger.LogInformation("Device JSON file {0} Saved", o.DeviceFileName);
+            }
+            else
+            {
+                try
+                {
+                    jsonString = File.ReadAllText(o.DeviceFileName);
+                    botDeviceConfig = JsonSerializer.Deserialize<BOTDeviceConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+                }
+                catch (JsonException jse)
+                {
+                    _logger.LogError(jse, "JSON file format error reading {0}", o.DeviceFileName);
+                    return -2;
+                }
+            }
+            return 0;
+        }
+
+
+
+        /// <summary>
+        /// Saves the device config file, so that the latest times of execution etc are saved for later
+        /// </summary>
+        private static void SaveDeviceConfigJson()
+        {
+            if (botDeviceConfig != null && botDeviceConfig.FileId != null && botDeviceConfig.LastActionTaken != null)
+            {
+                if (botDeviceConfig.LastActionTaken.Count > 0)
+                {
+                    try
+                    {
+                        if (deviceWatcher != null) deviceWatcher.EnableRaisingEvents = false;
+                        string jsonData = JsonSerializer.Serialize<BOTDeviceConfig>(botDeviceConfig, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false });
+                        File.WriteAllText(options.DeviceFileName, jsonData);
+                        _logger.LogInformation("Device JSON file {0} Saved", options.DeviceFileName);
+                        if (deviceWatcher != null) deviceWatcher.EnableRaisingEvents = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Exception thrown when writing {0}", options.DeviceFileName);
+                    }
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Attempt to save device config file {0}, when it hasn't been loaded.", options.DeviceFileName);
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// Loads the List Config into memory
+        /// </summary>
+        /// <param name="o"></param>
+        /// <returns></returns>
+        private static int LoadListConfig(Options o)
+        {
+            string jsonString = string.Empty;
+            try
+            {
+                jsonString = File.ReadAllText(o.ListConfigFileName);
+                botListConfig = JsonSerializer.Deserialize<BOTListConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+            }
+            catch (JsonException jse)
+            {
+                _logger.LogError(jse, "JSON file format error reading {0}", o.ListConfigFileName);
+                return -2;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Loads the Game Config into memory
+        /// </summary>
+        /// <param name="o"></param>
+        /// <param name="returnValue"></param>
+        /// <returns></returns>
+        private static int LoadGameConfig(Options o)
+        {
+            string jsonString = string.Empty;
+            try
+            {
+                jsonString = File.ReadAllText(o.ConfigFileName);
+                botGameConfig = JsonSerializer.Deserialize<BOTConfig>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip })!;
+            }
+            catch (JsonException jse)
+            {
+                _logger.LogError(jse, "JSON file format error reading {0}", o.ConfigFileName);
+                return -2;
+            }
+            return 0;
+        }
+
+        #endregion
+
+        #region Keyboard Handling
+        /// <summary>
+        /// General keyboard handler 
+        /// </summary>
+        /// <param name="Actions"></param>
+        /// <param name="lastActionTaken"></param>
+        /// <param name="paused"></param>
+        /// <returns></returns>
+        private static ConsoleKeyPressEnum HandleKeyboard(Dictionary<string, BotEngineClient.Action> Actions, Dictionary<string, ActionActivity> lastActionTaken, ref bool paused)
+        {
+            ConsoleKeyPressEnum consoleStatus = HandleConsoleKeyBoard(Actions, lastActionTaken);
+            if (consoleStatus != ConsoleKeyPressEnum.Nothing)
+            {
+                if (consoleStatus == ConsoleKeyPressEnum.Pause)
+                {
+                    paused = !paused;
+                    // Save the device status when Pausing, so that it's clean for an external to update it.
+                    if (paused)
+                        SaveDeviceConfigJson();
+                }
+                else if (consoleStatus == ConsoleKeyPressEnum.Exit)
+                {
+                    exitRequested = true;
+                }
+            }
+
+            return consoleStatus;
+        }
+
+        /// <summary>
+        /// Action the key pressed on the keyboard
+        /// </summary>
+        /// <param name="actions"></param>
+        /// <param name="lastActionTaken"></param>
+        /// <returns></returns>
+        private static ConsoleKeyPressEnum HandleConsoleKeyBoard(Dictionary<string, BotEngineClient.Action> actions, Dictionary<string, ActionActivity> lastActionTaken)
+        {
+            ConsoleKeyPressEnum result = ConsoleKeyPressEnum.Nothing;
+            if (Console.KeyAvailable)
+            {
+                switch (Console.ReadKey(true).KeyChar)
+                {
+                    case 'a':
+                    case 'A':
+                        ChooseAdhocAction(actions, lastActionTaken);
+                        result = ConsoleKeyPressEnum.Nothing;
+                        break;
+                    case 'd':
+                    case 'D':
+                        ChooseDisableAction(actions, lastActionTaken);
+                        result = ConsoleKeyPressEnum.Nothing;
+                        break;
+                    case 'e':
+                    case 'E':
+                        ChooseEnableAction(actions, lastActionTaken);
+                        result = ConsoleKeyPressEnum.Nothing;
+                        break;
+                    case 'h':
+                    case 'H':
+                        _logger.LogWarning("In Console Help:\r\na/A : Adhoc\r\nd/D : Disable\r\ne/E : Enable\r\nh/H : Help\r\np/P : Pause\r\ns/S : Execution Status\r\nx/X : Exit");
+                        Thread.Sleep(2000);
+                        result = ConsoleKeyPressEnum.Nothing;
+                        break;
+                    case 'p':
+                    case 'P':
+                        _logger.LogWarning("In Console Command Pause Received");
+                        result = ConsoleKeyPressEnum.Pause;
+                        break;
+                    case 's':
+                    case 'S':
+                        ShowBotStatus(actions, lastActionTaken);
+                        Thread.Sleep(1000);
+                        result = ConsoleKeyPressEnum.Nothing;
+                        break;
+                    case 'x':
+                    case 'X':
+                        _logger.LogWarning("In Console Command Exit Received");
+                        result = ConsoleKeyPressEnum.Exit;
+                        break;
+                    default:
+                        result = ConsoleKeyPressEnum.Nothing;
+                        break;
+                }
+            }
+            return result;
+        }
+        #endregion
+
+        #region Event Handlers
+        /// <summary>
+        /// Event handler for Ctrl-C or Break.
+        /// Sets that a cancel has been requested, and prevents the program from auto exiting.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        protected static void CancelHandler(object sender, ConsoleCancelEventArgs args)
+        {
+            _logger.LogCritical("Control C Captured");
+            if (threadCTS != null)
+            {
+                threadCTS.Cancel();
+            }
+            args.Cancel = true;
+            cancelRequested = true;
+        }
+
+        
+        /// <summary>
+        /// Call back from a bot thread with the results of the bot action.
+        /// </summary>
+        /// <param name="result"></param>
+        public static void ResultCallback(BotEngineClient.BotEngine.CommandResults result)
+        {
+            threadResult = result;
+        }
+
+        #region Reloading Config Files via Events
+        /// <summary>
+        /// Event Handler which is fired when changes happen to Config files.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void ReloadJSONConfig(object sender, FileSystemEventArgs e)
+        {
+            if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(gameConfigFileName).ToLower())
+            {
+                ReloadGameConfig(sender, e);
+            }
+            else if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(listConfigFileName).ToLower())
+            {
+                ReloadListConfig(sender, e);
+            }
+            else if (Path.GetFileName(e.FullPath).ToLower() == Path.GetFileName(deviceConfigFileName).ToLower())
+            {
+                ReloadDevice(sender, e);
+            }
+        }
+
+        /// <summary>
+        /// Reloads the Device config file, when changes are detected.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private static void ReloadDevice(object sender, FileSystemEventArgs e)
         {
             _logger.LogInformation("Changes detected in {0}, reloading", e.FullPath);
@@ -1203,6 +1346,11 @@ namespace BotEngine
             }
         }
 
+        /// <summary>
+        /// Reloads the Game config file, when changes are detected.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private static void ReloadGameConfig(object sender, FileSystemEventArgs e)
         {
             _logger.LogInformation("Changes detected in {0}, reloading", e.FullPath);
@@ -1221,6 +1369,11 @@ namespace BotEngine
             }
         }
 
+        /// <summary>
+        /// Reloads the List config file, when changes are detected.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private static void ReloadListConfig(object sender, FileSystemEventArgs e)
         {
             _logger.LogInformation("Changes detected in {0}, reloading", e.FullPath);
@@ -1238,6 +1391,13 @@ namespace BotEngine
             }
         }
 
+        /// <summary>
+        /// Loads the content of the text file that is referenced in the event arguments into 
+        /// a json string, which is returned
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="jsonString">will contain the contents of the file that was changed</param>
+        /// <returns></returns>
         private static bool ReloadJsonString(FileSystemEventArgs e, out string jsonString)
         {
             jsonString = string.Empty;
@@ -1262,6 +1422,28 @@ namespace BotEngine
             return true;
         }
 
+        #endregion
+
+        #endregion
+
+        #region Logging
+        /// <summary>
+        /// Ensures that the logging is done as per the command line requests
+        /// </summary>
+        /// <param name="opt"></param>
+        /// <returns></returns>
+        private static int ReconfigureLogging(Options opt)
+        {
+            ServiceProvider = ConfigureServices(opt);
+            _logger = (ILogger)ServiceProvider.GetService(typeof(ILogger));
+            return 0;
+        }
+
+        /// <summary>
+        /// Configures the logging settings, so that debug etc. can be avaialble.
+        /// </summary>
+        /// <param name="opt"></param>
+        /// <returns></returns>
         public static ServiceProvider ConfigureServices(Options opt)
         {
             //services.Clear();
@@ -1300,5 +1482,6 @@ namespace BotEngine
             services.AddSingleton(sp => sp.GetRequiredService<ILoggerFactory>().CreateLogger("AndroidBot"));
             return services.BuildServiceProvider();
         }
+        #endregion
     }
 }

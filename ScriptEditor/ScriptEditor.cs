@@ -360,6 +360,7 @@ namespace ScriptEditor
                         currentNode.Nodes.Add(newNode);
                         tvBotData.SelectedNode = newNode;
                         UnsavedChanges = true;
+                        saveToolStripMenuItem.Enabled = true;
                     }
                 }
             }
@@ -393,6 +394,7 @@ namespace ScriptEditor
                         parent.Nodes.Insert(currentNodeIndex, newNode);
                         tvBotData.SelectedNode = newNode;
                         UnsavedChanges = true;
+                        saveToolStripMenuItem.Enabled = true;
                     }
                 }
                 else if (currentNode.Tag is XYCoords)
@@ -405,6 +407,7 @@ namespace ScriptEditor
                     };
                     parent.Nodes.Insert(currentNodeIndex, newNode);
                     UnsavedChanges = true;
+                    saveToolStripMenuItem.Enabled = true;
                     tvBotData.SelectedNode = newNode;
                 }
                 else if (currentNode.Tag is List<XYCoords>)
@@ -417,6 +420,7 @@ namespace ScriptEditor
                     };
                     currentNode.Nodes.Add(newNode);
                     UnsavedChanges = true;
+                    saveToolStripMenuItem.Enabled = true;
                     tvBotData.SelectedNode = newNode;
                 }
             }
@@ -450,6 +454,7 @@ namespace ScriptEditor
                         parent.Nodes.Insert(currentNodeIndex + 1, newNode);
                         tvBotData.SelectedNode = newNode;
                         UnsavedChanges = true;
+                        saveToolStripMenuItem.Enabled = true;
                     }
                 }
                 else if (currentNode.Tag is BotEngineClient.Action)
@@ -468,6 +473,7 @@ namespace ScriptEditor
                         currentNode.Nodes.Add(newNode);
                         tvBotData.SelectedNode = newNode;
                         UnsavedChanges = true;
+                        saveToolStripMenuItem.Enabled = true;
                     }
                 }
                 else if (currentNode.Tag is XYCoords)
@@ -481,6 +487,7 @@ namespace ScriptEditor
                     parent.Nodes.Insert(currentNodeIndex + 1, newNode);
                     tvBotData.SelectedNode = newNode;
                     UnsavedChanges = true;
+                    saveToolStripMenuItem.Enabled = true;
                 }
                 else if (currentNode.Tag is List<XYCoords>)
                 {
@@ -492,6 +499,7 @@ namespace ScriptEditor
                     };
                     currentNode.Nodes.Add(newNode);
                     UnsavedChanges = true;
+                    saveToolStripMenuItem.Enabled = true;
                     tvBotData.SelectedNode = newNode;
                 }
             }
@@ -515,6 +523,7 @@ namespace ScriptEditor
                     parentNode.Nodes.Insert(treeIndex - 1, currentNode);
                     tvBotData.SelectedNode = currentNode;
                     UnsavedChanges = true;
+                    saveToolStripMenuItem.Enabled = true;
                 }
             }
         }
@@ -537,6 +546,7 @@ namespace ScriptEditor
                     parentNode.Nodes.Insert(treeIndex + 1, currentNode);
                     tvBotData.SelectedNode = currentNode;
                     UnsavedChanges = true;
+                    saveToolStripMenuItem.Enabled = true;
                 }
             }
         }
@@ -555,6 +565,7 @@ namespace ScriptEditor
             {
                 tvBotData.Nodes.Remove(currentNode);
                 UnsavedChanges = true;
+                saveToolStripMenuItem.Enabled = true;
                 ChangePending = false;
             }
         }

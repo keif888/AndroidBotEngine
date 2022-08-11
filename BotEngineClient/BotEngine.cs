@@ -899,7 +899,6 @@ namespace BotEngineClient
                 //}
                 for (int i = startAt; i < numberOFLoops; i++)
                 {
-                    actionActivity.CommandLoopStatus[activePath.ToString()] = i.ToString();
                     foreach (Command command in commands)
                     {
                         _logger.LogDebug("Executing Loop {0} command {1}", i, command.CommandId);
@@ -910,6 +909,14 @@ namespace BotEngineClient
                             return result;
                         }
                     }
+                    // Update the loop counter storage if it was successful.
+                    if (result == CommandResults.Ok)
+                        actionActivity.CommandLoopStatus[activePath.ToString()] = i.ToString();
+                }
+                // Reset the Loop Counter to 0 if the loop has completed successfully.
+                if (result == CommandResults.Ok)
+                {
+                    actionActivity.CommandLoopStatus[activePath.ToString()] = "0";
                 }
                 return result;
             }

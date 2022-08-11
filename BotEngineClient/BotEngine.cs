@@ -1546,11 +1546,12 @@ namespace BotEngineClient
                                 {
                                     if (actionActivity.CommandValueOverride.ContainsKey(command.OverrideId))
                                     {
-                                        if (!int.TryParse(actionActivity.CommandValueOverride[command.OverrideId], out NumberOFLoops))
-                                        {
-                                            _logger.LogError("CommandValueOverride {0} Value {1} is not an integer", command.OverrideId, actionActivity.CommandValueOverride[command.OverrideId]);
-                                            results = CommandResults.InputError;
-                                        }
+                                        if (actionActivity.CommandValueOverride[command.OverrideId] != null)
+                                            if (!int.TryParse(actionActivity.CommandValueOverride[command.OverrideId], out NumberOFLoops))
+                                            {
+                                                _logger.LogError("CommandValueOverride {0} Value {1} is not an integer", command.OverrideId, actionActivity.CommandValueOverride[command.OverrideId]);
+                                                results = CommandResults.InputError;
+                                            }
                                     }
                                 }
                                 if (NumberOFLoops > 0)

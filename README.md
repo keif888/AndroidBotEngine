@@ -87,7 +87,8 @@ The list of commands to date are:
 ## Release Notes
 
 2022-08-10 - 0.5.4.66_beta released.  
-Known issues with LDPlayer versions greater than 4.0.76 due to ADB retrieval of FrameBuffer being unstable  
+Known issues with LDPlayer versions 4.0.76.1, 4.0.78, 4.0.79 and 4.0.81 due to ADB retrieval of FrameBuffer being unstable  
+LDPlayer versions 4.0.76 and 4.0.83 tested and working  
 Adds Enable and Disable keyboard commands, and updates Adhoc keyboard command to allow changing Override settings  
 2022-08-07 - 0.4.4.63_beta released.  
 Known issues with LDPlayer versions greater than 4.0.76 due to ADB retrieval of FrameBuffer being unstable  

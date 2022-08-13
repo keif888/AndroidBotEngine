@@ -732,7 +732,7 @@ namespace BotEngineClient
         /// <param name="additionalData"></param>
         /// <param name="actionActivity"></param>
         /// <returns></returns>
-        private CommandResults LoopUntilNotFound(List<string> imageNames, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity)
+        private CommandResults LoopUntilNotFound(List<string> imageNames, bool ignoreMissing, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
             {
@@ -797,8 +797,16 @@ namespace BotEngineClient
                 }
                 else
                 {
-                    _logger.LogWarning("Item(s) haven't disappeared before Timeout");
-                    result = CommandResults.TimeOut;
+                    if (ignoreMissing)
+                    {
+                        _logger.LogInformation("Item(s) haven't disappeared before Timeout, but ignored due to ignoreMissing");
+                        result = CommandResults.Ok;
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Item(s) haven't disappeared before Timeout");
+                        result = CommandResults.TimeOut;
+                    }
                 }
                 return result;
             }
@@ -813,7 +821,7 @@ namespace BotEngineClient
         /// <param name="additionalData"></param>
         /// <param name="actionActivity"></param>
         /// <returns></returns>
-        private CommandResults LoopUntilFound(List<string> imageNames, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity)
+        private CommandResults LoopUntilFound(List<string> imageNames, bool ignoreMissing, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
             {
@@ -872,8 +880,16 @@ namespace BotEngineClient
                     _logger.LogDebug("Item(s) have now appeared");
                 else
                 {
-                    _logger.LogWarning("Item(s) haven't appeared before Timeout");
-                    result = CommandResults.TimeOut;
+                    if (ignoreMissing)
+                    {
+                        _logger.LogInformation("Item(s) haven't appeared before Timeout, but ignored due to ignoreMissing");
+                        result = CommandResults.Ok;
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Item(s) haven't appeared before Timeout");
+                        result = CommandResults.TimeOut;
+                    }
                 }
                 return result;
             }
@@ -1281,6 +1297,21 @@ namespace BotEngineClient
                             }
                             break;
                         case ValidCommandIds.LoopUntilFound:
+                            if (command.IgnoreMissing == null)
+                            {
+                                ignoreMissing = false;
+                            }
+                            else
+                            {
+                                if ((bool)command.IgnoreMissing)
+                                {
+                                    ignoreMissing = true;
+                                }
+                                else
+                                {
+                                    ignoreMissing = false;
+                                }
+                            }
                             if ((command.ImageName == null) && (command.ImageNames == null))
                             {
                                 _logger.LogError("Command {0} Error ImageName or ImageNames is null", command.CommandId);
@@ -1324,11 +1355,26 @@ namespace BotEngineClient
                                 }
                                 if (results == CommandResults.Ok)
                                 {
-                                    results = LoopUntilFound(imageNames, command.Commands, (int)command.TimeOut, additionalData, actionActivity);
+                                    results = LoopUntilFound(imageNames, ignoreMissing, command.Commands, (int)command.TimeOut, additionalData, actionActivity);
                                 }
                             }
                             break;
                         case ValidCommandIds.LoopUntilNotFound:
+                            if (command.IgnoreMissing == null)
+                            {
+                                ignoreMissing = false;
+                            }
+                            else
+                            {
+                                if ((bool)command.IgnoreMissing)
+                                {
+                                    ignoreMissing = true;
+                                }
+                                else
+                                {
+                                    ignoreMissing = false;
+                                }
+                            }
                             if ((command.ImageName == null) && (command.ImageNames == null))
                             {
                                 _logger.LogError("Command {0} Error ImageName or ImageNames is null", command.CommandId);
@@ -1372,7 +1418,7 @@ namespace BotEngineClient
                                 }
                                 if (results == CommandResults.Ok)
                                 {
-                                    results = LoopUntilNotFound(imageNames, command.Commands, (int)command.TimeOut, additionalData, actionActivity);
+                                    results = LoopUntilNotFound(imageNames, ignoreMissing, command.Commands, (int)command.TimeOut, additionalData, actionActivity);
                                 }
                             }
                             break;

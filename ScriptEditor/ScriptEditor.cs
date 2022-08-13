@@ -1348,14 +1348,16 @@ namespace ScriptEditor
                                 tbImageNamesWait.Text = commandCopy.TimeOut.ToString();
                             else
                                 tbImageNamesWait.Text = "";
-                            if (commandCopy.IgnoreMissing != null && (bool)commandCopy.IgnoreMissing)
+                            if (commandCopy.IgnoreMissing != null)
                             {
-                                cbImageNamesMissingOk.Checked = true;
+                                cbImageNamesMissingOk.Checked = (bool)commandCopy.IgnoreMissing;
                             }
                             else
                             {
                                 cbImageNamesMissingOk.Checked = false;
                             }
+                            cbImageNamesMissingOk.Enabled = true;
+                            cbImageNamesMissingOk.Visible = true;
                             gbImageNames.Enabled = true;
                             gbImageNames.Visible = true;
                             addCommandToolStripMenuItem.Enabled = true;
@@ -2193,14 +2195,7 @@ namespace ScriptEditor
                                         commandCopy.ImageNames.Add(item);
                                     }
                                 }
-                                if (cbImageNamesMissingOk.Checked)
-                                {
-                                    commandCopy.IgnoreMissing = true;
-                                }
-                                else
-                                { 
-                                    commandCopy.IgnoreMissing = false; 
-                                }
+                                commandCopy.IgnoreMissing = cbImageNamesMissingOk.Checked;
                                 commandCopy.TimeOut = int.Parse(tbImageNamesWait.Text);
                                 break;
                             case ValidCommandIds.Restart:

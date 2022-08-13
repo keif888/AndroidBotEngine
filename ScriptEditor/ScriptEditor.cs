@@ -1331,6 +1331,16 @@ namespace ScriptEditor
                                 tbImageNamesWait.Text = commandCopy.TimeOut.ToString();
                             else
                                 tbImageNamesWait.Text = "";
+                            if (commandCopy.IgnoreMissing != null)
+                            {
+                                cbImageNameMissingOk.Checked = (bool)commandCopy.IgnoreMissing;
+                            }
+                            else
+                            {
+                                cbImageNameMissingOk.Checked = false;
+                            }
+                            cbImageNamesMissingOk.Enabled = true;
+                            cbImageNamesMissingOk.Visible = true;
                             gbImageNames.Enabled = true;
                             gbImageNames.Visible = true;
                             break;
@@ -2186,10 +2196,7 @@ namespace ScriptEditor
                                 else
                                 {
                                     commandCopy.ImageName = null;
-                                    if (commandCopy.ImageNames == null)
-                                    {
-                                        commandCopy.ImageNames = new List<string>();
-                                    }
+                                    commandCopy.ImageNames = new List<string>();
                                     foreach (string item in lbImageNames.Items)
                                     {
                                         commandCopy.ImageNames.Add(item);

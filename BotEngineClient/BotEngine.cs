@@ -529,39 +529,76 @@ namespace BotEngineClient
             }
         }
 
-
-        private CommandResults FindClickAndWait(string searchName, FindString searchString, int timeOut)
+        /// <summary>
+        /// Searches for a number of potenial targets, and will click on the 1st one found, and then wait for that image to disappear.
+        /// If none of the images are found, then exit with Missing.
+        /// If the image doesn't disappear, then exit with Timeout.
+        /// </summary>
+        /// <param name="searchName"></param>
+        /// <param name="searchString"></param>
+        /// <param name="timeOut"></param>
+        /// <returns></returns>
+        private CommandResults FindClickAndWait(List<string> searchNames, bool missingOk, int timeOut)
         {
-            using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))
+            string lookingFor = searchNames[0];
+            using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), lookingFor)))
             {
                 bool found = false;
                 bool stillThere = false;
                 SearchResult foundAt = new SearchResult();
                 CommandResults result = CommandResults.Missing;
                 System.Threading.CancellationToken cancellationToken = default;
-                System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
-                stopWatch.Start();
-                while (stopWatch.Elapsed.TotalMilliseconds < timeOut)
-                {
-                    adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
-                    int zx = adbScreenSize.X, zy = adbScreenSize.Y, w = adbScreenSize.Width, h = adbScreenSize.Height;
-                    using (Image localImage = adbFrameBuffer.ToImage())
-                    {
-                        findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
-                    }
+                int zx = adbScreenSize.X, zy = adbScreenSize.Y, w = adbScreenSize.Width, h = adbScreenSize.Height;
+                FindString searchString = null;
+                if (timeOut == -1)
+                    timeOut = int.MaxValue;
 
-                    List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X+searchString.SearchArea.Width, searchString.SearchArea.Y+searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
+                // Find the 1st item from the list
+                adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                zx = adbScreenSize.X; zy = adbScreenSize.Y; w = adbScreenSize.Width; h = adbScreenSize.Height;
+                using (Image localImage = adbFrameBuffer.ToImage())
+                {
+                    findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
+                }
+
+                foreach (string item in searchNames)
+                {
+                    if (!FindStrings.ContainsKey(item))
+                    {
+                        _logger.LogError("FindString {0} is missing from json file", item);
+                        return CommandResults.InputError;
+                    }
+                    searchString = FindStrings[item];
+                    lookingFor = item;
+
+                    List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X + searchString.SearchArea.Width, searchString.SearchArea.Y + searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
                     if (dataresult != null)
                     {
-                        if (!found)
+                        _logger.LogDebug("Initial Search Successful, found {0} whilst looking for {1}, Clicking", dataresult[0].Id, lookingFor);
+                        result = CommandResults.TimeOut;
+                        ADBClick(dataresult[0].X, dataresult[0].Y);
+                        found = true;
+                        foundAt = new SearchResult(dataresult[0].TopLeftX, dataresult[0].TopLeftY, dataresult[0].Width, dataresult[0].Height, dataresult[0].X, dataresult[0].Y, dataresult[0].Id);
+                        break;
+                    }
+                }
+
+                if (found)
+                {
+                    System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+                    stopWatch.Start();
+                    while (stopWatch.Elapsed.TotalMilliseconds < timeOut)
+                    {
+                        Thread.Sleep(50);
+                        adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                        zx = adbScreenSize.X; zy = adbScreenSize.Y; w = adbScreenSize.Width; h = adbScreenSize.Height;
+                        using (Image localImage = adbFrameBuffer.ToImage())
                         {
-                            _logger.LogDebug("Initial Search Successful, found {0} whilst looking for {1}, Clicking", dataresult[0].Id, searchName);
-                            result = CommandResults.TimeOut;
-                            ADBClick(dataresult[0].X, dataresult[0].Y);
-                            found = true;
-                            foundAt = new SearchResult(dataresult[0].TopLeftX, dataresult[0].TopLeftY, dataresult[0].Width, dataresult[0].Height, dataresult[0].X, dataresult[0].Y, dataresult[0].Id);
+                            findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                         }
-                        else
+
+                        List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X + searchString.SearchArea.Width, searchString.SearchArea.Y + searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
+                        if (dataresult != null)
                         {
                             stillThere = false;
                             foreach (SearchResult item in dataresult)
@@ -569,39 +606,37 @@ namespace BotEngineClient
                                 if ((item.X > foundAt.TopLeftX && item.X < foundAt.TopLeftX + foundAt.Width)
                                     && (item.Y > foundAt.TopLeftY && item.X < foundAt.TopLeftY + foundAt.Height))
                                 {
-                                    _logger.LogDebug("Secondary Search Successful (bad) whilst looking for {0}", searchName);
+                                    _logger.LogDebug("Secondary Search Successful (bad) whilst looking for {0}", lookingFor);
                                     stillThere = true;
                                     break;
                                 }
                             }
                             if (!stillThere)
                             {
-                                _logger.LogDebug("Secondary Search Unsuccessful (good) whilst looking for {0}", searchName);
+                                _logger.LogDebug("Secondary Search Unsuccessful (good) whilst looking for {0}", lookingFor);
                                 result = CommandResults.Ok;
                                 break;
                             }
                         }
-                    }
-                    else
-                    {
-                        if (found)
+                        else
                         {
-                            _logger.LogDebug("Secondary Search Unsuccessful (good) whilst looking for {0}", searchName);
+                            _logger.LogDebug("Secondary Search Unsuccessful (good) whilst looking for {0}", lookingFor);
                             result = CommandResults.Ok;
                             break;
                         }
-                        else
-                        {
-                            _logger.LogDebug("Initial Search Unsuccessful, whilst looking for {0} at {1}", searchName, stopWatch.Elapsed.TotalMilliseconds);
-                        }
                     }
-                    Thread.Sleep(50);
+                    stopWatch.Stop();
                 }
-                stopWatch.Stop();
-                if (result != CommandResults.Ok)
+                if (result == CommandResults.Missing && missingOk)
                 {
-                    _logger.LogWarning("Unsuccessful with {0} whilst looking for {1}", result.ToString(), searchName);
+                    _logger.LogInformation("Unsuccessful with {0} whilst looking for {1}, but ignored due to MissingOk", result.ToString(), lookingFor);
+                    result = CommandResults.Ok;
                 }
+                else if (result != CommandResults.Ok)
+                {
+                    _logger.LogWarning("Unsuccessful with {0} whilst looking for {1}", result.ToString(), lookingFor);
+                }
+
                 return result;
             }
         }
@@ -725,6 +760,8 @@ namespace BotEngineClient
 
         /// <summary>
         /// Runs the Commands list, until all of the imageNames disappear.
+        /// ToDo: Refactor so it searches for each items separately, as it's finding stuff outside the bounds of the individual searches
+        ///         If the 2nd search is done in an individual level.
         /// </summary>
         /// <param name="imageNames"></param>
         /// <param name="Commands"></param>
@@ -753,7 +790,7 @@ namespace BotEngineClient
                         _logger.LogError("FindString {0} is missing from json file", item);
                         return CommandResults.InputError;
                     }
-                    _logger.LogDebug("Searching for {0}", item);
+                    _logger.LogDebug("Adding search for {0}", item);
                     FindString findString = FindStrings[item];
                     searchString += findString.SearchString;
                     searchX = Math.Min(searchX, findString.SearchArea.X);
@@ -1218,14 +1255,9 @@ namespace BotEngineClient
                             }
                             break;
                         case ValidCommandIds.FindClickAndWait:
-                            if (command.ImageName == null)
+                            if ((command.ImageName == null) && (command.ImageNames == null))
                             {
-                                _logger.LogError("Command {0} Error ImageName is null", command.CommandId);
-                                results = CommandResults.InputError;
-                            }
-                            else if (!FindStrings.ContainsKey(command.ImageName))
-                            {
-                                _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
+                                _logger.LogError("Command {0} Error ImageName or ImageNames is null", command.CommandId);
                                 results = CommandResults.InputError;
                             }
                             else if (command.TimeOut == null)
@@ -1235,7 +1267,34 @@ namespace BotEngineClient
                             }
                             else
                             {
-                                results = FindClickAndWait(command.ImageName, FindStrings[command.ImageName], (int)command.TimeOut);
+                                imageNames = new List<string>();
+                                if (command.ImageName != null)
+                                {
+                                    if (!FindStrings.ContainsKey(command.ImageName))
+                                    {
+                                        _logger.LogError("Command {0} Error ImageName {1} doesn't exist in FindStrings", command.CommandId, command.ImageName);
+                                        results = CommandResults.InputError;
+                                        break;
+                                    }
+                                    imageNames.Add(command.ImageName);
+                                }
+                                if (command.ImageNames != null)
+                                {
+                                    foreach (string item in command.ImageNames)
+                                    {
+                                        if (!FindStrings.ContainsKey(item))
+                                        {
+                                            _logger.LogError("Command {0} Error ImageNames {1} doesn't exist in FindStrings", command.CommandId, item);
+                                            results = CommandResults.InputError;
+                                            break;
+                                        }
+                                    }
+                                    imageNames.AddRange(command.ImageNames);
+                                }
+                                if (results == CommandResults.Ok)
+                                {
+                                    results = FindClickAndWait(imageNames, ignoreMissing, (int)command.TimeOut);
+                                }
                             }
                             break;
                         case ValidCommandIds.IfExists:

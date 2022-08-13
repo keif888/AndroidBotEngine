@@ -570,7 +570,7 @@ namespace BotEngineClient
                     }
                     searchString = FindStrings[item];
                     lookingFor = item;
-
+                    _logger.LogDebug("Searching for {0}", item);
                     List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X + searchString.SearchArea.Width, searchString.SearchArea.Y + searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
                     if (dataresult != null)
                     {
@@ -769,7 +769,7 @@ namespace BotEngineClient
         /// <param name="additionalData"></param>
         /// <param name="actionActivity"></param>
         /// <returns></returns>
-        private CommandResults LoopUntilNotFound(List<string> imageNames, bool ignoreMissing, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity)
+        private CommandResults LoopUntilNotFound(List<string> imageNames, bool ignoreMissing, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity, bool V2 = true)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
             {
@@ -779,54 +779,103 @@ namespace BotEngineClient
                 int searchX = w, searchY = h, searchW = 0, searchH = 0;
                 float textFactor = 0.0f, backFactor = 0.0f;
                 string searchString = string.Empty;
+                FindString findString = null;
                 if (timeOut == -1)
                     timeOut = int.MaxValue;
 
-                // Get the largest bounding box for searching, and the most permissive Factors.
-                foreach (string item in imageNames)
-                {
-                    if (!FindStrings.ContainsKey(item))
-                    {
-                        _logger.LogError("FindString {0} is missing from json file", item);
-                        return CommandResults.InputError;
-                    }
-                    _logger.LogDebug("Adding search for {0}", item);
-                    FindString findString = FindStrings[item];
-                    searchString += findString.SearchString;
-                    searchX = Math.Min(searchX, findString.SearchArea.X);
-                    searchY = Math.Min(searchY, findString.SearchArea.Y);
-                    searchW = Math.Max(searchW, findString.SearchArea.X+findString.SearchArea.Width);
-                    searchH = Math.Max(searchH, findString.SearchArea.Y+findString.SearchArea.Height);
-                    textFactor = Math.Max(textFactor, findString.TextTolerance);
-                    backFactor = Math.Max(backFactor, findString.BackgroundTolerance);
-                }
+                List<SearchResult>? dataresult = null;
 
-                List<SearchResult>? dataresult;
-                System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
-                stopWatch.Start();
-                do
+                if (V2 == true)
                 {
-                    adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
-                    using (Image localImage = adbFrameBuffer.ToImage())
+                    string lookingFor = string.Empty;
+                    System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+                    stopWatch.Start();
+                    do
                     {
-                        findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
-                    }
-                    // This is searching for all results, just to be sure.
-                    dataresult = findText.SearchText(searchX, searchY, searchW, searchH, backFactor, textFactor, searchString, false, true, false);
-                    if (dataresult != null)
-                    {
-                        _logger.LogDebug("Search Successful, found {0}", dataresult[0].Id);
-                        foreach (Command command in Commands)
+                        adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                        zx = adbScreenSize.X; zy = adbScreenSize.Y; w = adbScreenSize.Width; h = adbScreenSize.Height;
+                        using (Image localImage = adbFrameBuffer.ToImage())
                         {
-                            result = ExecuteCommand(command, additionalData, actionActivity);
-                            if (result != CommandResults.Ok)
+                            findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
+                        }
+
+                        foreach (string item in imageNames)
+                        {
+                            if (!FindStrings.ContainsKey(item))
                             {
-                                return result;
+                                _logger.LogError("FindString {0} is missing from json file", item);
+                                return CommandResults.InputError;
+                            }
+                            findString = FindStrings[item];
+                            lookingFor = item;
+                            _logger.LogDebug("Searching for {0}", item);
+
+                            dataresult = findText.SearchText(findString.SearchArea.X, findString.SearchArea.Y, findString.SearchArea.X + findString.SearchArea.Width, findString.SearchArea.Y + findString.SearchArea.Height, findString.BackgroundTolerance, findString.TextTolerance, findString.SearchString, false, false, false, findString.OffsetX, findString.OffsetY);
+                            if (dataresult != null)
+                            {
+                                _logger.LogDebug("Search Successful, found {0}", dataresult[0].Id);
+                                foreach (Command command in Commands)
+                                {
+                                    result = ExecuteCommand(command, additionalData, actionActivity);
+                                    if (result != CommandResults.Ok)
+                                    {
+                                        return result;
+                                    }
+                                }
+                                break;
                             }
                         }
+                        Thread.Sleep(50);
+                    } while ((dataresult != null) && (stopWatch.ElapsedMilliseconds < timeOut)) ;
+                }
+                else
+                {
+                    // Get the largest bounding box for searching, and the most permissive Factors.
+                    foreach (string item in imageNames)
+                    {
+                        if (!FindStrings.ContainsKey(item))
+                        {
+                            _logger.LogError("FindString {0} is missing from json file", item);
+                            return CommandResults.InputError;
+                        }
+                        _logger.LogDebug("Adding search for {0}", item);
+                        findString = FindStrings[item];
+                        searchString += findString.SearchString;
+                        searchX = Math.Min(searchX, findString.SearchArea.X);
+                        searchY = Math.Min(searchY, findString.SearchArea.Y);
+                        searchW = Math.Max(searchW, findString.SearchArea.X + findString.SearchArea.Width);
+                        searchH = Math.Max(searchH, findString.SearchArea.Y + findString.SearchArea.Height);
+                        textFactor = Math.Max(textFactor, findString.TextTolerance);
+                        backFactor = Math.Max(backFactor, findString.BackgroundTolerance);
                     }
-                    Thread.Sleep(50);
-                } while ((dataresult != null) && (stopWatch.ElapsedMilliseconds < timeOut));
+
+                    System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+                    stopWatch.Start();
+                    do
+                    {
+                        adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                        using (Image localImage = adbFrameBuffer.ToImage())
+                        {
+                            findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
+                        }
+                        // This is searching for all results, just to be sure.
+                        dataresult = findText.SearchText(searchX, searchY, searchW, searchH, backFactor, textFactor, searchString, false, true, false);
+                        if (dataresult != null)
+                        {
+                            _logger.LogDebug("Search Successful, found {0}", dataresult[0].Id);
+                            foreach (Command command in Commands)
+                            {
+                                result = ExecuteCommand(command, additionalData, actionActivity);
+                                if (result != CommandResults.Ok)
+                                {
+                                    return result;
+                                }
+                            }
+                        }
+                        Thread.Sleep(50);
+                    } while ((dataresult != null) && (stopWatch.ElapsedMilliseconds < timeOut));
+                }
+
                 if (dataresult == null)
                 {
                     _logger.LogDebug("Item(s) have now disappeared");
@@ -858,7 +907,7 @@ namespace BotEngineClient
         /// <param name="additionalData"></param>
         /// <param name="actionActivity"></param>
         /// <returns></returns>
-        private CommandResults LoopUntilFound(List<string> imageNames, bool ignoreMissing, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity)
+        private CommandResults LoopUntilFound(List<string> imageNames, bool ignoreMissing, List<Command> Commands, int timeOut, Object? additionalData, ActionActivity actionActivity, bool V2 = true)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
             {
@@ -868,51 +917,105 @@ namespace BotEngineClient
                 int searchX = w, searchY = h, searchW = 0, searchH = 0;
                 float textFactor = 0.0f, backFactor = 0.0f;
                 string searchString = string.Empty;
+                FindString findString = null;
                 if (timeOut == -1)
                     timeOut = int.MaxValue;
-                // Get the largest bounding box for searching, and the most permissive Factors.
-                foreach (string item in imageNames)
+
+                List<SearchResult>? dataresult = null;
+
+                if (V2 == true)
                 {
-                    if (!FindStrings.ContainsKey(item))
+                    string lookingFor = string.Empty;
+                    System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+                    stopWatch.Start();
+                    do
                     {
-                        _logger.LogError("FindString {0} is missing from json file", item);
-                        return CommandResults.InputError;
-                    }
-                    FindString findString = FindStrings[item];
-                    searchString += findString.SearchString;
-                    searchX = Math.Min(searchX, findString.SearchArea.X);
-                    searchY = Math.Min(searchY, findString.SearchArea.Y);
-                    searchW = Math.Max(searchW, findString.SearchArea.X + findString.SearchArea.Width);
-                    searchH = Math.Max(searchH, findString.SearchArea.Y + findString.SearchArea.Height);
-                    textFactor = Math.Max(textFactor, findString.TextTolerance);
-                    backFactor = Math.Max(backFactor, findString.BackgroundTolerance);
-                }
-                List<SearchResult>? dataresult;
-                System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
-                stopWatch.Start();
-                do
-                {
-                    adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
-                    using (Image localImage = adbFrameBuffer.ToImage())
-                    {
-                        findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
-                    }
-                    // This is searching for all results, just to be sure.
-                    dataresult = findText.SearchText(searchX, searchY, searchW, searchH, backFactor, textFactor, searchString, false, true, false);
-                    if (dataresult == null)
-                    {
-                        _logger.LogDebug("Search Unsuccessful, Execute Commands");
-                        foreach (Command command in Commands)
+                        adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                        zx = adbScreenSize.X; zy = adbScreenSize.Y; w = adbScreenSize.Width; h = adbScreenSize.Height;
+                        using (Image localImage = adbFrameBuffer.ToImage())
                         {
-                            result = ExecuteCommand(command, additionalData, actionActivity);
-                            if (result != CommandResults.Ok)
+                            findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
+                        }
+
+                        foreach (string item in imageNames)
+                        {
+                            if (!FindStrings.ContainsKey(item))
                             {
-                                return result;
+                                _logger.LogError("FindString {0} is missing from json file", item);
+                                return CommandResults.InputError;
+                            }
+                            findString = FindStrings[item];
+                            lookingFor = item;
+                            _logger.LogDebug("Searching for {0}", item);
+
+                            dataresult = findText.SearchText(findString.SearchArea.X, findString.SearchArea.Y, findString.SearchArea.X + findString.SearchArea.Width, findString.SearchArea.Y + findString.SearchArea.Height, findString.BackgroundTolerance, findString.TextTolerance, findString.SearchString, false, false, false, findString.OffsetX, findString.OffsetY);
+                            if (dataresult != null)
+                            {
+                                _logger.LogDebug("Search Successful, found {0}", dataresult[0].Id);
+                                break;
                             }
                         }
+                        if (dataresult == null)
+                        {
+                            _logger.LogDebug("Search Unsuccessful, Execute Commands");
+                            foreach (Command command in Commands)
+                            {
+                                result = ExecuteCommand(command, additionalData, actionActivity);
+                                if (result != CommandResults.Ok)
+                                {
+                                    return result;
+                                }
+                            }
+                            Thread.Sleep(50);
+                        }
+                    } while ((dataresult == null) && (stopWatch.ElapsedMilliseconds < timeOut));
+                }
+                else
+                {
+
+                    // Get the largest bounding box for searching, and the most permissive Factors.
+                    foreach (string item in imageNames)
+                    {
+                        if (!FindStrings.ContainsKey(item))
+                        {
+                            _logger.LogError("FindString {0} is missing from json file", item);
+                            return CommandResults.InputError;
+                        }
+                        findString = FindStrings[item];
+                        searchString += findString.SearchString;
+                        searchX = Math.Min(searchX, findString.SearchArea.X);
+                        searchY = Math.Min(searchY, findString.SearchArea.Y);
+                        searchW = Math.Max(searchW, findString.SearchArea.X + findString.SearchArea.Width);
+                        searchH = Math.Max(searchH, findString.SearchArea.Y + findString.SearchArea.Height);
+                        textFactor = Math.Max(textFactor, findString.TextTolerance);
+                        backFactor = Math.Max(backFactor, findString.BackgroundTolerance);
                     }
-                    Thread.Sleep(50);
-                } while ((dataresult == null) && (stopWatch.ElapsedMilliseconds < timeOut));
+                    System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
+                    stopWatch.Start();
+                    do
+                    {
+                        adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                        using (Image localImage = adbFrameBuffer.ToImage())
+                        {
+                            findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
+                        }
+                        // This is searching for all results, just to be sure.
+                        dataresult = findText.SearchText(searchX, searchY, searchW, searchH, backFactor, textFactor, searchString, false, true, false);
+                        if (dataresult == null)
+                        {
+                            _logger.LogDebug("Search Unsuccessful, Execute Commands");
+                            foreach (Command command in Commands)
+                            {
+                                result = ExecuteCommand(command, additionalData, actionActivity);
+                                if (result != CommandResults.Ok)
+                                {
+                                    return result;
+                                }
+                            }
+                        }
+                        Thread.Sleep(50);
+                    } while ((dataresult == null) && (stopWatch.ElapsedMilliseconds < timeOut));
+                }
                 if (dataresult != null)
                     _logger.LogDebug("Item(s) have now appeared");
                 else

@@ -861,134 +861,70 @@ namespace BotEngine
             {
                 if (Enum.TryParse(item.Value.ActionType, true, out ValidActionType validActionType))
                 {
-                    switch (validActionType)
+                    // For all but System, setup/update the ActionActivities
+                    if (validActionType != ValidActionType.System)
                     {
-                        case ValidActionType.Adhoc:
-                            if (!botDeviceConfig.LastActionTaken.ContainsKey(item.Key))
-                            {
-                                ActionActivity actionActivty = new ActionActivity
+                        ActionActivity actionActivty = new ActionActivity {
+                            ActionEnabled = false,  // Default all to disabled on 1st execution
+                            LastRun = DateTime.MinValue,
+                            CommandValueOverride = new Dictionary<string, string?>()
+                        };
+                        if (validActionType == ValidActionType.Always)
+                        {
+                            actionActivty.ActionEnabled = true;  //  Except for Always, which by default, always run.
+                        }
+                        if (!botDeviceConfig.LastActionTaken.ContainsKey(item.Key))
+                        {
+                            if (item.Value.Commands != null)
+                                foreach (Command commandItem in item.Value.Commands)
                                 {
-                                    ActionEnabled = false,
-                                    LastRun = DateTime.MinValue,
-                                    CommandValueOverride = new Dictionary<string, string?>()
-                                };
-                                if (item.Value.Commands != null)
-                                    foreach (Command commandItem in item.Value.Commands)
-                                    {
-                                        GatherOverrides(actionActivty.CommandValueOverride, commandItem);
-                                    }
-                                if (actionActivty.CommandValueOverride.Count == 0)
-                                {
-                                    actionActivty.CommandValueOverride = null;
+                                    GatherOverrides(actionActivty.CommandValueOverride, commandItem);
                                 }
-                                botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
+                            if (actionActivty.CommandValueOverride.Count == 0)
+                            {
+                                actionActivty.CommandValueOverride = null;
+                            }
+                            botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
+                        }
+                        else
+                        {
+                            actionActivty = botDeviceConfig.LastActionTaken[item.Key];
+                            Dictionary<string, string?> commandValueOverride = new Dictionary<string, string?>();
+                            // Update CommandValueOverride
+                            if (item.Value.Commands != null)
+                                foreach (Command commandItem in item.Value.Commands)
+                                {
+                                    GatherOverrides(commandValueOverride, commandItem);
+                                }
+                            if (commandValueOverride.Count == 0)
+                            {
+                                actionActivty.CommandValueOverride = null;
                             }
                             else
                             {
-                                ActionActivity actionActivty = botDeviceConfig.LastActionTaken[item.Key];
-                                Dictionary<string, string?> commandValueOverride = new Dictionary<string, string?>();
-                                // Update CommandValueOverride
-                                if (item.Value.Commands != null)
-                                    foreach (Command commandItem in item.Value.Commands)
-                                    {
-                                        GatherOverrides(commandValueOverride, commandItem);
-                                    }
-                                if (commandValueOverride.Count == 0)
+                                if (actionActivty.CommandValueOverride == null)
                                 {
-                                    actionActivty.CommandValueOverride = null;
+                                    actionActivty.CommandValueOverride = commandValueOverride;
                                 }
                                 else
                                 {
-                                    if (actionActivty.CommandValueOverride == null)
+                                    Dictionary<string, string?> replacementCommandValueOverride = new Dictionary<string, string?>();
+                                    foreach (KeyValuePair<string, string?> cvoItem in commandValueOverride)
                                     {
-                                        actionActivty.CommandValueOverride = commandValueOverride;
-                                    }
-                                    else
-                                    {
-                                        Dictionary<string, string?> replacementCommandValueOverride = new Dictionary<string, string?>();
-                                        foreach (KeyValuePair<string, string?> cvoItem in commandValueOverride)
+                                        if (actionActivty.CommandValueOverride.ContainsKey(cvoItem.Key))
                                         {
-                                            if (actionActivty.CommandValueOverride.ContainsKey(cvoItem.Key))
-                                            {
-                                                replacementCommandValueOverride.Add(cvoItem.Key, actionActivty.CommandValueOverride[cvoItem.Key]);
-                                            }
-                                            else
-                                            {
-                                                replacementCommandValueOverride.Add(cvoItem.Key, null);
-                                            }
+                                            replacementCommandValueOverride.Add(cvoItem.Key, actionActivty.CommandValueOverride[cvoItem.Key]);
                                         }
-                                        actionActivty.CommandValueOverride = replacementCommandValueOverride;
-                                    }
-                                    botDeviceConfig.LastActionTaken[item.Key] = actionActivty;
-                                }
-                            }
-                            break;
-                        case ValidActionType.Always:
-                        case ValidActionType.Daily:
-                        case ValidActionType.Scheduled:
-                            if (!botDeviceConfig.LastActionTaken.ContainsKey(item.Key))
-                            {
-                                ActionActivity actionActivty = new ActionActivity
-                                {
-                                    ActionEnabled = true,
-                                    LastRun = DateTime.MinValue,
-                                    CommandValueOverride = new Dictionary<string, string?>()
-                                };
-                                if (item.Value.Commands != null)
-                                    foreach (Command commandItem in item.Value.Commands)
-                                    {
-                                        GatherOverrides(actionActivty.CommandValueOverride, commandItem);
-                                    }
-                                if (actionActivty.CommandValueOverride.Count == 0)
-                                {
-                                    actionActivty.CommandValueOverride = null;
-                                }
-                                botDeviceConfig.LastActionTaken.Add(item.Key, actionActivty);
-                            }
-                            else
-                            {
-                                ActionActivity actionActivty = botDeviceConfig.LastActionTaken[item.Key];
-                                Dictionary<string, string?> commandValueOverride = new Dictionary<string, string?>();
-                                // Update CommandValueOverride
-                                if (item.Value.Commands != null)
-                                    foreach (Command commandItem in item.Value.Commands)
-                                    {
-                                        GatherOverrides(commandValueOverride, commandItem);
-                                    }
-                                if (commandValueOverride.Count == 0)
-                                {
-                                    actionActivty.CommandValueOverride = null;
-                                }
-                                else
-                                {
-                                    if (actionActivty.CommandValueOverride == null)
-                                    {
-                                        actionActivty.CommandValueOverride = commandValueOverride;
-                                    }
-                                    else
-                                    {
-                                        Dictionary<string, string?> replacementCommandValueOverride = new Dictionary<string, string?>();
-                                        foreach (KeyValuePair<string, string?> cvoItem in commandValueOverride)
+                                        else
                                         {
-                                            if (actionActivty.CommandValueOverride.ContainsKey(cvoItem.Key))
-                                            {
-                                                replacementCommandValueOverride.Add(cvoItem.Key, actionActivty.CommandValueOverride[cvoItem.Key]);
-                                            }
-                                            else
-                                            {
-                                                replacementCommandValueOverride.Add(cvoItem.Key, null);
-                                            }
+                                            replacementCommandValueOverride.Add(cvoItem.Key, null);
                                         }
-                                        actionActivty.CommandValueOverride = replacementCommandValueOverride;
                                     }
-                                    botDeviceConfig.LastActionTaken[item.Key] = actionActivty;
+                                    actionActivty.CommandValueOverride = replacementCommandValueOverride;
                                 }
+                                botDeviceConfig.LastActionTaken[item.Key] = actionActivty;
                             }
-                            break;
-                        case ValidActionType.System:
-                            break;
-                        default:
-                            break;
+                        }
                     }
                 }
                 else
@@ -1058,6 +994,8 @@ namespace BotEngine
                         switch (validActionType)
                         {
                             case ValidActionType.Adhoc:
+                            case ValidActionType.Daily:
+                            case ValidActionType.Scheduled:
                                 ActionActivity adhocActionActivity = new ActionActivity {
                                     LastRun = DateTime.MinValue,
                                     ActionEnabled = false,
@@ -1075,9 +1013,6 @@ namespace BotEngine
                                 botDeviceConfig.LastActionTaken.Add(item.Key, adhocActionActivity);
                                 break;
                             case ValidActionType.Always:
-                                break;
-                            case ValidActionType.Daily:
-                            case ValidActionType.Scheduled:
                                 ActionActivity dailyActionActivity = new ActionActivity {
                                     LastRun = DateTime.MinValue,
                                     ActionEnabled = true,

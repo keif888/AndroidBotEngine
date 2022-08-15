@@ -241,9 +241,10 @@ namespace ScriptEditor
         private void AddFindStringtoolStripMenuItem_Click(object sender, EventArgs e)
         {
             ResetEditFormItems();
-            if (tvBotData.SelectedNode.Nodes.ContainsKey("New FindString"))
+            // Only add FindStrings to the 1st Node.
+            if (tvBotData.Nodes[0].Nodes.ContainsKey("New FindString"))
             {
-                TreeNode selectedNode = tvBotData.SelectedNode.Nodes["New FindString"];
+                TreeNode selectedNode = tvBotData.Nodes[0].Nodes["New FindString"];
                 tvBotData.SelectedNode = selectedNode;
                 MessageBox.Show("Rename this FindString to allow new find strings to be added");
             }
@@ -257,7 +258,7 @@ namespace ScriptEditor
                     Tag = newFindString
                 };
 
-                tvBotData.SelectedNode.Nodes.Add(newNode);
+                tvBotData.Nodes[0].Nodes.Add(newNode);
                 tvBotData.SelectedNode = newNode;
             }
         }

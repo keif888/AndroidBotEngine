@@ -180,5 +180,16 @@ Finally enter the command like this into the editor (which is to launch the chro
             }
 
         }
+
+        /// <summary>
+        /// If double click, then select the item, and close the form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void lbCommands_DoubleClick(object sender, EventArgs e)
+        {
+            SelectedCommand = Enum.Parse<ValidCommandIds>(lbCommands.SelectedItem.ToString());
+            DialogResult = DialogResult.OK;
+        }
     }
 }

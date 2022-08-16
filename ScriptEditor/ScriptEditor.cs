@@ -1097,33 +1097,72 @@ namespace ScriptEditor
             foreach (TreeNode childNode in parent.Nodes)
             {
                 Command childCommand = (Command)childNode.Tag;
-                Command newCommand = new Command(childCommand.CommandId)
-                {
-                    ActionName = childCommand.ActionName,
-                    Areas = childCommand.Areas,
-                    ChangeDetectArea = childCommand.ChangeDetectArea,
-                    ChangeDetectDifference = childCommand.ChangeDetectDifference,
-                    CommandNumber = commandNumber
-                };
-                commandNumber += 10;
+                //Command newCommand = new Command(childCommand.CommandId)
+                //{
+                //    ActionName = childCommand.ActionName,
+                //    Areas = childCommand.Areas,
+                //    ChangeDetectArea = childCommand.ChangeDetectArea,
+                //    ChangeDetectDifference = childCommand.ChangeDetectDifference,
+                //    CommandNumber = commandNumber
+                //};
+                //commandNumber += 10;
+                //if (childNode.Nodes.Count != 0)
+                //{
+                //    List<Command> childCommands = new List<Command>();
+                //    LoadCommandList(childCommands, childNode, ref commandNumber);
+                //    newCommand.Commands = childCommands;
+                //}
+                //newCommand.Coordinates = childCommand.Coordinates;
+                //newCommand.Delay = childCommand.Delay;
+                //newCommand.IgnoreMissing = childCommand.IgnoreMissing;
+                //newCommand.ImageName = childCommand.ImageName;
+                //newCommand.ImageNames = childCommand.ImageNames;
+                //newCommand.Location = childCommand.Location;
+                //newCommand.Swipe = childCommand.Swipe;
+                //newCommand.TimeOut = childCommand.TimeOut;
+                //newCommand.Value = childCommand.Value;
+                //newCommand.OverrideId = childCommand.OverrideId;
+                //commands.Add(newCommand);
+
+                Command newCommand = CreateIndividualCommand(childCommand, ref commandNumber);
                 if (childNode.Nodes.Count != 0)
                 {
                     List<Command> childCommands = new List<Command>();
                     LoadCommandList(childCommands, childNode, ref commandNumber);
                     newCommand.Commands = childCommands;
                 }
-                newCommand.Coordinates = childCommand.Coordinates;
-                newCommand.Delay = childCommand.Delay;
-                newCommand.IgnoreMissing = childCommand.IgnoreMissing;
-                newCommand.ImageName = childCommand.ImageName;
-                newCommand.ImageNames = childCommand.ImageNames;
-                newCommand.Location = childCommand.Location;
-                newCommand.Swipe = childCommand.Swipe;
-                newCommand.TimeOut = childCommand.TimeOut;
-                newCommand.Value = childCommand.Value;
-                newCommand.OverrideId = childCommand.OverrideId;
                 commands.Add(newCommand);
             }
+        }
+
+        /// <summary>
+        /// Creates a new Command from a value that was stored in a Tag.
+        /// </summary>
+        /// <param name="childCommand"></param>
+        /// <param name="commandNumber"></param>
+        /// <returns></returns>
+        private Command CreateIndividualCommand(Command childCommand, ref int commandNumber)
+        {
+            Command newCommand = new Command(childCommand.CommandId) {
+                ActionName = childCommand.ActionName,
+                Areas = childCommand.Areas,
+                ChangeDetectArea = childCommand.ChangeDetectArea,
+                ChangeDetectDifference = childCommand.ChangeDetectDifference,
+                CommandNumber = commandNumber
+            };
+            commandNumber += 10;
+
+            newCommand.Coordinates = childCommand.Coordinates;
+            newCommand.Delay = childCommand.Delay;
+            newCommand.IgnoreMissing = childCommand.IgnoreMissing;
+            newCommand.ImageName = childCommand.ImageName;
+            newCommand.ImageNames = childCommand.ImageNames;
+            newCommand.Location = childCommand.Location;
+            newCommand.Swipe = childCommand.Swipe;
+            newCommand.TimeOut = childCommand.TimeOut;
+            newCommand.Value = childCommand.Value;
+            newCommand.OverrideId = childCommand.OverrideId;
+            return newCommand;
         }
 
 
@@ -2709,5 +2748,68 @@ namespace ScriptEditor
         }
 
         #endregion
+
+
+        /// <summary>
+        /// Fires when the right click menus that support Paste are opened, so that Paste can be shown if there is valid content to paste.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cms_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (Clipboard.ContainsText(TextDataFormat.Text))
+            {
+                string jsonString = Clipboard.GetText();
+                if (jsonString[0] == '{')
+                {
+                    Command copiedNode = new Command();
+                    try
+                    {
+                        copiedNode = JsonSerializer.Deserialize<Command>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip, PropertyNameCaseInsensitive = true })!;
+                    }
+                    catch
+                    {
+                        pasteToolStripMenuItem.Enabled = false;
+                        pasteToolStripMenuItem1.Enabled = false;
+                        return;
+                    }
+                    pasteToolStripMenuItem.Enabled = true;
+                    pasteToolStripMenuItem1.Enabled = true;
+                }
+                else
+                {
+                    pasteToolStripMenuItem.Enabled = false;
+                    pasteToolStripMenuItem1.Enabled = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fired when the copy command on the right click menus is selected
+        /// Will serialise the selected node into JSON and put into clipboard.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tvBotData.SelectedNode != null)
+            {
+                if (tvBotData.SelectedNode.Tag != null)
+                {
+                    TreeNode childNode = tvBotData.SelectedNode;
+                    int commandNumber = 10;
+                    Command selectedCommand = CreateIndividualCommand((Command)childNode.Tag, ref commandNumber);
+                    if (childNode.Nodes.Count != 0)
+                    {
+                        List<Command> childCommands = new List<Command>();
+                        LoadCommandList(childCommands, childNode, ref commandNumber);
+                        selectedCommand.Commands = childCommands;
+                    }
+
+                    string jsonData = JsonSerializer.Serialize<Command>(selectedCommand, new JsonSerializerOptions() { WriteIndented = true, IncludeFields = false, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull });
+                    Clipboard.SetText(jsonData);
+                }
+            }
+        }
     }
 }

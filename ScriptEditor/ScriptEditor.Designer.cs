@@ -30,7 +30,7 @@ namespace ScriptEditor
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem(new string[] {
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem(new string[] {
             "Ov1",
             "1500"}, -1);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ScriptEditor));
@@ -205,6 +205,7 @@ namespace ScriptEditor
             this.scriptEditorToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.cmsFindString = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addFindStringToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem13 = new System.Windows.Forms.ToolStripSeparator();
             this.deleteToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.cmsAction = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addActionToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -214,6 +215,14 @@ namespace ScriptEditor
             this.cmsBasicCommand = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.insertAboveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertBelowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem10 = new System.Windows.Forms.ToolStripSeparator();
+            this.moveUpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.moveDownToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem11 = new System.Windows.Forms.ToolStripSeparator();
+            this.copyToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.pasteToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem12 = new System.Windows.Forms.ToolStripSeparator();
+            this.deleteToolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
             this.cmsContainingCommand = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addCommandToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem6 = new System.Windows.Forms.ToolStripSeparator();
@@ -225,17 +234,8 @@ namespace ScriptEditor
             this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripSeparator();
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.deleteToolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem9 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripMenuItem10 = new System.Windows.Forms.ToolStripSeparator();
-            this.moveUpToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.moveDownToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem11 = new System.Windows.Forms.ToolStripSeparator();
-            this.copyToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.pasteToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem12 = new System.Windows.Forms.ToolStripSeparator();
-            this.deleteToolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem13 = new System.Windows.Forms.ToolStripSeparator();
+            this.deleteToolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -359,7 +359,7 @@ namespace ScriptEditor
             // 
             this.addFindStringtoolStripMenuItem.Enabled = false;
             this.addFindStringtoolStripMenuItem.Name = "addFindStringtoolStripMenuItem";
-            this.addFindStringtoolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addFindStringtoolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addFindStringtoolStripMenuItem.Text = "Add &FindString";
             this.addFindStringtoolStripMenuItem.Click += new System.EventHandler(this.AddFindStringtoolStripMenuItem_Click);
             // 
@@ -367,7 +367,7 @@ namespace ScriptEditor
             // 
             this.addActionToolStripMenuItem.Enabled = false;
             this.addActionToolStripMenuItem.Name = "addActionToolStripMenuItem";
-            this.addActionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addActionToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addActionToolStripMenuItem.Text = "Add Ac&tion";
             this.addActionToolStripMenuItem.Click += new System.EventHandler(this.AddActionToolStripMenuItem_Click);
             // 
@@ -375,20 +375,20 @@ namespace ScriptEditor
             // 
             this.addCoordinatestoolStripMenuItem.Enabled = false;
             this.addCoordinatestoolStripMenuItem.Name = "addCoordinatestoolStripMenuItem";
-            this.addCoordinatestoolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addCoordinatestoolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addCoordinatestoolStripMenuItem.Text = "Add &Coordinates";
             this.addCoordinatestoolStripMenuItem.Click += new System.EventHandler(this.AddCoordinatestoolStripMenuItem_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(160, 6);
             // 
             // addCommandToolStripMenuItem
             // 
             this.addCommandToolStripMenuItem.Enabled = false;
             this.addCommandToolStripMenuItem.Name = "addCommandToolStripMenuItem";
-            this.addCommandToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.addCommandToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.addCommandToolStripMenuItem.Text = "Add C&ommand";
             this.addCommandToolStripMenuItem.Click += new System.EventHandler(this.AddCommandToolStripMenuItem_Click);
             // 
@@ -396,7 +396,7 @@ namespace ScriptEditor
             // 
             this.aboveToolStripMenuItem.Enabled = false;
             this.aboveToolStripMenuItem.Name = "aboveToolStripMenuItem";
-            this.aboveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboveToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.aboveToolStripMenuItem.Text = "Insert &Above";
             this.aboveToolStripMenuItem.Click += new System.EventHandler(this.AboveToolStripMenuItem_Click);
             // 
@@ -404,27 +404,27 @@ namespace ScriptEditor
             // 
             this.belowToolStripMenuItem.Enabled = false;
             this.belowToolStripMenuItem.Name = "belowToolStripMenuItem";
-            this.belowToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.belowToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.belowToolStripMenuItem.Text = "Insert &Below";
             this.belowToolStripMenuItem.Click += new System.EventHandler(this.BelowToolStripMenuItem_Click);
             // 
             // toolStripMenuItem3
             // 
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(160, 6);
             // 
             // moveToolStripMenuItem
             // 
             this.moveToolStripMenuItem.Enabled = false;
             this.moveToolStripMenuItem.Name = "moveToolStripMenuItem";
-            this.moveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.moveToolStripMenuItem.Text = "Move";
             // 
             // upToolStripMenuItem
             // 
             this.upToolStripMenuItem.Enabled = false;
             this.upToolStripMenuItem.Name = "upToolStripMenuItem";
-            this.upToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.upToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.upToolStripMenuItem.Text = "&Up";
             this.upToolStripMenuItem.Click += new System.EventHandler(this.UpToolStripMenuItem_Click);
             // 
@@ -432,21 +432,21 @@ namespace ScriptEditor
             // 
             this.downToolStripMenuItem.Enabled = false;
             this.downToolStripMenuItem.Name = "downToolStripMenuItem";
-            this.downToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.downToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.downToolStripMenuItem.Text = "&Down";
             this.downToolStripMenuItem.Click += new System.EventHandler(this.DownToolStripMenuItem_Click);
             // 
             // toolStripMenuItem4
             // 
             this.toolStripMenuItem4.Name = "toolStripMenuItem4";
-            this.toolStripMenuItem4.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem4.Size = new System.Drawing.Size(160, 6);
             // 
             // deleteToolStripMenuItem
             // 
             this.deleteToolStripMenuItem.Enabled = false;
             this.deleteToolStripMenuItem.Name = "deleteToolStripMenuItem";
             this.deleteToolStripMenuItem.ShortcutKeyDisplayString = "Del";
-            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.deleteToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.deleteToolStripMenuItem.Text = "Delete";
             this.deleteToolStripMenuItem.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
             // 
@@ -866,7 +866,7 @@ namespace ScriptEditor
             this.columnHeader1});
             this.lvActionOverridesOverride.HideSelection = false;
             this.lvActionOverridesOverride.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3});
+            listViewItem2});
             this.lvActionOverridesOverride.Location = new System.Drawing.Point(94, 156);
             this.lvActionOverridesOverride.MultiSelect = false;
             this.lvActionOverridesOverride.Name = "lvActionOverridesOverride";
@@ -2029,6 +2029,11 @@ namespace ScriptEditor
             this.addFindStringToolStripMenuItem1.Text = "Add Find String";
             this.addFindStringToolStripMenuItem1.Click += new System.EventHandler(this.AddFindStringtoolStripMenuItem_Click);
             // 
+            // toolStripMenuItem13
+            // 
+            this.toolStripMenuItem13.Name = "toolStripMenuItem13";
+            this.toolStripMenuItem13.Size = new System.Drawing.Size(153, 6);
+            // 
             // deleteToolStripMenuItem1
             // 
             this.deleteToolStripMenuItem1.Name = "deleteToolStripMenuItem1";
@@ -2049,14 +2054,14 @@ namespace ScriptEditor
             // addActionToolStripMenuItem1
             // 
             this.addActionToolStripMenuItem1.Name = "addActionToolStripMenuItem1";
-            this.addActionToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.addActionToolStripMenuItem1.Size = new System.Drawing.Size(156, 22);
             this.addActionToolStripMenuItem1.Text = "Add Action";
             this.addActionToolStripMenuItem1.Click += new System.EventHandler(this.AddActionToolStripMenuItem_Click);
             // 
             // addCommandToolStripMenuItem1
             // 
             this.addCommandToolStripMenuItem1.Name = "addCommandToolStripMenuItem1";
-            this.addCommandToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.addCommandToolStripMenuItem1.Size = new System.Drawing.Size(156, 22);
             this.addCommandToolStripMenuItem1.Text = "Add Command";
             this.addCommandToolStripMenuItem1.Click += new System.EventHandler(this.AddCommandToolStripMenuItem_Click);
             // 
@@ -2068,7 +2073,7 @@ namespace ScriptEditor
             // deleteToolStripMenuItem2
             // 
             this.deleteToolStripMenuItem2.Name = "deleteToolStripMenuItem2";
-            this.deleteToolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
+            this.deleteToolStripMenuItem2.Size = new System.Drawing.Size(156, 22);
             this.deleteToolStripMenuItem2.Text = "Delete";
             this.deleteToolStripMenuItem2.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
             // 
@@ -2086,7 +2091,8 @@ namespace ScriptEditor
             this.toolStripMenuItem12,
             this.deleteToolStripMenuItem4});
             this.cmsBasicCommand.Name = "cmsBasicCommand";
-            this.cmsBasicCommand.Size = new System.Drawing.Size(141, 176);
+            this.cmsBasicCommand.Size = new System.Drawing.Size(181, 198);
+            this.cmsBasicCommand.Opening += new System.ComponentModel.CancelEventHandler(this.cms_Opening);
             // 
             // insertAboveToolStripMenuItem
             // 
@@ -2101,100 +2107,6 @@ namespace ScriptEditor
             this.insertBelowToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.insertBelowToolStripMenuItem.Text = "Insert Below";
             this.insertBelowToolStripMenuItem.Click += new System.EventHandler(this.BelowToolStripMenuItem_Click);
-            // 
-            // cmsContainingCommand
-            // 
-            this.cmsContainingCommand.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addCommandToolStripMenuItem2,
-            this.toolStripMenuItem6,
-            this.insertAboveToolStripMenuItem1,
-            this.insertBelowToolStripMenuItem1,
-            this.toolStripMenuItem7,
-            this.moveUpToolStripMenuItem,
-            this.moveDownToolStripMenuItem,
-            this.toolStripMenuItem8,
-            this.copyToolStripMenuItem,
-            this.pasteToolStripMenuItem,
-            this.toolStripMenuItem9,
-            this.deleteToolStripMenuItem3});
-            this.cmsContainingCommand.Name = "cmsContainingCommand";
-            this.cmsContainingCommand.Size = new System.Drawing.Size(157, 204);
-            // 
-            // addCommandToolStripMenuItem2
-            // 
-            this.addCommandToolStripMenuItem2.Name = "addCommandToolStripMenuItem2";
-            this.addCommandToolStripMenuItem2.Size = new System.Drawing.Size(156, 22);
-            this.addCommandToolStripMenuItem2.Text = "Add Command";
-            this.addCommandToolStripMenuItem2.Click += new System.EventHandler(this.AddCommandToolStripMenuItem_Click);
-            // 
-            // toolStripMenuItem6
-            // 
-            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(177, 6);
-            // 
-            // insertAboveToolStripMenuItem1
-            // 
-            this.insertAboveToolStripMenuItem1.Name = "insertAboveToolStripMenuItem1";
-            this.insertAboveToolStripMenuItem1.Size = new System.Drawing.Size(156, 22);
-            this.insertAboveToolStripMenuItem1.Text = "Insert Above";
-            this.insertAboveToolStripMenuItem1.Click += new System.EventHandler(this.AboveToolStripMenuItem_Click);
-            // 
-            // insertBelowToolStripMenuItem1
-            // 
-            this.insertBelowToolStripMenuItem1.Name = "insertBelowToolStripMenuItem1";
-            this.insertBelowToolStripMenuItem1.Size = new System.Drawing.Size(156, 22);
-            this.insertBelowToolStripMenuItem1.Text = "Insert Below";
-            this.insertBelowToolStripMenuItem1.Click += new System.EventHandler(this.BelowToolStripMenuItem_Click);
-            // 
-            // toolStripMenuItem7
-            // 
-            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
-            this.toolStripMenuItem7.Size = new System.Drawing.Size(177, 6);
-            // 
-            // moveUpToolStripMenuItem
-            // 
-            this.moveUpToolStripMenuItem.Name = "moveUpToolStripMenuItem";
-            this.moveUpToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-            this.moveUpToolStripMenuItem.Text = "Move Up";
-            this.moveUpToolStripMenuItem.Click += new System.EventHandler(this.UpToolStripMenuItem_Click);
-            // 
-            // moveDownToolStripMenuItem
-            // 
-            this.moveDownToolStripMenuItem.Name = "moveDownToolStripMenuItem";
-            this.moveDownToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-            this.moveDownToolStripMenuItem.Text = "Move Down";
-            this.moveDownToolStripMenuItem.Click += new System.EventHandler(this.DownToolStripMenuItem_Click);
-            // 
-            // toolStripMenuItem8
-            // 
-            this.toolStripMenuItem8.Name = "toolStripMenuItem8";
-            this.toolStripMenuItem8.Size = new System.Drawing.Size(177, 6);
-            // 
-            // copyToolStripMenuItem
-            // 
-            this.copyToolStripMenuItem.Enabled = false;
-            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
-            this.copyToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-            this.copyToolStripMenuItem.Text = "Copy";
-            // 
-            // pasteToolStripMenuItem
-            // 
-            this.pasteToolStripMenuItem.Enabled = false;
-            this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
-            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
-            this.pasteToolStripMenuItem.Text = "Paste";
-            // 
-            // deleteToolStripMenuItem3
-            // 
-            this.deleteToolStripMenuItem3.Name = "deleteToolStripMenuItem3";
-            this.deleteToolStripMenuItem3.Size = new System.Drawing.Size(156, 22);
-            this.deleteToolStripMenuItem3.Text = "Delete";
-            this.deleteToolStripMenuItem3.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
-            // 
-            // toolStripMenuItem9
-            // 
-            this.toolStripMenuItem9.Name = "toolStripMenuItem9";
-            this.toolStripMenuItem9.Size = new System.Drawing.Size(153, 6);
             // 
             // toolStripMenuItem10
             // 
@@ -2222,10 +2134,10 @@ namespace ScriptEditor
             // 
             // copyToolStripMenuItem1
             // 
-            this.copyToolStripMenuItem1.Enabled = false;
             this.copyToolStripMenuItem1.Name = "copyToolStripMenuItem1";
-            this.copyToolStripMenuItem1.Size = new System.Drawing.Size(140, 22);
+            this.copyToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.copyToolStripMenuItem1.Text = "Copy";
+            this.copyToolStripMenuItem1.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
             // 
             // pasteToolStripMenuItem1
             // 
@@ -2246,10 +2158,100 @@ namespace ScriptEditor
             this.deleteToolStripMenuItem4.Text = "Delete";
             this.deleteToolStripMenuItem4.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
             // 
-            // toolStripMenuItem13
+            // cmsContainingCommand
             // 
-            this.toolStripMenuItem13.Name = "toolStripMenuItem13";
-            this.toolStripMenuItem13.Size = new System.Drawing.Size(153, 6);
+            this.cmsContainingCommand.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addCommandToolStripMenuItem2,
+            this.toolStripMenuItem6,
+            this.insertAboveToolStripMenuItem1,
+            this.insertBelowToolStripMenuItem1,
+            this.toolStripMenuItem7,
+            this.moveUpToolStripMenuItem,
+            this.moveDownToolStripMenuItem,
+            this.toolStripMenuItem8,
+            this.copyToolStripMenuItem,
+            this.pasteToolStripMenuItem,
+            this.toolStripMenuItem9,
+            this.deleteToolStripMenuItem3});
+            this.cmsContainingCommand.Name = "cmsContainingCommand";
+            this.cmsContainingCommand.Size = new System.Drawing.Size(157, 204);
+            this.cmsContainingCommand.Opening += new System.ComponentModel.CancelEventHandler(this.cms_Opening);
+            // 
+            // addCommandToolStripMenuItem2
+            // 
+            this.addCommandToolStripMenuItem2.Name = "addCommandToolStripMenuItem2";
+            this.addCommandToolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
+            this.addCommandToolStripMenuItem2.Text = "Add Command";
+            this.addCommandToolStripMenuItem2.Click += new System.EventHandler(this.AddCommandToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem6
+            // 
+            this.toolStripMenuItem6.Name = "toolStripMenuItem6";
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(177, 6);
+            // 
+            // insertAboveToolStripMenuItem1
+            // 
+            this.insertAboveToolStripMenuItem1.Name = "insertAboveToolStripMenuItem1";
+            this.insertAboveToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.insertAboveToolStripMenuItem1.Text = "Insert Above";
+            this.insertAboveToolStripMenuItem1.Click += new System.EventHandler(this.AboveToolStripMenuItem_Click);
+            // 
+            // insertBelowToolStripMenuItem1
+            // 
+            this.insertBelowToolStripMenuItem1.Name = "insertBelowToolStripMenuItem1";
+            this.insertBelowToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.insertBelowToolStripMenuItem1.Text = "Insert Below";
+            this.insertBelowToolStripMenuItem1.Click += new System.EventHandler(this.BelowToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem7
+            // 
+            this.toolStripMenuItem7.Name = "toolStripMenuItem7";
+            this.toolStripMenuItem7.Size = new System.Drawing.Size(177, 6);
+            // 
+            // moveUpToolStripMenuItem
+            // 
+            this.moveUpToolStripMenuItem.Name = "moveUpToolStripMenuItem";
+            this.moveUpToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveUpToolStripMenuItem.Text = "Move Up";
+            this.moveUpToolStripMenuItem.Click += new System.EventHandler(this.UpToolStripMenuItem_Click);
+            // 
+            // moveDownToolStripMenuItem
+            // 
+            this.moveDownToolStripMenuItem.Name = "moveDownToolStripMenuItem";
+            this.moveDownToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.moveDownToolStripMenuItem.Text = "Move Down";
+            this.moveDownToolStripMenuItem.Click += new System.EventHandler(this.DownToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem8
+            // 
+            this.toolStripMenuItem8.Name = "toolStripMenuItem8";
+            this.toolStripMenuItem8.Size = new System.Drawing.Size(177, 6);
+            // 
+            // copyToolStripMenuItem
+            // 
+            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.copyToolStripMenuItem.Text = "Copy";
+            this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
+            // 
+            // pasteToolStripMenuItem
+            // 
+            this.pasteToolStripMenuItem.Enabled = false;
+            this.pasteToolStripMenuItem.Name = "pasteToolStripMenuItem";
+            this.pasteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.pasteToolStripMenuItem.Text = "Paste";
+            // 
+            // toolStripMenuItem9
+            // 
+            this.toolStripMenuItem9.Name = "toolStripMenuItem9";
+            this.toolStripMenuItem9.Size = new System.Drawing.Size(177, 6);
+            // 
+            // deleteToolStripMenuItem3
+            // 
+            this.deleteToolStripMenuItem3.Name = "deleteToolStripMenuItem3";
+            this.deleteToolStripMenuItem3.Size = new System.Drawing.Size(180, 22);
+            this.deleteToolStripMenuItem3.Text = "Delete";
+            this.deleteToolStripMenuItem3.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
             // 
             // ScriptEditor
             // 

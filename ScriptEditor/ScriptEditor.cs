@@ -255,7 +255,8 @@ namespace ScriptEditor
                 TreeNode newNode = new TreeNode {
                     Text = "New FindString",
                     Name = "New FindString",
-                    Tag = newFindString
+                    Tag = newFindString,
+                    ContextMenuStrip = cmsFindString
                 };
 
                 tvBotData.Nodes[0].Nodes.Add(newNode);
@@ -288,7 +289,8 @@ namespace ScriptEditor
                 TreeNode newNode = new TreeNode {
                     Text = "New Action",
                     Name = "New Action",
-                    Tag = newAction
+                    Tag = newAction,
+                    ContextMenuStrip = cmsAction
                 };
 
                 tvBotData.SelectedNode.Nodes.Add(newNode);
@@ -356,7 +358,8 @@ namespace ScriptEditor
                         TreeNode newNode = new TreeNode {
                             Tag = newCommand,
                             Name = commandId,
-                            Text = childText
+                            Text = childText,
+                            ContextMenuStrip = GetContextMenuStripForCommand(newCommand.CommandId)
                         };
                         currentNode.Nodes.Add(newNode);
                         tvBotData.SelectedNode = newNode;
@@ -390,7 +393,8 @@ namespace ScriptEditor
                         TreeNode newNode = new TreeNode {
                             Tag = newCommand,
                             Name = commandId,
-                            Text = childText
+                            Text = childText,
+                            ContextMenuStrip = GetContextMenuStripForCommand(newCommand.CommandId)
                         };
                         parent.Nodes.Insert(currentNodeIndex, newNode);
                         tvBotData.SelectedNode = newNode;
@@ -450,7 +454,8 @@ namespace ScriptEditor
                         TreeNode newNode = new TreeNode {
                             Tag = newCommand,
                             Name = commandId,
-                            Text = childText
+                            Text = childText,
+                            ContextMenuStrip = GetContextMenuStripForCommand(newCommand.CommandId)
                         };
                         parent.Nodes.Insert(currentNodeIndex + 1, newNode);
                         tvBotData.SelectedNode = newNode;
@@ -469,7 +474,8 @@ namespace ScriptEditor
                         TreeNode newNode = new TreeNode {
                             Tag = newCommand,
                             Name = commandId,
-                            Text = childText
+                            Text = childText,
+                            ContextMenuStrip = GetContextMenuStripForCommand(newCommand.CommandId)
                         };
                         currentNode.Nodes.Add(newNode);
                         tvBotData.SelectedNode = newNode;
@@ -504,6 +510,32 @@ namespace ScriptEditor
                     tvBotData.SelectedNode = newNode;
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the correct ContextMenuStrip basedon the Command in use.
+        /// </summary>
+        /// <param name="commandId"></param>
+        /// <returns></returns>
+        private ContextMenuStrip GetContextMenuStripForCommand(string commandId)
+        {
+            if (Enum.TryParse(commandId, true, out ValidCommandIds selectedCommand))
+            {
+                switch (selectedCommand)
+                {
+                    case ValidCommandIds.IfExists:
+                    case ValidCommandIds.IfNotExists:
+                    case ValidCommandIds.LoopCoordinates:
+                    case ValidCommandIds.LoopCounter:
+                    case ValidCommandIds.LoopUntilFound:
+                    case ValidCommandIds.LoopUntilNotFound:
+                        return cmsContainingCommand;
+                    default:
+                        return cmsBasicCommand;
+                }
+            }
+            else
+                return cmsBasicCommand;
         }
 
         /// <summary>
@@ -564,10 +596,13 @@ namespace ScriptEditor
             // ToDo: Update the combo boxes for FindText and Actions.
             if (currentNode != null)
             {
-                tvBotData.Nodes.Remove(currentNode);
-                UnsavedChanges = true;
-                saveToolStripMenuItem.Enabled = true;
-                ChangePending = false;
+                if (currentNode.Tag != null)
+                {
+                    tvBotData.Nodes.Remove(currentNode);
+                    UnsavedChanges = true;
+                    saveToolStripMenuItem.Enabled = true;
+                    ChangePending = false;
+                }
             }
         }
 
@@ -777,7 +812,8 @@ namespace ScriptEditor
                 {
                     Name = item.Key,
                     Tag = item.Value,
-                    Text = item.Key
+                    Text = item.Key,
+                    ContextMenuStrip = cmsFindString
                 };
                 findStringsNode.Nodes.Add(treeNode);
                 cbImageNameNoWait.Items.Add(item.Key);
@@ -787,7 +823,7 @@ namespace ScriptEditor
             }
             tvBotData.Sort();  // Do not do this again after loading the findStrings, as it will stuff every thing up.
             tvBotData.Sorted = false;
-
+            findStringsNode.ContextMenuStrip = cmsFindString;
             findStringsNode.Expand();
             TreeNode systemActionsNode = tvBotData.Nodes.Add("SystemActions");
             systemActionsNode.Name = "SystemActions";
@@ -798,6 +834,7 @@ namespace ScriptEditor
                 cbActionAfter.Items.Add(item.Key);
                 cbActionBefore.Items.Add(item.Key);
             }
+            systemActionsNode.ContextMenuStrip = cmsAction;
             systemActionsNode.Expand();
             TreeNode actionsNode = tvBotData.Nodes.Add("Actions");
             actionsNode.Name = "Actions";
@@ -808,6 +845,7 @@ namespace ScriptEditor
                 cbActionAfter.Items.Add(item.Key);
                 cbActionBefore.Items.Add(item.Key);
             }
+            actionsNode.ContextMenuStrip = cmsAction;
             actionsNode.Expand();
 
             tvBotData.ResumeLayout();
@@ -928,7 +966,8 @@ namespace ScriptEditor
         {
             TreeNode child = new TreeNode
             {
-                Name = item.Key
+                Name = item.Key,
+                ContextMenuStrip = cmsAction
             };
             if (item.Value.Commands != null)
             {
@@ -961,9 +1000,10 @@ namespace ScriptEditor
                 }
                 TreeNode child = new TreeNode
                 {
-                    Name = command.CommandNumber.ToString(),  //ToDo: Check if this could be childText
+                    Name = command.CommandNumber.ToString(),
                     Tag = commandCopy,
-                    Text = childText
+                    Text = childText,
+                    ContextMenuStrip = GetContextMenuStripForCommand(commandCopy.CommandId)
                 };
                 if (command.Commands != null)
                 {
@@ -2669,6 +2709,5 @@ namespace ScriptEditor
         }
 
         #endregion
-
     }
 }

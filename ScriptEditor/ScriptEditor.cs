@@ -84,7 +84,6 @@ namespace ScriptEditor
 
         // ToDo: Add GrabWindow, that isn't Modal, so you can get Coords etc from it
         // ToDo: Add Defer Command which sets a scheduled task to retry n minutes in the future.This should incorporate restart from where it was
-        // ToDo: Add Insert Above/Below for FindString
         // ToDo: Fix ComboBoxes when Delete/Rename items
 
         #region File Menu
@@ -2749,7 +2748,7 @@ namespace ScriptEditor
 
         #endregion
 
-
+        #region Right Click Menu
         /// <summary>
         /// Fires when the right click menus that support Paste are opened, so that Paste can be shown if there is valid content to paste.
         /// </summary>
@@ -2771,15 +2770,18 @@ namespace ScriptEditor
                     {
                         pasteToolStripMenuItem.Enabled = false;
                         pasteToolStripMenuItem1.Enabled = false;
+                        pasteToolStripMenuItem2.Enabled = false;
                         return;
                     }
                     pasteToolStripMenuItem.Enabled = true;
                     pasteToolStripMenuItem1.Enabled = true;
+                    pasteToolStripMenuItem2.Enabled = true;
                 }
                 else
                 {
                     pasteToolStripMenuItem.Enabled = false;
                     pasteToolStripMenuItem1.Enabled = false;
+                    pasteToolStripMenuItem2.Enabled = false;
                 }
             }
         }
@@ -2811,5 +2813,60 @@ namespace ScriptEditor
                 }
             }
         }
+
+
+        /// <summary>
+        /// Fired when the paste command on the right click menus is selected
+        /// Will deserialise the JSON from the clipboard, and turn it into TreeNode in tvBotData.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Clipboard.ContainsText(TextDataFormat.Text))
+            {
+                string jsonString = Clipboard.GetText();
+                if (jsonString[0] == '{')
+                {
+                    Command copiedNode = new Command();
+                    try
+                    {
+                        copiedNode = JsonSerializer.Deserialize<Command>(jsonString, new JsonSerializerOptions() { ReadCommentHandling = JsonCommentHandling.Skip, PropertyNameCaseInsensitive = true })!;
+                    }
+                    catch
+                    {
+                        return;
+                    }
+
+                    List<Command> copiedCommands = new List<Command>();
+                    copiedCommands.Add(copiedNode);
+                    if (tvBotData.SelectedNode.Tag is BotEngineClient.Action)
+                    {
+                        LoadActionTreeNode(tvBotData.SelectedNode, copiedCommands);
+                    }
+                    else if (tvBotData.SelectedNode.Tag is Command)
+                    {
+                        if (Enum.TryParse((tvBotData.SelectedNode.Tag as Command).CommandId, true, out ValidCommandIds validCommandIds))
+                        {
+                            switch (validCommandIds)
+                            {
+                                case ValidCommandIds.IfExists:
+                                case ValidCommandIds.IfNotExists:
+                                case ValidCommandIds.LoopCoordinates:
+                                case ValidCommandIds.LoopCounter:
+                                case ValidCommandIds.LoopUntilFound:
+                                case ValidCommandIds.LoopUntilNotFound:
+                                    LoadActionTreeNode(tvBotData.SelectedNode, copiedCommands);
+                                    break;
+                                default:
+                                    LoadActionTreeNode(tvBotData.SelectedNode.Parent, copiedCommands);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
     }
 }

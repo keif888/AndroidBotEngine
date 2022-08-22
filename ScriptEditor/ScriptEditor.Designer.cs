@@ -1993,6 +1993,7 @@ namespace ScriptEditor
             this.tbPointX.TabIndex = 1;
             this.tbPointX.ValidatingType = typeof(int);
             this.tbPointX.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbPointX.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // tbPointY
             // 
@@ -2002,6 +2003,7 @@ namespace ScriptEditor
             this.tbPointY.Size = new System.Drawing.Size(25, 23);
             this.tbPointY.TabIndex = 2;
             this.tbPointY.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbPointY.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // openFileDialog1
             // 
@@ -2053,45 +2055,45 @@ namespace ScriptEditor
             this.toolStripMenuItem2,
             this.deleteToolStripMenuItem2});
             this.cmsAction.Name = "cmsAction";
-            this.cmsAction.Size = new System.Drawing.Size(181, 126);
+            this.cmsAction.Size = new System.Drawing.Size(157, 104);
             this.cmsAction.Opening += new System.ComponentModel.CancelEventHandler(this.cms_Opening);
             // 
             // addActionToolStripMenuItem1
             // 
             this.addActionToolStripMenuItem1.Name = "addActionToolStripMenuItem1";
-            this.addActionToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.addActionToolStripMenuItem1.Size = new System.Drawing.Size(156, 22);
             this.addActionToolStripMenuItem1.Text = "Add Action";
             this.addActionToolStripMenuItem1.Click += new System.EventHandler(this.AddActionToolStripMenuItem_Click);
             // 
             // addCommandToolStripMenuItem1
             // 
             this.addCommandToolStripMenuItem1.Name = "addCommandToolStripMenuItem1";
-            this.addCommandToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.addCommandToolStripMenuItem1.Size = new System.Drawing.Size(156, 22);
             this.addCommandToolStripMenuItem1.Text = "Add Command";
             this.addCommandToolStripMenuItem1.Click += new System.EventHandler(this.AddCommandToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(153, 6);
             // 
             // pasteToolStripMenuItem2
             // 
             this.pasteToolStripMenuItem2.Enabled = false;
             this.pasteToolStripMenuItem2.Name = "pasteToolStripMenuItem2";
-            this.pasteToolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
+            this.pasteToolStripMenuItem2.Size = new System.Drawing.Size(156, 22);
             this.pasteToolStripMenuItem2.Text = "Paste";
             this.pasteToolStripMenuItem2.Click += new System.EventHandler(this.pasteToolStripMenuItem_Click);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(153, 6);
             // 
             // deleteToolStripMenuItem2
             // 
             this.deleteToolStripMenuItem2.Name = "deleteToolStripMenuItem2";
-            this.deleteToolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
+            this.deleteToolStripMenuItem2.Size = new System.Drawing.Size(156, 22);
             this.deleteToolStripMenuItem2.Text = "Delete";
             this.deleteToolStripMenuItem2.Click += new System.EventHandler(this.DeleteToolStripMenuItem_Click);
             // 

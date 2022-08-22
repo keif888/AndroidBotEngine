@@ -167,8 +167,10 @@ namespace ScriptEditor
         {
             bool fileWatcherStatus = false;
             if (fileWatcher != null)
+            {
                 fileWatcherStatus = fileWatcher.EnableRaisingEvents;
-            fileWatcher.EnableRaisingEvents = false;
+                fileWatcher.EnableRaisingEvents = false;
+            }
             switch (loadedFileType)
             {
                 case JsonHelper.ConfigFileType.GameConfig:
@@ -2868,5 +2870,15 @@ namespace ScriptEditor
             }
         }
         #endregion
+
+        private void MaskedTextBox_Enter(object sender, EventArgs e)
+        {
+            BeginInvoke((System.Action)delegate { SetMaskedTextBoxSelectAll((MaskedTextBox)sender); });
+        }
+
+        private void SetMaskedTextBoxSelectAll(MaskedTextBox txtbox)
+        {
+            txtbox.SelectAll();
+        }
     }
 }

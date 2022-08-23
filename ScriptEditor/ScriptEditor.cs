@@ -2871,14 +2871,25 @@ namespace ScriptEditor
         }
         #endregion
 
+        #region Masked Textbox Events
+        /// <summary>
+        /// Ensure that all the text in a masked text box is highlighted on entry.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MaskedTextBox_Enter(object sender, EventArgs e)
         {
             BeginInvoke((System.Action)delegate { SetMaskedTextBoxSelectAll((MaskedTextBox)sender); });
         }
 
+        /// <summary>
+        /// Select all the text in a masked text box
+        /// </summary>
+        /// <param name="txtbox"></param>
         private void SetMaskedTextBoxSelectAll(MaskedTextBox txtbox)
         {
             txtbox.SelectAll();
         }
+        #endregion
     }
 }

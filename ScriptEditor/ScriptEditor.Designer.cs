@@ -656,6 +656,7 @@ namespace ScriptEditor
             this.tbLoopsCounter.TabIndex = 11;
             this.tbLoopsCounter.ValidatingType = typeof(int);
             this.tbLoopsCounter.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbLoopsCounter.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // gbList
             // 
@@ -738,6 +739,7 @@ namespace ScriptEditor
             this.tbImageAreasX.Size = new System.Drawing.Size(26, 23);
             this.tbImageAreasX.TabIndex = 11;
             this.tbImageAreasX.ValidatingType = typeof(int);
+            this.tbImageAreasX.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label32
             // 
@@ -756,6 +758,7 @@ namespace ScriptEditor
             this.tbImageAreasH.Size = new System.Drawing.Size(26, 23);
             this.tbImageAreasH.TabIndex = 15;
             this.tbImageAreasH.ValidatingType = typeof(int);
+            this.tbImageAreasH.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // tbImageAreasY
             // 
@@ -765,6 +768,7 @@ namespace ScriptEditor
             this.tbImageAreasY.Size = new System.Drawing.Size(26, 23);
             this.tbImageAreasY.TabIndex = 12;
             this.tbImageAreasY.ValidatingType = typeof(int);
+            this.tbImageAreasY.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label33
             // 
@@ -783,6 +787,7 @@ namespace ScriptEditor
             this.tbImageAreasW.Size = new System.Drawing.Size(26, 23);
             this.tbImageAreasW.TabIndex = 14;
             this.tbImageAreasW.ValidatingType = typeof(int);
+            this.tbImageAreasW.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label31
             // 
@@ -1025,6 +1030,7 @@ namespace ScriptEditor
             this.tbActionOverrideFrequency.TabIndex = 6;
             this.tbActionOverrideFrequency.ValidatingType = typeof(int);
             this.tbActionOverrideFrequency.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbActionOverrideFrequency.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label28
             // 
@@ -1068,6 +1074,7 @@ namespace ScriptEditor
             this.tbAppNameTimeout.TabIndex = 3;
             this.tbAppNameTimeout.ValidatingType = typeof(int);
             this.tbAppNameTimeout.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbAppNameTimeout.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label24
             // 
@@ -1151,6 +1158,7 @@ namespace ScriptEditor
             this.tbAppControlWait.TabIndex = 3;
             this.tbAppControlWait.ValidatingType = typeof(int);
             this.tbAppControlWait.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbAppControlWait.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // tbAppControlName
             // 
@@ -1225,6 +1233,7 @@ namespace ScriptEditor
             this.tbWFNCWait.TabIndex = 9;
             this.tbWFNCWait.ValidatingType = typeof(int);
             this.tbWFNCWait.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbWFNCWait.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // tbWFNCX1
             // 
@@ -1235,6 +1244,7 @@ namespace ScriptEditor
             this.tbWFNCX1.TabIndex = 1;
             this.tbWFNCX1.ValidatingType = typeof(int);
             this.tbWFNCX1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbWFNCX1.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label15
             // 
@@ -1254,6 +1264,7 @@ namespace ScriptEditor
             this.tbWFNCY2.TabIndex = 5;
             this.tbWFNCY2.ValidatingType = typeof(int);
             this.tbWFNCY2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbWFNCY2.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // tbWFNCY1
             // 
@@ -1264,6 +1275,7 @@ namespace ScriptEditor
             this.tbWFNCY1.TabIndex = 2;
             this.tbWFNCY1.ValidatingType = typeof(int);
             this.tbWFNCY1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbWFNCY1.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label16
             // 
@@ -1283,6 +1295,7 @@ namespace ScriptEditor
             this.tbWFNCX2.TabIndex = 4;
             this.tbWFNCX2.ValidatingType = typeof(int);
             this.tbWFNCX2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbWFNCX2.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // gbFindText
             // 
@@ -1350,6 +1363,7 @@ namespace ScriptEditor
             this.tbFindTextBackTolerance.Size = new System.Drawing.Size(40, 23);
             this.tbFindTextBackTolerance.TabIndex = 13;
             this.tbFindTextBackTolerance.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbFindTextBackTolerance.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // tbFindTextTextTolerance
             // 
@@ -1359,6 +1373,7 @@ namespace ScriptEditor
             this.tbFindTextTextTolerance.Size = new System.Drawing.Size(40, 23);
             this.tbFindTextTextTolerance.TabIndex = 11;
             this.tbFindTextTextTolerance.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbFindTextTextTolerance.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label12
             // 
@@ -1378,6 +1393,7 @@ namespace ScriptEditor
             this.tbFindTextSearchX1.TabIndex = 5;
             this.tbFindTextSearchX1.ValidatingType = typeof(int);
             this.tbFindTextSearchX1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbFindTextSearchX1.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label10
             // 
@@ -1397,6 +1413,7 @@ namespace ScriptEditor
             this.tbFindTextSearchY2.TabIndex = 9;
             this.tbFindTextSearchY2.ValidatingType = typeof(int);
             this.tbFindTextSearchY2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbFindTextSearchY2.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // tbFindTextSearchY1
             // 
@@ -1407,6 +1424,7 @@ namespace ScriptEditor
             this.tbFindTextSearchY1.TabIndex = 6;
             this.tbFindTextSearchY1.ValidatingType = typeof(int);
             this.tbFindTextSearchY1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbFindTextSearchY1.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label11
             // 
@@ -1426,6 +1444,7 @@ namespace ScriptEditor
             this.tbFindTextSearchX2.TabIndex = 8;
             this.tbFindTextSearchX2.ValidatingType = typeof(int);
             this.tbFindTextSearchX2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbFindTextSearchX2.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // tbFindTextSearch
             // 
@@ -1595,6 +1614,7 @@ namespace ScriptEditor
             this.tbActionFrequency.TabIndex = 5;
             this.tbActionFrequency.ValidatingType = typeof(int);
             this.tbActionFrequency.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbActionFrequency.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label7
             // 
@@ -1647,6 +1667,7 @@ namespace ScriptEditor
             this.tbDelay.TabIndex = 1;
             this.tbDelay.ValidatingType = typeof(int);
             this.tbDelay.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbDelay.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // gbImageNames
             // 
@@ -1696,6 +1717,7 @@ namespace ScriptEditor
             this.tbImageNamesWait.TabIndex = 5;
             this.tbImageNamesWait.ValidatingType = typeof(int);
             this.tbImageNamesWait.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbImageNamesWait.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // btnRemoveImageNames
             // 
@@ -1792,6 +1814,7 @@ namespace ScriptEditor
             this.tbTimeout.TabIndex = 2;
             this.tbTimeout.ValidatingType = typeof(int);
             this.tbTimeout.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbTimeout.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // gbImageName
             // 
@@ -1902,6 +1925,7 @@ namespace ScriptEditor
             this.tbDragTime.TabIndex = 7;
             this.tbDragTime.ValidatingType = typeof(int);
             this.tbDragTime.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbDragTime.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // tbDragX1
             // 
@@ -1912,6 +1936,7 @@ namespace ScriptEditor
             this.tbDragX1.TabIndex = 1;
             this.tbDragX1.ValidatingType = typeof(int);
             this.tbDragX1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbDragX1.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label2
             // 
@@ -1931,6 +1956,7 @@ namespace ScriptEditor
             this.tbDragY2.TabIndex = 5;
             this.tbDragY2.ValidatingType = typeof(int);
             this.tbDragY2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbDragY2.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // tbDragY1
             // 
@@ -1941,6 +1967,7 @@ namespace ScriptEditor
             this.tbDragY1.TabIndex = 2;
             this.tbDragY1.ValidatingType = typeof(int);
             this.tbDragY1.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbDragY1.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // label3
             // 
@@ -1960,6 +1987,7 @@ namespace ScriptEditor
             this.tbDragX2.TabIndex = 4;
             this.tbDragX2.ValidatingType = typeof(int);
             this.tbDragX2.TextChanged += new System.EventHandler(this.AllFields_TextChanged);
+            this.tbDragX2.Enter += new System.EventHandler(this.MaskedTextBox_Enter);
             // 
             // gbClick
             // 

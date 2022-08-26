@@ -1525,33 +1525,4 @@ namespace FindTextClient
         }
 
     }
-
-    public class StoredScreenShot
-    {
-        public IntPtr HBM { get; set; }
-        public int Zx { get; set; }
-        public int Zy { get; set; }
-        public int Zh { get; set; }
-        public int Zw { get; set; }
-        public int Stride { get; set; }
-        public IntPtr Scan0 { get; set; }
-        public int Oldzw { get; internal set; }
-        public int Oldzh { get; internal set; }
-
-        public StoredScreenShot()
-        {
-            HBM = IntPtr.Zero;
-            Scan0 = IntPtr.Zero;
-        }
-
-        ~StoredScreenShot()
-        {
-            if (HBM != IntPtr.Zero)
-            {
-                GDIFunctions.DeleteObject(HBM);
-                HBM = IntPtr.Zero;
-            }
-        }
-
-    }
 }

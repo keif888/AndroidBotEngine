@@ -1415,45 +1415,6 @@ namespace FindTextClient
         }
     }
 
-    public class SearchResult
-    {
-        public SearchResult()
-        {
-            this.Width = 0;
-            this.Height = 0;
-            this.TopLeftX = 0;
-            this.TopLeftY = 0;
-            this.X = 0;
-            this.Y = 0;
-            this.Id = string.Empty;
-        }
-
-        public SearchResult(int x1, int y1, int w, int h, int centerX, int centerY, string comment)
-        {
-            TopLeftX = x1;
-            TopLeftY = y1;
-            Width = w;
-            Height = h;
-            X = centerX;
-            Y = centerY;
-            Id = comment;
-        }
-
-        public int TopLeftX { get; set; }
-        public int TopLeftY { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
-        public string Id { get; set; }
-
-        public override string ToString()
-        {
-            return string.Format("Rectangle ({0}, {1})-({2}, {3}), Center ({4}, {5}), id = {6}", TopLeftX, TopLeftY, Width, Height, X, Y, Id);
-        }
-
-    }
-
     public class PictureInfo
     {
         // [v, w, h, len1, len0, e1, e0 , mode, color, n, comment, seterr]

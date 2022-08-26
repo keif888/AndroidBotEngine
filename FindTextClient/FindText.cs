@@ -1486,43 +1486,4 @@ namespace FindTextClient
             this.Seterr = seterr;
         }
     }
-    public class DistanceType : IEquatable<DistanceType>, IComparable<DistanceType>
-    {
-        public DistanceType(SearchResult point, double distance)
-        {
-            this.Point = point;
-            this.Distance = distance;
-        }
-
-        public SearchResult Point { get; set; }
-        public double Distance { get; set; }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj == null) return false;
-            if (!(obj is DistanceType objAsDistanceType)) return false;
-            else return Equals(objAsDistanceType);
-        }
-
-        // Default comparer for DistanceType type.
-        public int CompareTo(DistanceType? compareDistanceType)
-        {
-            // A null value means that this object is greater.
-            if (compareDistanceType == null)
-                return 1;
-
-            else
-                return this.Distance.CompareTo(compareDistanceType.Distance);
-        }
-        public override int GetHashCode()
-        {
-            return (int)Math.Round(Distance);
-        }
-        public bool Equals(DistanceType? other)
-        {
-            if (other == null) return false;
-            return (this.Distance.Equals(other.Distance));
-        }
-
-    }
 }

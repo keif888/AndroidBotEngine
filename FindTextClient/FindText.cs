@@ -554,68 +554,6 @@ namespace FindTextClient
             return;
         }
 
-        // Show the saved Picture file
-        public void ShowPic(string file, bool show, ref int zx, ref int zy, ref int w, ref int h)
-        {
-            //local
-            //static Ptr:= "Ptr"
-            //Gui, FindText_Screen: Destroy
-            //if (file = "") or!FileExist(file)
-            //  return
-            if (file.Length == 0 || !File.Exists(file))
-            {
-                return;
-            }
-            //bits:= this.GetBitsFromScreen(0, 0, 0, 0, 1, zx, zy, zw, zh)
-            // ToDo: Make the following work, but avoid the hole screen shot mess.
-            int x = 0, y = 0, zw = 0, zh = 0;
-            _ = GetBitsFromScreen(ref x, ref y, ref w, ref h, true, ref zx, ref zy, ref zw, ref zh);
-
-            //hBM:= bits.hBM, hBM2:= LoadPicture(file)
-            IntPtr hBM = bits.HBM;
-            Bitmap loadedBitmap = new Bitmap(file);
-            IntPtr hBM2 = loadedBitmap.GetHbitmap();
-
-
-            //this.GetBitmapWH(hBM2, w, h)
-            GetBitmapWH(hBM2, ref w, ref h);
-            //// Populate the hBM.
-            //if (hBM != IntPtr.Zero)
-            //{
-            //    DeleteObject(hBM);
-            //}
-            //Bitmap blank = new Bitmap(w, h);
-            //hBM = blank.GetHbitmap();
-            //bits.hBM = hBM;
-            //blank.Dispose();
-            //this.CopyHBM(hBM, 0, 0, hBM2, 0, 0, w, h)
-            CopyHBM(hBM, 0, 0, hBM2, 0, 0, w, h);
-            //DllCall("DeleteObject", Ptr, hBM2)
-            GDIFunctions.DeleteObject(hBM2);
-            loadedBitmap.Dispose();
-            //if (!show)
-            //              return
-            if (!show)
-                return;
-            // ToDo: Implement putting this image on the screen.
-            return;
-            //            ; -------------------
-            //             mDC:= DllCall("CreateCompatibleDC", Ptr, 0, Ptr)
-            //oBM:= DllCall("SelectObject", Ptr, mDC, Ptr, hBM, Ptr)
-            //hBrush:= DllCall("CreateSolidBrush", "uint", 0xFFFFFF, Ptr)
-            //oBrush:= DllCall("SelectObject", Ptr, mDC, Ptr, hBrush, Ptr)
-            //DllCall("BitBlt", Ptr, mDC, "int", 0, "int", 0, "int", zw, "int", zh
-            //  , Ptr, mDC, "int", 0, "int", 0, "uint", 0xC000CA); MERGECOPY
-            //DllCall("SelectObject", Ptr, mDC, Ptr, oBrush)
-            //DllCall("DeleteObject", Ptr, hBrush)
-            //DllCall("SelectObject", Ptr, mDC, Ptr, oBM)
-            //DllCall("DeleteDC", Ptr, mDC)
-            //; -------------------
-            // Gui, FindText_Screen: +AlwaysOnTop - Caption + ToolWindow - DPIScale + E0x08000000
-            //Gui, FindText_Screen: Margin, 0, 0
-            //Gui, FindText_Screen: Add, Pic,, HBITMAP: *% hBM %
-            // Gui, FindText_Screen: Show, NA x% zx % y % zy % w % zw % h % zh %, Show Pic
-        }
 
         private int GetBitmapWH(IntPtr hBM, ref int w, ref int h)
         {

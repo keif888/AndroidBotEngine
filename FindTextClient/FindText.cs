@@ -1414,37 +1414,4 @@ namespace FindTextClient
             this.Comment = comment;
         }
     }
-
-    public class PictureInfo
-    {
-        // [v, w, h, len1, len0, e1, e0 , mode, color, n, comment, seterr]
-        public string V { get; set; }
-        public int W { get; set; }
-        public int H { get; set; }
-        public int Len1 { get; set; }
-        public int Len0 { get; set; }
-        public int E1 { get; set; }
-        public int E0 { get; set; }
-        public FindText.FindMode Mode { get; set; }
-        public string Colour { get; set; }
-        public uint N { get; set; }
-        public string Comment { get; set; }
-        public int Seterr { get; set; }
-
-        public PictureInfo(string v, int w, int h, int len1, int len0, int e1, int e0, FindText.FindMode mode, string colour, uint n, string comment, int seterr)
-        {
-            this.V = v;
-            this.W = w;
-            this.H = h;
-            this.Len1 = len1;
-            this.Len0 = len0;
-            this.E1 = e1;
-            this.E0 = e0;
-            this.Mode = mode;
-            this.Colour = colour;
-            this.N = n;
-            this.Comment = comment;
-            this.Seterr = seterr;
-        }
-    }
 }

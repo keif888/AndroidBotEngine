@@ -10,6 +10,8 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using FindTextClient;
 using System.Threading;
+using System.Buffers.Text;
+using System.Collections;
 
 namespace ScriptEditor
 {
@@ -805,7 +807,7 @@ namespace ScriptEditor
             string v = tbOutputText.Text;
             Regex regexComment = new Regex(@"<([^>]*)>");
             Regex regexSquareBrackets = new Regex(@"\[([^\]]*)]");
-            Regex regexColourClean = new Regex(@"[*#\s]");
+            Regex regexColourClean = new Regex(@"[!*#\s]");
 
             string comment = string.Empty;
 
@@ -838,7 +840,8 @@ namespace ScriptEditor
             string colourString = v.Split("$")[0];
             v = v[(v.IndexOf("$") + 1)..].Trim();
 
-            FindText.FindMode mode = colourString.Contains("##") ? FindText.FindMode.multiColourMode
+            FindText.FindMode mode = colourString.Contains("!!") ? FindText.FindMode.imageMode
+                        : colourString.Contains("##") ? FindText.FindMode.multiColourMode
                         : colourString.Contains("-") ? FindText.FindMode.colourDifferenceMode
                         : colourString.Contains("#") ? FindText.FindMode.colourPositionMode
                         : colourString.Contains("**") ? FindText.FindMode.greyDifferenceMode
@@ -928,6 +931,86 @@ namespace ScriptEditor
                 tbGrayThreshold.Text = colourString.Replace("|","");
                 HasBeenGrayed = true;
             }
+            else if (mode == FindText.FindMode.imageMode)
+            {
+                string[] rv = v.Split(".");
+                int w = int.Parse(rv[0]);
+                int h = int.Parse(rv[1]);
+                v = rv[2];
+                byte[] byteArray = Convert.FromBase64String(v);
+                uint[][] colourArray = new uint[h][];
+                for (int i = 0; i < h; i++)
+                {
+                    colourArray[i] = new uint[w];
+                    Buffer.BlockCopy(byteArray, i * w * 4, colourArray[i], 0, w * 4);
+                }
+
+                ClearUI();
+                dgvImage.SuspendLayout();
+                dgvImage.Columns.Clear();
+                savedRows.Clear();
+                int colourARGB = Color.Gray.ToArgb();
+                if (!bitmaps.ContainsKey(colourARGB))
+                {
+                    Bitmap bitmap = new Bitmap(10, 10);
+                    Graphics g = Graphics.FromImage(bitmap);
+                    g.Clear(Color.Gray);
+                    int gray = (((colourARGB >> 16) & 0xFF) * 38 + ((colourARGB >> 8) & 0xFF) * 75 + (colourARGB & 0xFF) * 15) >> 7;
+                    ColourGridTag tag = new ColourGridTag(colourARGB, Color.Gray.R, Color.Gray.G, Color.Gray.B, gray, string.Format("0x{0:X6}", (colourARGB & 0x00ffffff)), false);
+                    bitmaps.Add(colourARGB, new ColourDictionaryEntry(bitmap, tag));
+                }
+
+                for (int i = 0; i < w; i++)
+                {
+                    DataGridViewImageColumn dgvColumn = new DataGridViewImageColumn {
+                        Width = 10
+                    };
+                    dgvImage.Columns.Add(dgvColumn);
+                }
+                dgvImage.Rows.Add(h);
+
+                // Create the save space
+                for (int i = 0; i < h; i++)
+                {
+                    CellItems cells = new CellItems();
+                    for (int j = 0; j < w; j++)
+                    {
+                        cells.Cells.Add(0);
+                    }
+                    savedRows.Add(cells);
+                }
+
+                int x = 0; int y = 0; int counter = 0;
+                for (int i = 0; i < h; i++)
+                {
+                    x = 0;
+                    for (int j = 0; j < w; j++)
+                    {
+                        colourARGB = (int)colourArray[i][j];
+                        if (!bitmaps.ContainsKey(colourARGB))
+                        {
+                            Bitmap bitmap = new Bitmap(10, 10);
+                            Graphics g = Graphics.FromImage(bitmap);
+                            Color colour = Color.FromArgb(colourARGB);
+                            g.Clear(colour);
+                            //g.Clear(Color.Silver);
+                            int gray = (((colourARGB >> 16) & 0xFF) * 38 + ((colourARGB >> 8) & 0xFF) * 75 + (colourARGB & 0xFF) * 15) >> 7;
+                            ColourGridTag tag = new ColourGridTag(colourARGB, colour.R, colour.G, colour.B, gray, string.Format("0x{0:X6}", (colourARGB & 0x00ffffff)), false);
+                            bitmaps.Add(colourARGB, new ColourDictionaryEntry(bitmap, tag));
+                        }
+                        (dgvImage.Rows[y].Cells[x] as DataGridViewImageCell).Value = bitmaps[colourARGB].Bitmap;
+                        (dgvImage.Rows[y].Cells[x] as DataGridViewImageCell).Tag = bitmaps[colourARGB].Tag.ShallowCopy();
+                        (dgvImage.Rows[y].Cells[x] as DataGridViewImageCell).ToolTipText = bitmaps[colourARGB].Tag.ColourString;
+                        (dgvImage.Rows[i].Cells[j].Tag as ColourGridTag).Black = colourARGB == Color.Black.ToArgb();
+                        savedRows[y].Cells[x] = colourARGB;
+                        x++;
+                    }
+                    y++;
+                }
+                dgvImage.ResumeLayout();
+                tbComment.Text = comment;
+                HasBeenGrayed = false;
+            }
         }
 
         private void BtnOK_Click(object sender, EventArgs e)
@@ -945,6 +1028,10 @@ namespace ScriptEditor
             if (tcColourTabs.SelectedTab != tpMultiColour)
             {
                 cbFindMultiColour.Checked = false;
+            }
+            if (tcColourTabs.SelectedTab == tpImage)
+            {
+                findMode = FindText.FindMode.imageMode;
             }
         }
 
@@ -1003,6 +1090,20 @@ namespace ScriptEditor
             Clipboard.SetText(clipboard);
         }
 
+        /// <summary>
+        /// Update the tbOutputText value based on the changing value
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void nudImageRGB_ValueChanged(object sender, EventArgs e)
+        {
+            if (tbOutputText.TextLength > 0)
+            {
+                string[] results = tbOutputText.Text.Split("$");
+                tbOutputText.Text = string.Format("|<{0}>!!{1}${2}", tbComment.Text, nudImageRGB.Value, results[1]);
+            }
+        }
+
         private void ClearUI()
         {
             lastSelected = Point.Empty;
@@ -1012,6 +1113,7 @@ namespace ScriptEditor
             nudGreen.Value = 255;
             nudBlue.Value = 255;
             nudRGB.Value = 255;
+            nudImageRGB.Value = 0;
             cbFindMultiColour.Checked = false;
             cbModify.Checked = false;
             removedBottom = removedLeft = removedRight = removedTop = 0;
@@ -1072,15 +1174,39 @@ namespace ScriptEditor
             string colour = colourString;
             string txt = string.Empty;
 
-            if (!HasBeenGrayed)
-                return;
-
             if (findMode == FindText.FindMode.multiColourMode)
             {
                 SearchText = tbOutputText.Text;
             }
+            else if ( findMode == FindText.FindMode.imageMode)
+            {
+                colour = String.Format("!!{0}", nudImageRGB.Value);
+                int w = dgvImage.Columns.Count;
+                int h = dgvImage.Rows.Count;
+
+                if (w < 1 || h < 1)
+                    return;
+
+                List<uint> data = new List<uint>();
+                for (int y = 0; y < h; y++)
+                {
+                    for (int innerLoop = 0; innerLoop < w; innerLoop++)
+                    {
+                        data.Add((uint)(dgvImage.Rows[y].Cells[innerLoop].Tag as ColourGridTag).ColourARGB);
+                    }
+                }
+                byte[] byteArray = new byte[data.Count * 4];
+                Buffer.BlockCopy(data.ToArray(), 0, byteArray, 0, data.Count * 4);
+                string v = Convert.ToBase64String(byteArray,Base64FormattingOptions.None);
+                textString = string.Format(@"|<{0}>{1}${2}.{3}.{4}", tbComment.Text, colour, w, h, v);
+                tbOutputText.Text = textString;
+                SearchText = textString;
+            }
             else
             {
+                if (!HasBeenGrayed)
+                    return;
+
                 for (int i = 0; i < dgvImage.Rows.Count; i++)
                     for (int j = 0; j < dgvImage.Columns.Count; j++)
                     {

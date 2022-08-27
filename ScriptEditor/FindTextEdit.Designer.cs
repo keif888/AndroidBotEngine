@@ -33,6 +33,7 @@ namespace ScriptEditor
             this.panel1 = new System.Windows.Forms.Panel();
             this.dgvImage = new System.Windows.Forms.DataGridView();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnCopy = new System.Windows.Forms.Button();
             this.btnLoadText = new System.Windows.Forms.Button();
             this.btnADB = new System.Windows.Forms.Button();
             this.btnLoadPic = new System.Windows.Forms.Button();
@@ -102,7 +103,10 @@ namespace ScriptEditor
             this.btnCancel = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.btnCopy = new System.Windows.Forms.Button();
+            this.tpImage = new System.Windows.Forms.TabPage();
+            this.label17 = new System.Windows.Forms.Label();
+            this.nudImageRGB = new System.Windows.Forms.NumericUpDown();
+            this.label18 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvImage)).BeginInit();
             this.panel2.SuspendLayout();
@@ -120,6 +124,8 @@ namespace ScriptEditor
             ((System.ComponentModel.ISupportInitialize)(this.nudRed)).BeginInit();
             this.tpMultiColour.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRGB)).BeginInit();
+            this.tpImage.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudImageRGB)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -203,6 +209,16 @@ namespace ScriptEditor
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(824, 217);
             this.panel2.TabIndex = 1;
+            // 
+            // btnCopy
+            // 
+            this.btnCopy.Location = new System.Drawing.Point(163, 155);
+            this.btnCopy.Name = "btnCopy";
+            this.btnCopy.Size = new System.Drawing.Size(75, 23);
+            this.btnCopy.TabIndex = 43;
+            this.btnCopy.Text = "Copy Text";
+            this.btnCopy.UseVisualStyleBackColor = true;
+            this.btnCopy.Click += new System.EventHandler(this.BtnCopy_Click);
             // 
             // btnLoadText
             // 
@@ -513,6 +529,7 @@ namespace ScriptEditor
             this.tcColourTabs.Controls.Add(this.tpColourPos);
             this.tcColourTabs.Controls.Add(this.tpColourDiff);
             this.tcColourTabs.Controls.Add(this.tpMultiColour);
+            this.tcColourTabs.Controls.Add(this.tpImage);
             this.tcColourTabs.Location = new System.Drawing.Point(312, 42);
             this.tcColourTabs.Name = "tcColourTabs";
             this.tcColourTabs.SelectedIndex = 0;
@@ -920,15 +937,50 @@ namespace ScriptEditor
             this.openFileDialog1.Filter = "BMP files|*.bmp|PNG files|*.png|All files|*.*";
             this.openFileDialog1.Title = "Image File";
             // 
-            // btnCopy
+            // tpImage
             // 
-            this.btnCopy.Location = new System.Drawing.Point(163, 155);
-            this.btnCopy.Name = "btnCopy";
-            this.btnCopy.Size = new System.Drawing.Size(75, 23);
-            this.btnCopy.TabIndex = 43;
-            this.btnCopy.Text = "Copy Text";
-            this.btnCopy.UseVisualStyleBackColor = true;
-            this.btnCopy.Click += new System.EventHandler(this.BtnCopy_Click);
+            this.tpImage.Controls.Add(this.label18);
+            this.tpImage.Controls.Add(this.label17);
+            this.tpImage.Controls.Add(this.nudImageRGB);
+            this.tpImage.Location = new System.Drawing.Point(4, 24);
+            this.tpImage.Name = "tpImage";
+            this.tpImage.Padding = new System.Windows.Forms.Padding(3);
+            this.tpImage.Size = new System.Drawing.Size(411, 72);
+            this.tpImage.TabIndex = 6;
+            this.tpImage.Text = "Image";
+            this.tpImage.UseVisualStyleBackColor = true;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(6, 9);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(39, 15);
+            this.label17.TabIndex = 5;
+            this.label17.Text = "R/G/B";
+            // 
+            // nudImageRGB
+            // 
+            this.nudImageRGB.Location = new System.Drawing.Point(51, 7);
+            this.nudImageRGB.Maximum = new decimal(new int[] {
+            255,
+            0,
+            0,
+            0});
+            this.nudImageRGB.Name = "nudImageRGB";
+            this.nudImageRGB.Size = new System.Drawing.Size(48, 23);
+            this.nudImageRGB.TabIndex = 4;
+            this.nudImageRGB.ValueChanged += new System.EventHandler(this.nudImageRGB_ValueChanged);
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(105, 5);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(141, 60);
+            this.label18.TabIndex = 6;
+            this.label18.Text = "0 means exact match.\r\nEach increment of 1 \r\nincreases the per pixel \r\ncolour vari" +
+    "ation accepted";
             // 
             // FindTextEdit
             // 
@@ -964,6 +1016,9 @@ namespace ScriptEditor
             this.tpMultiColour.ResumeLayout(false);
             this.tpMultiColour.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRGB)).EndInit();
+            this.tpImage.ResumeLayout(false);
+            this.tpImage.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nudImageRGB)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -1043,5 +1098,9 @@ namespace ScriptEditor
         private System.Windows.Forms.NumericUpDown tbColourSimilarity;
         private System.Windows.Forms.NumericUpDown tbColourPosSimilarity;
         private System.Windows.Forms.Button btnCopy;
+        private System.Windows.Forms.TabPage tpImage;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.NumericUpDown nudImageRGB;
     }
 }

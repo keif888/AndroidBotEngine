@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.IO;
+using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -96,7 +97,8 @@ namespace FindTextClient
             greyDifferenceMode, // 2
             colourPositionMode, // 3
             colourDifferenceMode, // 4
-            multiColourMode // 5
+            multiColourMode, // 5
+            imageMode // Converts to multiColourMode
         }
 
         // 1 ==> Top to Bottom ( Left to Right )
@@ -1024,7 +1026,47 @@ namespace FindTextClient
             //if (mode = 5)
             //          {
 
-            if (mode == FindMode.multiColourMode)
+            if (mode == FindMode.imageMode)
+            {
+                // imageMode format is:
+                // width of image DOT height of image DOT Data Base64Encoded
+                int i = 0;
+                string[] rv = v.Split(".");
+                w = int.Parse(rv[0]);
+                h = int.Parse(rv[1]);
+                v = rv[2];
+                // Reset mode to one that the C++ code expects.
+                mode = FindMode.multiColourMode;
+                byte[] byteArray = Convert.FromBase64String(v);
+                uint[][] colourArray = new uint[h][];
+                for (i = 0; i < h; i++)
+                {
+                    colourArray[i] = new uint[w];
+                    Buffer.BlockCopy(byteArray, i*w*4, colourArray[i], 0, w*4);
+                }
+                uint c1 = colourArray[0][0] & 0xFFFFFF;
+                uint c2 = colourArray[0][w-1] & 0xFFFFFF;
+                uint c3 = colourArray[h-1][0] & 0xFFFFFF; 
+                uint c4 = colourArray[h - 1][w-1] & 0xFFFFFF;
+                if (c1 != c2 || c1 != c3 || c1 != c4)
+                    c1 = 0xFFFFFFFF;
+                v = string.Empty;
+                i = -4;
+                n = 0;
+                for (int y = 0; y < h; y++)
+                {
+                    for (int innerLoop = 0; innerLoop < w; innerLoop++)
+                    {
+                        uint c = colourArray[y][innerLoop] & 0xFFFFFF;
+                        if (c != c1)
+                        {
+                            v += (innerLoop | y << 16) + "/" + c + "/";
+                            n++;
+                        }
+                    }
+                }
+            }
+            else if (mode == FindMode.multiColourMode)
             {
                 //              if (v~= "[^\s\w/]") and FileExist(v)  ; ImageSearch
                 //              {

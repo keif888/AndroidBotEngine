@@ -10,6 +10,8 @@ using System.Drawing;
 using System.Text;
 using System.Threading;
 using FindTextClient;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace BotEngineClient
 {
@@ -39,6 +41,9 @@ namespace BotEngineClient
         private CancellationToken cancellationToken;
         private bool isThreading;
         private StringBuilder activePath;
+        private DateTime lastActivityTime;
+        private Regex findAgeFromDumsys;
+        private bool hasCheckedUserActivityThisAction;
 
         public enum CommandResults
         {
@@ -177,6 +182,9 @@ namespace BotEngineClient
             }
             isThreading = false;
             activePath = new StringBuilder();
+            lastActivityTime = DateTime.Now;
+            findAgeFromDumsys = new Regex("(?:MotionEvent.+age=)([0-9.]+)(?:ms)", RegexOptions.Compiled);
+            hasCheckedUserActivityThisAction = false;
         }
 
         public CommandResults ExecuteAction(string actionName, ActionActivity actionActivity)
@@ -187,6 +195,7 @@ namespace BotEngineClient
                 string currentPath = string.Format("{0}/", actionName);
                 string savePath = activePath.ToString();
                 activePath.Append(currentPath);
+                hasCheckedUserActivityThisAction = false;
                 Action action;
                 if (SystemActions.ContainsKey(actionName))
                 {
@@ -228,21 +237,75 @@ namespace BotEngineClient
             }
         }
 
-        private void ADBSwipe(int x1, int y1, int x2, int y2, int delay)
+        #region Send input or commands via ADB
+        /// <summary>
+        /// Issues a swipe command to the ADB controlled device, IF there hasn't been any user input
+        /// </summary>
+        /// <param name="x1"></param>
+        /// <param name="y1"></param>
+        /// <param name="x2"></param>
+        /// <param name="y2"></param>
+        /// <param name="delay"></param>
+        /// <returns>Ok where there has been no activity, and Restart where there has been user activity.</returns>
+        private CommandResults ADBSwipe(int x1, int y1, int x2, int y2, int delay)
         {
-            AdbClientExtensions.ExecuteRemoteCommand(adbClient, string.Format("input swipe {0} {1} {2} {3} {4}", x1, y1, x2, y2, delay), adbDevice, adbReceiver);
+            if (isNonBotActivity())
+            {
+                return CommandResults.Restart;
+            }
+            else
+            {
+                AdbClientExtensions.ExecuteRemoteCommand(adbClient, string.Format("input swipe {0} {1} {2} {3} {4}", x1, y1, x2, y2, delay), adbDevice, adbReceiver);
+                lastActivityTime = DateTime.Now;
+                return CommandResults.Ok;
+            }
         }
 
-        private void ADBClick(int x, int y)
+        /// <summary>
+        /// Issues a tap command to the ADB controlled device, IF there hasn't been any user input
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns>Ok where there has been no activity, and Restart where there has been user activity.</returns>
+        private CommandResults ADBClick(int x, int y)
         {
-            AdbClientExtensions.ExecuteRemoteCommand(adbClient, string.Format("input tap {0} {1}", x, y), adbDevice, adbReceiver);
+            if (isNonBotActivity())
+            {
+                return CommandResults.Restart;
+            }
+            else
+            {
+                AdbClientExtensions.ExecuteRemoteCommand(adbClient, string.Format("input tap {0} {1}", x, y), adbDevice, adbReceiver);
+                lastActivityTime = DateTime.Now;
+                return CommandResults.Ok;
+            }
         }
 
-        private void ADBSendKeys(string text)
+        /// <summary>
+        /// Issues an input keyboard text command to the ADB controlled device, IF there hasn't been any user input
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns>Ok where there has been no activity, and Restart where there has been user activity.</returns>
+        private CommandResults ADBSendKeys(string text)
         {
-            AdbClientExtensions.ExecuteRemoteCommand(adbClient, string.Format("input keyboard text '{0}'", text), adbDevice, adbReceiver);
+            if (isNonBotActivity())
+            {
+                return CommandResults.Restart;
+            }
+            else
+            {
+                AdbClientExtensions.ExecuteRemoteCommand(adbClient, string.Format("input keyboard text '{0}'", text), adbDevice, adbReceiver);
+                lastActivityTime = DateTime.Now;
+                return CommandResults.Ok;
+            }
         }
 
+        /// <summary>
+        /// Starts an application on the ADB controlled device
+        /// </summary>
+        /// <param name="gameString">The string that identifies the app to start</param>
+        /// <param name="timeOut"></param>
+        /// <returns></returns>
         private CommandResults ADBStartGame(string gameString, int timeOut)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
@@ -277,10 +340,17 @@ namespace BotEngineClient
                     adbReceiver = new ConsoleOutputReceiver(null);
                 } while (stopWatch.Elapsed.TotalMilliseconds < timeOut);
                 stopWatch.Stop();
+                lastActivityTime = DateTime.Now;
                 return results;
             }
         }
 
+        /// <summary>
+        /// Stops an application on the ADB controlled device
+        /// </summary>
+        /// <param name="gameString">The string that identifies the app to stop</param>
+        /// <param name="timeOut"></param>
+        /// <returns></returns>
         private CommandResults ADBStopGame(string gameString, int timeOut)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))
@@ -315,9 +385,60 @@ namespace BotEngineClient
                     adbReceiver = new ConsoleOutputReceiver(null);
                 } while (stopWatch.Elapsed.TotalMilliseconds < timeOut);
                 stopWatch.Stop();
+                lastActivityTime = DateTime.Now;
                 return results;
             }
         }
+
+        /// <summary>
+        /// Determines if there has been any non bot input to the emulator since the last activity.
+        /// If there has been activity, then the activity must be older than 30 sceonds.
+        /// </summary>
+        /// <returns></returns>
+        private bool isNonBotActivity()
+        {
+            if (!hasCheckedUserActivityThisAction)
+            {
+                hasCheckedUserActivityThisAction = true;
+                // Get the latest input time from ADB and dumpsys input
+                ConsoleOutputReceiver dumpsysReceiver = new ConsoleOutputReceiver(null);
+                AdbClientExtensions.ExecuteRemoteCommand(adbClient, "dumpsys input", adbDevice, dumpsysReceiver);
+                dumpsysReceiver.Flush();
+                string results = dumpsysReceiver.ToString();
+                // Use regex to find all the Ages (age=4008.8ms) after a MotionEvent.
+                MatchCollection foundAges = findAgeFromDumsys.Matches(results);
+                // Parse through the matches to get the minimum elapsed time
+                double minimumAge = double.MaxValue;
+                foreach (Match item in foundAges.Cast<Match>())
+                {
+                    foreach (Group group in item.Groups)
+                    {
+                        if (double.TryParse(group.Value, out double milliseconds))
+                        {
+                            if (minimumAge > milliseconds)
+                            {
+                                minimumAge = milliseconds;
+                            }
+                        }
+                    }
+                }
+                // Now calculate how many milliseconds since Bot sent input
+                double elapsed = (DateTime.Now - lastActivityTime).TotalMilliseconds;
+                if (elapsed - minimumAge > 500)  // allow 1/2 a second buffer for general crap
+                {
+                    // There has been input since the last activity.
+                    _logger.LogInformation("There has been user input {0}ms ago, with the bots last action {1}ms ago", minimumAge, elapsed);
+                    if (minimumAge > 30000)  // if the last user input was more than 30 seconds ago, then assume that have stopped doing stuff
+                        return false;
+                    else
+                        return true;
+                }
+                else
+                    return false;
+            }
+            return false;
+        }
+        #endregion
 
         /// <summary>
         /// Waits until one of the images indicated by searchNames appears on the screen.
@@ -405,8 +526,7 @@ namespace BotEngineClient
                     if (dataresult != null)
                     {
                         _logger.LogDebug("Initial Search Successful, found {0} whilst looking for {1}, Clicking", dataresult[0].Id, searchName);
-                        result = CommandResults.Ok;
-                        ADBClick(dataresult[0].X, dataresult[0].Y);
+                        result = ADBClick(dataresult[0].X, dataresult[0].Y);
                         Thread.Sleep(50);
                         break;
                     }
@@ -511,8 +631,7 @@ namespace BotEngineClient
                 if (dataresult != null)
                 {
                     _logger.LogDebug("Initial Search Successful, found {0} whilst looking for {1}, Clicking", dataresult[0].Id, searchName);
-                    result = CommandResults.Ok;
-                    ADBClick(dataresult[0].X, dataresult[0].Y);
+                    result = ADBClick(dataresult[0].X, dataresult[0].Y);
                     Thread.Sleep(50);
                 }
                 else
@@ -576,7 +695,10 @@ namespace BotEngineClient
                     {
                         _logger.LogDebug("Initial Search Successful, found {0} whilst looking for {1}, Clicking", dataresult[0].Id, lookingFor);
                         result = CommandResults.TimeOut;
-                        ADBClick(dataresult[0].X, dataresult[0].Y);
+                        if (ADBClick(dataresult[0].X, dataresult[0].Y) != CommandResults.Ok)
+                        {
+                            return CommandResults.Restart;
+                        }
                         found = true;
                         foundAt = new SearchResult(dataresult[0].TopLeftX, dataresult[0].TopLeftY, dataresult[0].Width, dataresult[0].Height, dataresult[0].X, dataresult[0].Y, dataresult[0].Id);
                         break;
@@ -678,8 +800,7 @@ namespace BotEngineClient
                         _logger.LogDebug("Search Unsuccessful, found nothing at {0} whilst looking for {1}, Clicking", areas[0].ToString(), searchName);
                         int x = areas[0].X + (areas[0].Width / 2);
                         int y = areas[0].Y + (areas[0].Height / 2);
-                        ADBClick(x, y);
-                        result = CommandResults.Ok;
+                        result = ADBClick(x, y);
                     }
                     else
                     {
@@ -702,8 +823,7 @@ namespace BotEngineClient
                                 _logger.LogDebug("Partial Search Unsuccessful, Clicking, whilst looking for {0} at {1}", searchName, area.ToString());
                                 int x = area.X + (area.Width / 2);
                                 int y = area.Y + (area.Height / 2);
-                                ADBClick(x, y);
-                                result = CommandResults.Ok;
+                                result = ADBClick(x, y);
                                 break;
                             }
                         }
@@ -1253,7 +1373,7 @@ namespace BotEngineClient
                             }
                             else
                             {
-                                ADBClick(command.Location.X, command.Location.Y);
+                                results = ADBClick(command.Location.X, command.Location.Y);
                             }
                             break;
                         case ValidCommandIds.ClickWhenNotFoundInArea:
@@ -1290,7 +1410,7 @@ namespace BotEngineClient
                             }
                             else
                             {
-                                ADBSwipe(command.Swipe.X1, command.Swipe.Y1, command.Swipe.X2, command.Swipe.Y2, (int)command.Delay);
+                                results = ADBSwipe(command.Swipe.X1, command.Swipe.Y1, command.Swipe.X2, command.Swipe.Y2, (int)command.Delay);
                             }
                             break;
                         case ValidCommandIds.Exit:
@@ -1313,11 +1433,11 @@ namespace BotEngineClient
                             }
                             else if (command.Value.ToLower() == "x")
                             {
-                                ADBSendKeys(((XYCoords)additionalData).X.ToString());
+                                results = ADBSendKeys(((XYCoords)additionalData).X.ToString());
                             }
                             else
                             {
-                                ADBSendKeys(((XYCoords)additionalData).Y.ToString());
+                                results = ADBSendKeys(((XYCoords)additionalData).Y.ToString());
                             }
                             break;
                         case ValidCommandIds.EnterText:
@@ -1335,7 +1455,7 @@ namespace BotEngineClient
                                         commandValue = actionActivity.CommandValueOverride[command.OverrideId];
                                 }
                             }
-                            ADBSendKeys(commandValue);
+                            results = ADBSendKeys(commandValue);
                             break;
                         case ValidCommandIds.FindClick:
                             if (command.ImageName == null)

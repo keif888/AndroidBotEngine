@@ -86,6 +86,14 @@ The list of commands to date are:
 
 ## Release Notes
 
+2022-09-16 - 0.5.4.104_beta release.  
+LDPlayer version 4.0.83 tested and working  
+Adds detection of non bot interaction with controlled device, which will then wait until 30 seconds has passed from last non bot interaction before resuming bot actions  
+Adds right click menu options in editor  
+Changes default for all actions to disabled on 1st run against a new device config file  
+Add colour graphic image capture to editor and ability to find within bot  
+Fix FindClickAndWait command to work correctly on a list of images  
+Fix a number of usability issues in editor  
 2022-08-10 - 0.5.4.66_beta released.  
 Known issues with LDPlayer versions 4.0.76.1, 4.0.78, 4.0.79 and 4.0.81 due to ADB retrieval of FrameBuffer being unstable  
 LDPlayer versions 4.0.76 and 4.0.83 tested and working  

@@ -78,6 +78,22 @@ namespace BotEngineClient
         public string? BeforeAction { get; set; }
         public string? AfterAction { get; set; }
 
+        /// <summary>
+        /// Virtual method to return the value of DateTime.Now, so that it can be tested in unit tests
+        /// By Inheriting from this class, and overriding this method
+        /// </summary>
+        /// <returns>A DateTime value that contains the current date and time</returns>
+        protected virtual DateTime DateTimeNow()
+        {
+            return DateTime.Now;
+        }
+
+        /// <summary>
+        /// Determines if the passed in actionActivity is due to be run.
+        /// Does not take into account if the actionActivity is disabled.
+        /// </summary>
+        /// <param name="actionActivity">The details about when this last ran, and any overrides in place</param>
+        /// <returns>true when the Action is available to be executed</returns>
         public bool ExecuteDue(ActionActivity actionActivity)
         {
             int frequency = 0;
@@ -104,7 +120,7 @@ namespace BotEngineClient
                 case "scheduled":
                     if (Frequency != null)
                     {
-                        if ((DateTime.Now - actionActivity.LastRun).TotalMinutes > frequency)
+                        if ((DateTimeNow() - actionActivity.LastRun).TotalMinutes > frequency)
                             return true;
                         else
                             return false;
@@ -116,8 +132,8 @@ namespace BotEngineClient
                 case "daily":
                     if (DailyScheduledTime != null)
                     {
-                        DateTime nextScheduledDateTime = DateTime.Now.Date + dailyScheduledTime.TimeOfDay;
-                        if ((nextScheduledDateTime > actionActivity.LastRun && nextScheduledDateTime < DateTime.Now) // Last time it ran was before the scheduled time, and it's after the scheduled to run time.
+                        DateTime nextScheduledDateTime = DateTimeNow().Date + dailyScheduledTime.TimeOfDay;
+                        if ((nextScheduledDateTime > actionActivity.LastRun && nextScheduledDateTime < DateTimeNow()) // Last time it ran was before the scheduled time, and it's after the scheduled to run time.
                             || ((nextScheduledDateTime - actionActivity.LastRun).TotalDays > 1))  // 
                         {
                             return true;
@@ -135,6 +151,11 @@ namespace BotEngineClient
             }
         }
 
+        /// <summary>
+        /// Returns when this action is due next to be executed
+        /// </summary>
+        /// <param name="actionActivity">The details about when this last ran, and any overrides in place</param>
+        /// <returns>The date time when this Action is due next</returns>
         public DateTime NextExecuteDue(ActionActivity actionActivity)
         {
             int frequency = 0;
@@ -171,12 +192,15 @@ namespace BotEngineClient
                 case "daily":
                     if (DailyScheduledTime != null)
                     {
-                        return DateTime.Now.Date + dailyScheduledTime.TimeOfDay;
+                        if (ExecuteDue(actionActivity))
+                            return DateTimeNow().Date + dailyScheduledTime.TimeOfDay;
+                        else
+                            return DateTimeNow().Date + dailyScheduledTime.TimeOfDay + TimeSpan.FromDays(1);
                     }
                     else
                         return DateTime.MaxValue;
                 case "anywhere":
-                    return DateTime.Now;
+                    return DateTimeNow();
                 default:
                     return DateTime.MaxValue;
             }
@@ -429,9 +453,20 @@ namespace BotEngineClient
         /// </summary>
         public Dictionary<string,string?>? CommandValueOverride { get; set; }
 
+
+        /// <summary>
+        /// Virtual method to return the value of DateTime.Now, so that it can be tested in unit tests
+        /// By Inheriting from this class, and overriding this method
+        /// </summary>
+        /// <returns>A DateTime value that contains the current date and time</returns>
+        protected virtual DateTime DateTimeNow()
+        {
+            return DateTime.Now;
+        }
+
         public void MarkStartupBot(int Frequency)
         {
-            LastRun = DateTime.Now - TimeSpan.FromMinutes(Frequency);
+            LastRun = DateTimeNow() - TimeSpan.FromMinutes(Frequency);
         }
 
         /// <summary>
@@ -439,7 +474,7 @@ namespace BotEngineClient
         /// </summary>
         public void MarkExecuted()
         {
-            LastRun = DateTime.Now;
+            LastRun = DateTimeNow();
         }
 
         public void SetLastExecuted(DateTime lastRun)

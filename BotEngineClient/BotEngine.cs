@@ -400,6 +400,40 @@ namespace BotEngineClient
             if (!hasCheckedUserActivityThisAction)
             {
                 hasCheckedUserActivityThisAction = true;
+                double minimumAge = GetAgeLastActivity();
+                // Now calculate how many milliseconds since Bot sent input
+                double elapsed = (DateTime.Now - lastActivityTime).TotalMilliseconds;
+                if (elapsed - minimumAge > 500)  // allow 1/2 a second buffer for general crap
+                {
+                    while (minimumAge < 30000.0)
+                    {
+                        // There has been input since the last activity.
+                        _logger.LogInformation("There has been user input {0}ms ago, with the bots last action {1}ms ago, waiting until last user input was 30 seconds ago", minimumAge, elapsed);
+                        int waitTime = (30000 - (int)minimumAge) / 10;
+                        for (int i = 0; i < 11; i++)
+                        {
+                            Thread.Sleep(waitTime);
+                            if (isCancelled())
+                            {
+                                return true;
+                            }
+                        }
+                        minimumAge = GetAgeLastActivity();
+                        elapsed = (DateTime.Now - lastActivityTime).TotalMilliseconds;
+                    }
+                    if (minimumAge > 30000.0)  // if the last user input was more than 30 seconds ago, then assume that have stopped doing stuff
+                        return false;
+                    else
+                        return true;
+                }
+                else
+                    return false;
+            }
+            return false;
+
+            
+            double GetAgeLastActivity()
+            {
                 // Get the latest input time from ADB and dumpsys input
                 ConsoleOutputReceiver dumpsysReceiver = new ConsoleOutputReceiver(null);
                 AdbClientExtensions.ExecuteRemoteCommand(adbClient, "dumpsys input", adbDevice, dumpsysReceiver);
@@ -422,21 +456,9 @@ namespace BotEngineClient
                         }
                     }
                 }
-                // Now calculate how many milliseconds since Bot sent input
-                double elapsed = (DateTime.Now - lastActivityTime).TotalMilliseconds;
-                if (elapsed - minimumAge > 500)  // allow 1/2 a second buffer for general crap
-                {
-                    // There has been input since the last activity.
-                    _logger.LogInformation("There has been user input {0}ms ago, with the bots last action {1}ms ago", minimumAge, elapsed);
-                    if (minimumAge > 30000)  // if the last user input was more than 30 seconds ago, then assume that have stopped doing stuff
-                        return false;
-                    else
-                        return true;
-                }
-                else
-                    return false;
+
+                return minimumAge;
             }
-            return false;
         }
         #endregion
 

@@ -5,11 +5,11 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <StartupObject>BotEngine.Program</StartupObject>
     <Nullable>annotations</Nullable>
-    <Version>0.2.3-beta-89</Version>
+    <Version>0.2.3-beta-91</Version>
     <Authors>Keif888</Authors>
     <Description>Android BotEngine</Description>
-    <AssemblyVersion>0.2.3.88</AssemblyVersion>
-    <FileVersion>0.2.3.88</FileVersion>
+    <AssemblyVersion>0.2.3.90</AssemblyVersion>
+    <FileVersion>0.2.3.90</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

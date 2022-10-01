@@ -45,6 +45,9 @@ namespace BotEngineClient
         private Regex findAgeFromDumsys;
         private bool hasCheckedUserActivityThisAction;
 
+        /// <summary>
+        /// Enum of all the possible results from executing a command
+        /// </summary>
         public enum CommandResults
         {
             Ok,
@@ -87,6 +90,12 @@ namespace BotEngineClient
             WaitForNoChange
         }
 
+        /// <summary>
+        /// Sets the command that will be executed within a called thread for the engine
+        /// </summary>
+        /// <param name="ActionName">The name of the action to call</param>
+        /// <param name="callbackDelegate">The delegate to use to return results to the caller</param>
+        /// <param name="actionActivity">The data to use when executing the action</param>
         public void SetThreadingCommand(string ActionName, BotEngineCallback callbackDelegate, ActionActivity actionActivity)
         {
             ThreadActionName = ActionName;
@@ -94,6 +103,10 @@ namespace BotEngineClient
             callback = callbackDelegate;
         }
 
+        /// <summary>
+        /// This executes the action that has been confugred using SetThreadingCommand
+        /// </summary>
+        /// <param name="obj">The CancellationToken to enable this thread to be cancellable</param>
         public void InitiateThreadingCommand(object obj)
         {
             cancellationToken = (CancellationToken)obj;
@@ -109,6 +122,10 @@ namespace BotEngineClient
             }
         }
 
+        /// <summary>
+        /// Checks if a cancellation has been requested, if running in multi thread mode
+        /// </summary>
+        /// <returns>True if the cancellationToken has a request to cancel set</returns>
         private bool isCancelled()
         {
             if (isThreading)
@@ -124,26 +141,53 @@ namespace BotEngineClient
             return false;
         }
 
+        /// <summary>
+        /// Updates the local variable FindStrings with a new set of strings
+        /// </summary>
+        /// <param name="findStrings">The FindStrings to load in</param>
         public void ReloadFindStrings(Dictionary<string, FindString> findStrings)
         {
             FindStrings = findStrings;
         }
 
+        /// <summary>
+        /// Updates the local variable NormalActions with a new set of actions
+        /// </summary>
+        /// <param name="normalActions">The Actions to load in</param>
         public void ReloadNormalActions(Dictionary<string, Action> normalActions)
         {
             NormalActions = normalActions;
         }
 
+        /// <summary>
+        /// Updates the local variable SystemActions with a new set of actions
+        /// </summary>
+        /// <param name="systemActions">The Actions to load in</param>
         public void ReloadSystemActions(Dictionary<string, Action> systemActions)
         {
             SystemActions = systemActions;
         }
 
+        /// <summary>
+        /// Updates the local variable ListConfig with a new set of config
+        /// </summary>
+        /// <param name="listConfig">The BOTListConfig to load in</param>
         public void ReloadListConfig(BOTListConfig listConfig)
         {
             ListConfig = listConfig;
         }
 
+        /// <summary>
+        /// Class Constructor, which sets the default class settings
+        /// </summary>
+        /// <param name="ServiceProvider">Logging Service Provider</param>
+        /// <param name="ADBPath">The path to the adb.exe executable</param>
+        /// <param name="ADBDeviceData">The string that identifies the ADB device to issue commands against</param>
+        /// <param name="findStrings">The set of FindStrings to use</param>
+        /// <param name="systemActions">The set of Actions that are System actions</param>
+        /// <param name="normalActions">The set of Actions that are not System actions</param>
+        /// <param name="listConfig">The config which contains the lists used</param>
+        /// <exception cref="Exception"></exception>
         public BotEngine(IServiceProvider ServiceProvider, string ADBPath, string ADBDeviceData, Dictionary<string, FindString> findStrings, Dictionary<string, Action> systemActions, Dictionary<string, Action> normalActions, BOTListConfig listConfig)
         {
             _logger = (ILogger)ServiceProvider.GetService(typeof(ILogger));
@@ -187,6 +231,12 @@ namespace BotEngineClient
             hasCheckedUserActivityThisAction = false;
         }
 
+        /// <summary>
+        /// Executes the named action
+        /// </summary>
+        /// <param name="actionName">The name of the action to execute</param>
+        /// <param name="actionActivity">The config for the action being executed</param>
+        /// <returns>Ok on success, Restart if the action needs to rerun, and any other supported result if something goes wrong</returns>
         public CommandResults ExecuteAction(string actionName, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(string.Format("{0}:{1}({2})", EmulatorName,Helpers.CurrentMethodName(), actionName)))
@@ -1197,6 +1247,7 @@ namespace BotEngineClient
                 //}
                 for (int i = startAt; i < numberOFLoops; i++)
                 {
+                    _logger.LogInformation("Executing Loop {0} of {1}", i, numberOFLoops);
                     foreach (Command command in commands)
                     {
                         _logger.LogDebug("Executing Loop {0} command {1}", i, command.CommandId);
@@ -1260,6 +1311,13 @@ namespace BotEngineClient
             return startAt;
         }
 
+        /// <summary>
+        /// Waits for a change to happen within a defined area on the devices screen
+        /// </summary>
+        /// <param name="changeDetectArea">The area of the screen to watch</param>
+        /// <param name="changeDetectDifference">The percentage of change that needs to happen</param>
+        /// <param name="timeOut">How long to wait for a change</param>
+        /// <returns>Ok, if changes happen, or TimeOut if no change detected.</returns>
         private CommandResults WaitForChange(SearchArea changeDetectArea, float changeDetectDifference, int timeOut)
         {
             using (_logger.BeginScope(Helpers.CurrentMethodName()))

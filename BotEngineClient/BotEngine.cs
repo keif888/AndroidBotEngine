@@ -577,6 +577,14 @@ namespace BotEngineClient
             }
         }
 
+        /// <summary>
+        /// Waits until the image identified by searchString appears, and then clicks on it.  
+        /// If the wait time exceeds timeOut, then the function will return TimeOut
+        /// </summary>
+        /// <param name="searchName">The search name used in logging</param>
+        /// <param name="searchString">The FindString that is being searched for</param>
+        /// <param name="timeOut">How long in ms to keep searching for</param>
+        /// <returns>Ok, when found and clicked, else Timeout</returns>
         private CommandResults WaitForThenClick(string searchName, FindString searchString, int timeOut)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))
@@ -613,6 +621,15 @@ namespace BotEngineClient
             }
         }
 
+        /// <summary>
+        /// Looks for the image described by findString, and if found executes the Commands. 
+        /// </summary>
+        /// <param name="searchName">Text string used for logging</param>
+        /// <param name="findString">The image to search for</param>
+        /// <param name="Commands">The list of Command(s) to be executed if the image is found</param>
+        /// <param name="additionalData">An optional object which will be passed to all Commands that are executed if the image is found</param>
+        /// <param name="actionActivity">The ActionActivity which will be passed to all Commands that are executed if the image is found</param>
+        /// <returns>Ok, if all works, or the result from the 1st Command that fails</returns>
         private CommandResults IfExists(string searchName, FindString findString, List<Command> Commands, Object? additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))
@@ -650,6 +667,15 @@ namespace BotEngineClient
             }
         }
 
+        /// <summary>
+        /// Looks for the image described by findString, and if not found executes the Commands. 
+        /// </summary>
+        /// <param name="searchName">Text string used for logging</param>
+        /// <param name="findString">The image to search for</param>
+        /// <param name="Commands">The list of Command(s) to be executed if the image is not found</param>
+        /// <param name="additionalData">An optional object which will be passed to all Commands that are executed if the image is not found</param>
+        /// <param name="actionActivity">The ActionActivity which will be passed to all Commands that are executed if the image is not found</param>
+        /// <returns>Ok, if all works, or the result from the 1st Command that fails</returns>
         private CommandResults IfNotExists(string searchName, FindString findString, List<Command> Commands, Object? additionalData, ActionActivity actionActivity)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))
@@ -686,6 +712,13 @@ namespace BotEngineClient
             }
         }
 
+        /// <summary>
+        /// Searches for the image identified by searchString, and if found, clicks on it.
+        /// </summary>
+        /// <param name="searchName">Text string used for logging</param>
+        /// <param name="searchString">The image to search for</param>
+        /// <param name="IgnoreMissing">If the image is not there, then returns Ok.</param>
+        /// <returns>Ok if found, else Missing</returns>
         private CommandResults FindClick(string searchName, FindString searchString, bool IgnoreMissing)
         {
             using (_logger.BeginScope(String.Format("{0}({1})", Helpers.CurrentMethodName(), searchName)))

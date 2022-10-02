@@ -261,24 +261,36 @@ namespace BotEngineClient
                     return CommandResults.InputError;
                 }
                 CommandResults result = CommandResults.Ok;
-                foreach (Command item in action.Commands)
+                // Make sure there has been no user input.
+                while (isNonBotActivity() && !isCancelled())
+                { 
+                    Thread.Sleep(500);
+                }
+                if (isCancelled())
                 {
-                    result = ExecuteCommand(item, null, actionActivity);
-                    if (result == CommandResults.Exit)
+                    result = CommandResults.Cancelled;
+                }
+                else
+                {
+                    foreach (Command item in action.Commands)
                     {
-                        _logger.LogDebug("Resetting Exit result to Ok for Action {0}", actionName);
-                        result = CommandResults.Ok;
-                        break;
-                    }
-                    else if (result == CommandResults.Restart)
-                    {
-                        _logger.LogDebug("Action {0} resulted in {1}", actionName, result.ToString());
-                        break;
-                    }
-                    else if (result != CommandResults.Ok)
-                    {
-                        _logger.LogWarning("Action {0} Unsuccessful with {1}", actionName, result.ToString());
-                        break;
+                        result = ExecuteCommand(item, null, actionActivity);
+                        if (result == CommandResults.Exit)
+                        {
+                            _logger.LogDebug("Resetting Exit result to Ok for Action {0}", actionName);
+                            result = CommandResults.Ok;
+                            break;
+                        }
+                        else if (result == CommandResults.Restart)
+                        {
+                            _logger.LogDebug("Action {0} resulted in {1}", actionName, result.ToString());
+                            break;
+                        }
+                        else if (result != CommandResults.Ok)
+                        {
+                            _logger.LogWarning("Action {0} Unsuccessful with {1}", actionName, result.ToString());
+                            break;
+                        }
                     }
                 }
                 activePath.Clear();

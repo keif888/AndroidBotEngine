@@ -2761,7 +2761,7 @@ namespace ScriptEditor
             if (Clipboard.ContainsText(TextDataFormat.Text))
             {
                 string jsonString = Clipboard.GetText();
-                if (jsonString[0] == '{')
+                if (jsonString != null && jsonString.Contains('{') && jsonString[0] == '{')
                 {
                     Command copiedNode = new Command();
                     try

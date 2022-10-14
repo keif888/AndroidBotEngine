@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -709,6 +710,11 @@ namespace BotEngine
                                 // Don't execute this, just get out of here.
                                 return;
                             }
+                        }
+                        //Reset the CommandLoopStatus values to 0, just in case it was cancelled before.
+                        if (lastActionTaken[adhocActions[selectedOption]].CommandLoopStatus != null)
+                        {
+                            lastActionTaken[adhocActions[selectedOption]].CommandLoopStatus.Keys.ToList().ForEach(k => lastActionTaken[adhocActions[selectedOption]].CommandLoopStatus[k] = "0");
                         }
                         lastActionTaken[adhocActions[selectedOption]].ActionEnabled = true;
                     }

@@ -58,7 +58,7 @@ namespace FindTextClient
             infoDictionary = new Dictionary<string, PictureInfo>();
             regexComment = new Regex(@"<([^>]*)>");
             regexSquareBrackets = new Regex(@"\[([^\]]*)]");
-            regexColourClean = new Regex(@"[*#\s]");
+            regexColourClean = new Regex(@"[*#!\s]");
             regexFileMatch = new Regex(@"[^\s\w/]");
             regexWhiteSpace = new Regex(@"\s");
             Cursor = IntPtr.Zero;
@@ -1017,6 +1017,7 @@ namespace FindTextClient
                 : colour.Contains("#") ? FindMode.colourPositionMode
                 : colour.Contains("**") ? FindMode.greyDifferenceMode
                 : colour.Contains("*") ? FindMode.greyThresholdMode
+                : colour.Contains("!!") ? FindMode.imageMode
                 : FindMode.colourMode;
 
             //color:= RegExReplace(color, "[*#\s]")

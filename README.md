@@ -85,7 +85,11 @@ The list of commands to date are:
 
 
 ## Release Notes
-
+2022-10-19 - 0.5.5.110_beta release.  
+Fix colour graphic image detection  
+Improve non bot interaction handling  
+Fix issue with not Zeroing counters when starting an action  
+Fix incorrect detection of json for paste operation  
 2022-09-16 - 0.5.4.104_beta release.  
 LDPlayer version 4.0.83 tested and working  
 Adds detection of non bot interaction with controlled device, which will then wait until 30 seconds has passed from last non bot interaction before resuming bot actions  

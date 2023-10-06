@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "BotEngine": {
-      "commandName": "Project",
-      "commandLineArgs": "-t -p d:\\adb\\adb.exe"
-    }
-  }
-}

@@ -501,6 +501,11 @@ namespace BotEngineClient
                 AdbClientExtensions.ExecuteRemoteCommand(adbClient, "dumpsys input", adbDevice, dumpsysReceiver);
                 dumpsysReceiver.Flush();
                 string results = dumpsysReceiver.ToString();
+                // Get rid of any ANR (Application Not Responding) which can have stale MotionEvents in them
+                if (results.Contains("Input Dispatcher State at time of last ANR"))
+                {
+                    results = results[..results.IndexOf("Input Dispatcher State at time of last ANR")];
+                }
                 // Use regex to find all the Ages (age=4008.8ms) after a MotionEvent.
                 MatchCollection foundAges = findAgeFromDumsys.Matches(results);
                 // Parse through the matches to get the minimum elapsed time

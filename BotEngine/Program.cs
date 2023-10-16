@@ -822,7 +822,7 @@ namespace BotEngine
             sb.AppendLine("Any other text will return to normal operation");
             // Log as Warning, so that it will show by default.
             _logger.LogWarning(sb.ToString());
-            inputText = Console.ReadLine();
+            inputText = Console.ReadLine(); // ToDo: Add ability to override values.
             int selectedOption;
             if (int.TryParse(inputText, out selectedOption))
             {

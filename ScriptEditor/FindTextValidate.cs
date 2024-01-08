@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using BotEngineClient;
@@ -73,7 +74,7 @@ namespace ScriptEditor
                     FindString searchString = gameConfig.FindStrings[cbFindString.SelectedItem.ToString()];
 
                     findText.LoadImage(loadedFromADBImage, ref zx, ref zy, ref w, ref h);
-                    List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X + searchString.SearchArea.Width, searchString.SearchArea.Y + searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, false, false, searchString.OffsetX, searchString.OffsetY);
+                    List<SearchResult>? dataresult = findText.SearchText(searchString.SearchArea.X, searchString.SearchArea.Y, searchString.SearchArea.X + searchString.SearchArea.Width, searchString.SearchArea.Y + searchString.SearchArea.Height, searchString.BackgroundTolerance, searchString.TextTolerance, searchString.SearchString, false, cbShowAll.Checked, false, searchString.OffsetX, searchString.OffsetY);
                     if (dataresult != null)
                     {
                         tssText.Text = string.Format("Found {0} instances of FindString {1}", dataresult.Count, cbFindString.SelectedItem.ToString());
@@ -87,6 +88,7 @@ namespace ScriptEditor
                         {
                             Rectangle rectangle = new Rectangle(result.TopLeftX, result.TopLeftY, result.Width, result.Height);
                             graphics.DrawRectangle(Pens.LightGray, rectangle);
+                            Debug.WriteLine("Found at {0},{1},{2},{3}", result.TopLeftX, result.TopLeftY, result.Width, result.Height);
                         }
                         pbFrame.Image = localImage;
                         pbFrame.ResumeLayout();

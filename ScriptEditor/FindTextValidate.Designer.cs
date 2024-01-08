@@ -33,160 +33,170 @@ namespace ScriptEditor
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnGrab = new System.Windows.Forms.Button();
-            this.btnTest = new System.Windows.Forms.Button();
-            this.btnReset = new System.Windows.Forms.Button();
-            this.pnlControls = new System.Windows.Forms.Panel();
-            this.cbFindString = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.pnlGraphics = new System.Windows.Forms.Panel();
-            this.pbFrame = new System.Windows.Forms.PictureBox();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.tssText = new System.Windows.Forms.ToolStripStatusLabel();
-            this.label2 = new System.Windows.Forms.Label();
-            this.cbDevices = new System.Windows.Forms.ComboBox();
-            this.pnlControls.SuspendLayout();
-            this.pnlGraphics.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbFrame)).BeginInit();
-            this.statusStrip1.SuspendLayout();
-            this.SuspendLayout();
+            btnGrab = new System.Windows.Forms.Button();
+            btnTest = new System.Windows.Forms.Button();
+            btnReset = new System.Windows.Forms.Button();
+            pnlControls = new System.Windows.Forms.Panel();
+            label2 = new System.Windows.Forms.Label();
+            cbDevices = new System.Windows.Forms.ComboBox();
+            cbFindString = new System.Windows.Forms.ComboBox();
+            label1 = new System.Windows.Forms.Label();
+            pnlGraphics = new System.Windows.Forms.Panel();
+            pbFrame = new System.Windows.Forms.PictureBox();
+            statusStrip1 = new System.Windows.Forms.StatusStrip();
+            tssText = new System.Windows.Forms.ToolStripStatusLabel();
+            cbShowAll = new System.Windows.Forms.CheckBox();
+            pnlControls.SuspendLayout();
+            pnlGraphics.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)pbFrame).BeginInit();
+            statusStrip1.SuspendLayout();
+            SuspendLayout();
             // 
             // btnGrab
             // 
-            this.btnGrab.Location = new System.Drawing.Point(601, 12);
-            this.btnGrab.Name = "btnGrab";
-            this.btnGrab.Size = new System.Drawing.Size(75, 23);
-            this.btnGrab.TabIndex = 0;
-            this.btnGrab.Text = "Grab";
-            this.btnGrab.UseVisualStyleBackColor = true;
-            this.btnGrab.Click += new System.EventHandler(this.BtnGrab_Click);
+            btnGrab.Location = new System.Drawing.Point(731, 11);
+            btnGrab.Name = "btnGrab";
+            btnGrab.Size = new System.Drawing.Size(75, 23);
+            btnGrab.TabIndex = 0;
+            btnGrab.Text = "Grab";
+            btnGrab.UseVisualStyleBackColor = true;
+            btnGrab.Click += BtnGrab_Click;
             // 
             // btnTest
             // 
-            this.btnTest.Location = new System.Drawing.Point(682, 12);
-            this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(75, 23);
-            this.btnTest.TabIndex = 1;
-            this.btnTest.Text = "Test";
-            this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Click += new System.EventHandler(this.BtnTest_Click);
+            btnTest.Location = new System.Drawing.Point(812, 11);
+            btnTest.Name = "btnTest";
+            btnTest.Size = new System.Drawing.Size(75, 23);
+            btnTest.TabIndex = 1;
+            btnTest.Text = "Test";
+            btnTest.UseVisualStyleBackColor = true;
+            btnTest.Click += BtnTest_Click;
             // 
             // btnReset
             // 
-            this.btnReset.Location = new System.Drawing.Point(763, 12);
-            this.btnReset.Name = "btnReset";
-            this.btnReset.Size = new System.Drawing.Size(75, 23);
-            this.btnReset.TabIndex = 2;
-            this.btnReset.Text = "Reset";
-            this.btnReset.UseVisualStyleBackColor = true;
-            this.btnReset.Click += new System.EventHandler(this.BtnReset_Click);
+            btnReset.Location = new System.Drawing.Point(893, 11);
+            btnReset.Name = "btnReset";
+            btnReset.Size = new System.Drawing.Size(75, 23);
+            btnReset.TabIndex = 2;
+            btnReset.Text = "Reset";
+            btnReset.UseVisualStyleBackColor = true;
+            btnReset.Click += BtnReset_Click;
             // 
             // pnlControls
             // 
-            this.pnlControls.Controls.Add(this.label2);
-            this.pnlControls.Controls.Add(this.cbDevices);
-            this.pnlControls.Controls.Add(this.cbFindString);
-            this.pnlControls.Controls.Add(this.label1);
-            this.pnlControls.Controls.Add(this.btnGrab);
-            this.pnlControls.Controls.Add(this.btnReset);
-            this.pnlControls.Controls.Add(this.btnTest);
-            this.pnlControls.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlControls.Location = new System.Drawing.Point(0, 0);
-            this.pnlControls.Name = "pnlControls";
-            this.pnlControls.Size = new System.Drawing.Size(980, 47);
-            this.pnlControls.TabIndex = 3;
-            // 
-            // cbFindString
-            // 
-            this.cbFindString.FormattingEnabled = true;
-            this.cbFindString.Location = new System.Drawing.Point(339, 12);
-            this.cbFindString.Name = "cbFindString";
-            this.cbFindString.Size = new System.Drawing.Size(256, 23);
-            this.cbFindString.Sorted = true;
-            this.cbFindString.TabIndex = 4;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(269, 16);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(64, 15);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Find String";
-            // 
-            // pnlGraphics
-            // 
-            this.pnlGraphics.AutoScroll = true;
-            this.pnlGraphics.Controls.Add(this.pbFrame);
-            this.pnlGraphics.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlGraphics.Location = new System.Drawing.Point(0, 47);
-            this.pnlGraphics.Name = "pnlGraphics";
-            this.pnlGraphics.Size = new System.Drawing.Size(980, 433);
-            this.pnlGraphics.TabIndex = 4;
-            // 
-            // pbFrame
-            // 
-            this.pbFrame.Location = new System.Drawing.Point(0, 0);
-            this.pbFrame.Name = "pbFrame";
-            this.pbFrame.Size = new System.Drawing.Size(318, 272);
-            this.pbFrame.TabIndex = 0;
-            this.pbFrame.TabStop = false;
-            // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tssText});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 480);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(980, 22);
-            this.statusStrip1.TabIndex = 5;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
-            // tssText
-            // 
-            this.tssText.Name = "tssText";
-            this.tssText.Size = new System.Drawing.Size(88, 17);
-            this.tssText.Text = "Nothing Found";
+            pnlControls.Controls.Add(cbShowAll);
+            pnlControls.Controls.Add(label2);
+            pnlControls.Controls.Add(cbDevices);
+            pnlControls.Controls.Add(cbFindString);
+            pnlControls.Controls.Add(label1);
+            pnlControls.Controls.Add(btnGrab);
+            pnlControls.Controls.Add(btnReset);
+            pnlControls.Controls.Add(btnTest);
+            pnlControls.Dock = System.Windows.Forms.DockStyle.Top;
+            pnlControls.Location = new System.Drawing.Point(0, 0);
+            pnlControls.Name = "pnlControls";
+            pnlControls.Size = new System.Drawing.Size(980, 47);
+            pnlControls.TabIndex = 3;
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 15);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(42, 15);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "Device";
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(12, 15);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(42, 15);
+            label2.TabIndex = 7;
+            label2.Text = "Device";
             // 
             // cbDevices
             // 
-            this.cbDevices.DropDownWidth = 400;
-            this.cbDevices.FormattingEnabled = true;
-            this.cbDevices.Location = new System.Drawing.Point(61, 12);
-            this.cbDevices.Name = "cbDevices";
-            this.cbDevices.Size = new System.Drawing.Size(200, 23);
-            this.cbDevices.Sorted = true;
-            this.cbDevices.TabIndex = 6;
+            cbDevices.DropDownWidth = 400;
+            cbDevices.FormattingEnabled = true;
+            cbDevices.Location = new System.Drawing.Point(61, 12);
+            cbDevices.Name = "cbDevices";
+            cbDevices.Size = new System.Drawing.Size(200, 23);
+            cbDevices.Sorted = true;
+            cbDevices.TabIndex = 6;
+            // 
+            // cbFindString
+            // 
+            cbFindString.FormattingEnabled = true;
+            cbFindString.Location = new System.Drawing.Point(339, 12);
+            cbFindString.Name = "cbFindString";
+            cbFindString.Size = new System.Drawing.Size(256, 23);
+            cbFindString.Sorted = true;
+            cbFindString.TabIndex = 4;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(269, 16);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(64, 15);
+            label1.TabIndex = 3;
+            label1.Text = "Find String";
+            // 
+            // pnlGraphics
+            // 
+            pnlGraphics.AutoScroll = true;
+            pnlGraphics.Controls.Add(pbFrame);
+            pnlGraphics.Dock = System.Windows.Forms.DockStyle.Fill;
+            pnlGraphics.Location = new System.Drawing.Point(0, 47);
+            pnlGraphics.Name = "pnlGraphics";
+            pnlGraphics.Size = new System.Drawing.Size(980, 433);
+            pnlGraphics.TabIndex = 4;
+            // 
+            // pbFrame
+            // 
+            pbFrame.Location = new System.Drawing.Point(0, 0);
+            pbFrame.Name = "pbFrame";
+            pbFrame.Size = new System.Drawing.Size(318, 272);
+            pbFrame.TabIndex = 0;
+            pbFrame.TabStop = false;
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { tssText });
+            statusStrip1.Location = new System.Drawing.Point(0, 480);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new System.Drawing.Size(980, 22);
+            statusStrip1.TabIndex = 5;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // tssText
+            // 
+            tssText.Name = "tssText";
+            tssText.Size = new System.Drawing.Size(88, 17);
+            tssText.Text = "Nothing Found";
+            // 
+            // cbShowAll
+            // 
+            cbShowAll.AutoSize = true;
+            cbShowAll.Location = new System.Drawing.Point(601, 14);
+            cbShowAll.Name = "cbShowAll";
+            cbShowAll.Size = new System.Drawing.Size(72, 19);
+            cbShowAll.TabIndex = 8;
+            cbShowAll.Text = "Show All";
+            cbShowAll.UseVisualStyleBackColor = true;
             // 
             // FindTextValidate
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(980, 502);
-            this.Controls.Add(this.pnlGraphics);
-            this.Controls.Add(this.pnlControls);
-            this.Controls.Add(this.statusStrip1);
-            this.MinimumSize = new System.Drawing.Size(990, 540);
-            this.Name = "FindTextValidate";
-            this.Text = "FindTextValidate";
-            this.pnlControls.ResumeLayout(false);
-            this.pnlControls.PerformLayout();
-            this.pnlGraphics.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pbFrame)).EndInit();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(980, 502);
+            Controls.Add(pnlGraphics);
+            Controls.Add(pnlControls);
+            Controls.Add(statusStrip1);
+            MinimumSize = new System.Drawing.Size(990, 540);
+            Name = "FindTextValidate";
+            Text = "FindTextValidate";
+            pnlControls.ResumeLayout(false);
+            pnlControls.PerformLayout();
+            pnlGraphics.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)pbFrame).EndInit();
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -203,5 +213,6 @@ namespace ScriptEditor
         private System.Windows.Forms.ToolStripStatusLabel tssText;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox cbDevices;
+        private System.Windows.Forms.CheckBox cbShowAll;
     }
 }

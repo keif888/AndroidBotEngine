@@ -1,0 +1,13 @@
+﻿BitBlt
+CreateCompatibleBitmap
+CreateCompatibleDC
+DeleteDC
+DeleteObject
+SelectObject
+GetDesktopWindow
+GetWindowDC
+GetWindowRect
+ReleaseDC
+ROP_CODE
+SetWindowPos
+HWND_*

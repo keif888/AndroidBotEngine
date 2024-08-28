@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>annotations</Nullable>
     <AssemblyVersion>1.5.4.85</AssemblyVersion>
     <FileVersion>1.5.4.85</FileVersion>
@@ -18,6 +18,7 @@
       <Private>true</Private>
       <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
     </ProjectReference>
+    <ProjectReference Include="..\Win32FrameBufferClient\Win32FrameBufferClient.csproj" />
   </ItemGroup>
 
 </Project>

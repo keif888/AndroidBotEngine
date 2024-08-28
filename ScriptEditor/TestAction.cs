@@ -10,7 +10,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using BotEngineClient;
-using SharpAdbClient;
+using AdvancedSharpAdbClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Action = BotEngineClient.Action;
@@ -176,8 +176,9 @@ namespace ScriptEditor
             Action action = workerArgument.action;
             string deviceId = workerArgument.deviceId;
             string actionName = workerArgument.actionName;
+            Win32FrameBufferClient.Win32FrameBuffer win32FrameBuffer = null;
 
-            BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig);
+            BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig, false, win32FrameBuffer);
             BotEngine.CommandResults cr;
             threadCTS = new CancellationTokenSource();
             Thread botThread;

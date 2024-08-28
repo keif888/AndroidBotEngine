@@ -14,8 +14,9 @@ using CommandLine;
 using CommandLine.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SharpAdbClient;
+using AdvancedSharpAdbClient;
 using Win32FrameBufferClient;
+using AdvancedSharpAdbClient.Models;
 
 namespace BotEngine
 {
@@ -43,13 +44,6 @@ namespace BotEngine
 
         private static BotEngineClient.BotEngine.CommandResults threadResult;
         private static CancellationTokenSource threadCTS;
-
-        private static string emulatorProcessName;
-        private static string emulatorWindowName;
-        private static int emulatorX;
-        private static int emulatorY;
-        private static int emulatorWidth;
-        private static int emulatorHeight;
 
         private static bool UseWin32;
 
@@ -277,18 +271,18 @@ namespace BotEngine
                         }
                     }
                     AdbClient client = new AdbClient();
-                    List<DeviceData> devices = new List<DeviceData>();
+                    IEnumerable<DeviceData> devices = new List<DeviceData>();
                     for (int i = 0; i < 5; i++)
                     {
                         devices = client.GetDevices();
-                        if (devices.Count > 0)
+                        if (devices.Count() > 0)
                             break;
                         _logger.LogWarning("No ADB Clients Found");
                         Thread.Sleep(1500);
                     }
                     #endregion
 
-                    if (devices.Count == 0)
+                    if (devices.Count() == 0)
                     {
                         _logger.LogError("No ADB Clients Found");
                         exitCode = -2;
@@ -362,7 +356,7 @@ namespace BotEngine
                             return -2;
                         #endregion
 
-                        BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, o.ADBPath, GetDeviceId(o, devices), botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig);
+                        BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, o.ADBPath, GetDeviceId(o, devices), botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig, UseWin32, _win32FrameBuffer);
                         BotEngineClient.BotEngine.CommandResults cr = BotEngineClient.BotEngine.CommandResults.Ok;
                         DateTime tenMinuteDateTime = DateTime.Now;
                         bool paused = false;
@@ -520,12 +514,12 @@ namespace BotEngine
         /// <param name="o"></param>
         /// <param name="devices"></param>
         /// <returns></returns>
-        private static string GetDeviceId(Options o, List<DeviceData> devices)
+        private static string GetDeviceId(Options o, IEnumerable<DeviceData> devices)
         {
             string deviceId;
             if (o.DeviceString is null)
             {
-                DeviceData device = devices[0];
+                DeviceData device = devices.FirstOrDefault();
                 string deviceState = device.State == DeviceState.Online ? "device" : device.State.ToString().ToLower();
                 deviceId = String.Format("{0} {1} product:{2} model:{3} device:{4} features:{5}  transport_id:{6}", device.Serial, deviceState, device.Product, device.Model, device.Name, device.Features, device.TransportId);
             }
@@ -564,16 +558,16 @@ namespace BotEngine
                 }
             }
             AdbClient client = new AdbClient();
-            List<DeviceData> devices = new List<DeviceData>();
+            IEnumerable<DeviceData> devices = new List<DeviceData>();
             for (int i = 0; i < 5; i++)
             {
                 devices = client.GetDevices();
-                if (devices.Count > 0)
+                if (devices.Count() > 0)
                     break;
                 _logger.LogWarning("No ADB Clients Found");
                 Thread.Sleep(1500);
             }
-            if (devices.Count == 0)
+            if (devices.Count() == 0)
             {
                 _logger.LogError("No ADB Clients Found");
                 exitCode = -2;

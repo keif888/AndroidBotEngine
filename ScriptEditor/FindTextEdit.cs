@@ -2,7 +2,7 @@
 // Copyright (c) Keith Martin
 // Licensed under the Apache License, Version 2.0 (the "License")</copyright>
 
-using SharpAdbClient;
+using AdvancedSharpAdbClient;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,6 +12,7 @@ using FindTextClient;
 using System.Threading;
 using System.Buffers.Text;
 using System.Collections;
+using AdvancedSharpAdbClient.Models;
 
 namespace ScriptEditor
 {
@@ -1144,7 +1145,7 @@ namespace ScriptEditor
             }
 
             AdbClient client = new AdbClient();
-            List<DeviceData> devices = client.GetDevices();
+            IEnumerable<DeviceData> devices = client.GetDevices();
 
             List<string> devicesList = new List<string>();
             DeviceSelect deviceSelect = new DeviceSelect();
@@ -1162,7 +1163,7 @@ namespace ScriptEditor
 
                 Framebuffer framebuffer = new Framebuffer(device, client);
                 System.Threading.CancellationToken cancellationToken = default;
-                framebuffer.RefreshAsync(cancellationToken).Wait(3000);
+                framebuffer.Refresh(false);
                 Image image = framebuffer.ToImage();
                 LoadGrabAndGrid(ref image);
             }

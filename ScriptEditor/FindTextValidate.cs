@@ -9,7 +9,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using BotEngineClient;
 using FindTextClient;
-using SharpAdbClient;
+using AdvancedSharpAdbClient;
+using AdvancedSharpAdbClient.Models;
 
 namespace ScriptEditor
 {
@@ -52,7 +53,7 @@ namespace ScriptEditor
 
                 Framebuffer framebuffer = new Framebuffer(device, client);
                 System.Threading.CancellationToken cancellationToken = default;
-                framebuffer.RefreshAsync(cancellationToken).Wait(3000);
+                framebuffer.Refresh(false);
                 loadedFromADBImage = framebuffer.ToImage();
                 adbScreenSize = new Rectangle(0, 0, loadedFromADBImage.Width, loadedFromADBImage.Height);
                 BtnReset_Click(sender, e);

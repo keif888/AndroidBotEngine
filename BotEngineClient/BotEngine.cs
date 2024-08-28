@@ -3,7 +3,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License")</copyright>
 
 using Microsoft.Extensions.Logging;
-using SharpAdbClient;
+using AdvancedSharpAdbClient;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,6 +12,12 @@ using System.Threading;
 using FindTextClient;
 using System.Text.RegularExpressions;
 using System.Linq;
+using Win32FrameBufferClient;
+using AdvancedSharpAdbClient.Models;
+using AdvancedSharpAdbClient.Receivers;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace BotEngineClient
 {
@@ -44,6 +50,8 @@ namespace BotEngineClient
         private DateTime lastActivityTime;
         private Regex findAgeFromDumsys;
         private bool hasCheckedUserActivityThisAction;
+        private bool _useWin32;
+        private Win32FrameBuffer _win32FrameBuffer;
 
         /// <summary>
         /// Enum of all the possible results from executing a command
@@ -187,8 +195,10 @@ namespace BotEngineClient
         /// <param name="systemActions">The set of Actions that are System actions</param>
         /// <param name="normalActions">The set of Actions that are not System actions</param>
         /// <param name="listConfig">The config which contains the lists used</param>
+        /// <param name="UseWin32">True when graphics collection is to be via Win32 instead of ADB</param>
+        /// <param name="win32FrameBuffer">The Win32FrameBuffer that points at the window of the emulator</param>
         /// <exception cref="Exception"></exception>
-        public BotEngine(IServiceProvider ServiceProvider, string ADBPath, string ADBDeviceData, Dictionary<string, FindString> findStrings, Dictionary<string, Action> systemActions, Dictionary<string, Action> normalActions, BOTListConfig listConfig)
+        public BotEngine(IServiceProvider ServiceProvider, string ADBPath, string ADBDeviceData, Dictionary<string, FindString> findStrings, Dictionary<string, Action> systemActions, Dictionary<string, Action> normalActions, BOTListConfig listConfig, bool UseWin32,  Win32FrameBuffer win32FrameBuffer)
         {
             _logger = (ILogger)ServiceProvider.GetService(typeof(ILogger));
             using (_logger.BeginScope("BotEngine"))
@@ -211,9 +221,12 @@ namespace BotEngineClient
                 adbDevice = DeviceData.CreateFromAdbData(ADBDeviceData);
                 adbReceiver = new ConsoleOutputReceiver(null);
                 findText = new FindText();
-                System.Threading.CancellationToken cancellationToken = default;
-                adbFrameBuffer = new Framebuffer(adbDevice, adbClient);
-                adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                //System.Threading.CancellationToken cancellationToken = default;
+                //adbFrameBuffer = adbClient.CreateFramebuffer(adbDevice);
+                //adbFrameBuffer.Data();
+                //adbFrameBuffer = new Framebuffer(adbDevice, adbClient);
+                //_ = adbFrameBuffer.RefreshAsync().Wait(3000);
+                adbFrameBuffer = adbClient.GetFrameBuffer(adbDevice);
                 using (Image localImage = adbFrameBuffer.ToImage())
                 {
                     adbScreenSize = new Rectangle(0, 0, localImage.Width, localImage.Height);
@@ -223,6 +236,17 @@ namespace BotEngineClient
                 NormalActions = normalActions;
                 ListConfig = listConfig;
                 EmulatorName = adbDevice.Model;
+                if (UseWin32)
+                {
+                    _logger.LogDebug("Resize window");
+                    Rectangle windowSize = win32FrameBuffer.ImageSize;
+                    windowSize.Width = windowSize.Width + (windowSize.X * 2);  // This assumes that X is the width of the border of the window
+                    windowSize.Height = windowSize.Height + windowSize.Y + windowSize.X;  // This assumes that Y is the height of the top of the window frame, and that the bottom border is the same width as the sides.
+                    win32FrameBuffer.ResizeEmulator(0, 0, windowSize.Width, windowSize.Height, false);
+                    adbScreenSize = new Rectangle(0, 0, win32FrameBuffer.ImageSize.Width, win32FrameBuffer.ImageSize.Height);
+                    _useWin32 = true;
+                    _win32FrameBuffer = win32FrameBuffer;
+                }
             }
             isThreading = false;
             activePath = new StringBuilder();
@@ -546,9 +570,10 @@ namespace BotEngineClient
                 stopWatch.Start();
                 while (stopWatch.Elapsed.TotalMilliseconds < timeOut)
                 {
-                    adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
                     int zx = adbScreenSize.X, zy = adbScreenSize.Y, w = adbScreenSize.Width, h = adbScreenSize.Height;
-                    using (Image localImage = adbFrameBuffer.ToImage())
+
+                    if (!_useWin32) { adbFrameBuffer.Refresh(false); }
+                    using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                     {
                         findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                     }
@@ -612,9 +637,9 @@ namespace BotEngineClient
                 stopWatch.Start();
                 while (stopWatch.Elapsed.TotalMilliseconds < timeOut)
                 {
-                    adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                    if (!_useWin32) adbFrameBuffer.Refresh(false);
                     int zx = adbScreenSize.X, zy = adbScreenSize.Y, w = adbScreenSize.Width, h = adbScreenSize.Height;
-                    using (Image localImage = adbFrameBuffer.ToImage())
+                    using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                     {
                         findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                     }
@@ -653,9 +678,9 @@ namespace BotEngineClient
             {
                 CommandResults result = CommandResults.Missing;
                 System.Threading.CancellationToken cancellationToken = default;
-                adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                if (!_useWin32) adbFrameBuffer.Refresh(false);
                 int zx = adbScreenSize.X, zy = adbScreenSize.Y, w = adbScreenSize.Width, h = adbScreenSize.Height;
-                using (Image localImage = adbFrameBuffer.ToImage())
+                using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                 {
                     findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                 }
@@ -699,9 +724,9 @@ namespace BotEngineClient
             {
                 CommandResults result = CommandResults.Missing;
                 System.Threading.CancellationToken cancellationToken = default;
-                adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                if (!_useWin32) adbFrameBuffer.Refresh(false);
                 int zx = adbScreenSize.X, zy = adbScreenSize.Y, w = adbScreenSize.Width, h = adbScreenSize.Height;
-                using (Image localImage = adbFrameBuffer.ToImage())
+                using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                 {
                     findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                 }
@@ -742,9 +767,9 @@ namespace BotEngineClient
             {
                 CommandResults result = CommandResults.Missing;
                 System.Threading.CancellationToken cancellationToken = default;
-                adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                if (!_useWin32) adbFrameBuffer.Refresh(false);
                 int zx = adbScreenSize.X, zy = adbScreenSize.Y, w = adbScreenSize.Width, h = adbScreenSize.Height;
-                using (Image localImage = adbFrameBuffer.ToImage())
+                using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                 {
                     findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                 }
@@ -795,9 +820,9 @@ namespace BotEngineClient
                     timeOut = int.MaxValue;
 
                 // Find the 1st item from the list
-                adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                if (!_useWin32) adbFrameBuffer.Refresh(false);
                 zx = adbScreenSize.X; zy = adbScreenSize.Y; w = adbScreenSize.Width; h = adbScreenSize.Height;
-                using (Image localImage = adbFrameBuffer.ToImage())
+                using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                 {
                     findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                 }
@@ -834,9 +859,9 @@ namespace BotEngineClient
                     while (stopWatch.Elapsed.TotalMilliseconds < timeOut)
                     {
                         Thread.Sleep(50);
-                        adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                        if (!_useWin32) adbFrameBuffer.Refresh(false);
                         zx = adbScreenSize.X; zy = adbScreenSize.Y; w = adbScreenSize.Width; h = adbScreenSize.Height;
-                        using (Image localImage = adbFrameBuffer.ToImage())
+                        using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                         {
                             findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                         }
@@ -900,9 +925,9 @@ namespace BotEngineClient
                 if (areas.Count > 0)
                 {
                     System.Threading.CancellationToken cancellationToken = default;
-                    adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                    if (!_useWin32) adbFrameBuffer.Refresh(false);
                     int zx = adbScreenSize.X, zy = adbScreenSize.Y, w = adbScreenSize.Width, h = adbScreenSize.Height;
-                    using (Image localImage = adbFrameBuffer.ToImage())
+                    using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                     {
                         findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                     }
@@ -1034,9 +1059,9 @@ namespace BotEngineClient
                     stopWatch.Start();
                     do
                     {
-                        adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                        if (!_useWin32) adbFrameBuffer.Refresh(false);
                         zx = adbScreenSize.X; zy = adbScreenSize.Y; w = adbScreenSize.Width; h = adbScreenSize.Height;
-                        using (Image localImage = adbFrameBuffer.ToImage())
+                        using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                         {
                             findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                         }
@@ -1095,8 +1120,8 @@ namespace BotEngineClient
                     stopWatch.Start();
                     do
                     {
-                        adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
-                        using (Image localImage = adbFrameBuffer.ToImage())
+                        if (!_useWin32) adbFrameBuffer.Refresh(false);
+                        using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                         {
                             findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                         }
@@ -1172,9 +1197,9 @@ namespace BotEngineClient
                     stopWatch.Start();
                     do
                     {
-                        adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
+                        if (!_useWin32) adbFrameBuffer.Refresh(false);
                         zx = adbScreenSize.X; zy = adbScreenSize.Y; w = adbScreenSize.Width; h = adbScreenSize.Height;
-                        using (Image localImage = adbFrameBuffer.ToImage())
+                        using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                         {
                             findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                         }
@@ -1236,8 +1261,8 @@ namespace BotEngineClient
                     stopWatch.Start();
                     do
                     {
-                        adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
-                        using (Image localImage = adbFrameBuffer.ToImage())
+                        if (!_useWin32) { adbFrameBuffer.Refresh(false); }
+                        using (Image localImage = (_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                         {
                             findText.LoadImage(localImage, ref zx, ref zy, ref w, ref h);
                         }
@@ -1375,10 +1400,10 @@ namespace BotEngineClient
                 CommandResults result = CommandResults.TimeOut;
                 System.Threading.CancellationToken cancellationToken = default;
                 int iterationWait = Math.Max(timeOut / 20, 50);
-                
 
-                adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
-                using (Bitmap savedImage = (Bitmap)adbFrameBuffer.ToImage())
+
+                if (!_useWin32) adbFrameBuffer.Refresh(false);
+                using (Bitmap savedImage = (Bitmap)(_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                 {
                     Rectangle srcRect = new Rectangle(changeDetectArea.X, changeDetectArea.Y, changeDetectArea.Width, changeDetectArea.Height);
                     using (Bitmap savedPart = savedImage.Clone(srcRect, savedImage.PixelFormat))
@@ -1388,8 +1413,8 @@ namespace BotEngineClient
                         do
                         {
                             Thread.Sleep(iterationWait);
-                            adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
-                            using (Bitmap newImage = (Bitmap)adbFrameBuffer.ToImage())
+                            if (!_useWin32) adbFrameBuffer.Refresh(false);
+                            using (Bitmap newImage = (Bitmap)(_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                             {
                                 using (Bitmap newPart = newImage.Clone(srcRect, newImage.PixelFormat))
                                 {
@@ -1430,8 +1455,8 @@ namespace BotEngineClient
                 int iterationWait = Math.Max(timeOut / 20, 50);
 
 
-                adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
-                using (Bitmap savedImage = (Bitmap)adbFrameBuffer.ToImage())
+                if (!_useWin32) adbFrameBuffer.Refresh(false);
+                using (Bitmap savedImage = (Bitmap)(_useWin32 ? _win32FrameBuffer.ToImage() : adbFrameBuffer.ToImage()))
                 {
                     Rectangle srcRect = new Rectangle(changeDetectArea.X, changeDetectArea.Y, changeDetectArea.Width, changeDetectArea.Height);
                     using (Bitmap savedPart = savedImage.Clone(srcRect, savedImage.PixelFormat))
@@ -1441,8 +1466,8 @@ namespace BotEngineClient
                         do
                         {
                             Thread.Sleep(iterationWait);
-                            adbFrameBuffer.RefreshAsync(cancellationToken).Wait(3000);
-                            using (Bitmap newImage = (Bitmap)adbFrameBuffer.ToImage())
+                            if (!_useWin32) adbFrameBuffer.Refresh(false);
+                            using (Bitmap newImage = (Bitmap) (_useWin32 ? _win32FrameBuffer.ToImage() :adbFrameBuffer.ToImage()))
                             {
                                 using (Bitmap newPart = newImage.Clone(srcRect, newImage.PixelFormat))
                                 {
@@ -2040,7 +2065,5 @@ namespace BotEngineClient
                 return results;
             }
         }
-
-
     }
 }

@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <Nullable>annotations</Nullable>
-    <AssemblyVersion>1.5.4.85</AssemblyVersion>
-    <FileVersion>1.5.4.85</FileVersion>
+    <AssemblyVersion>1.5.4.92</AssemblyVersion>
+    <FileVersion>1.5.4.92</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AdvancedSharpAdbClient" Version="3.3.13" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
-    <PackageReference Include="SharpAdbClient" Version="2.3.23" />
   </ItemGroup>
 
   <ItemGroup>

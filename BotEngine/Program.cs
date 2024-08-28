@@ -15,6 +15,7 @@ using CommandLine.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SharpAdbClient;
+using Win32FrameBufferClient;
 
 namespace BotEngine
 {
@@ -43,6 +44,16 @@ namespace BotEngine
         private static BotEngineClient.BotEngine.CommandResults threadResult;
         private static CancellationTokenSource threadCTS;
 
+        private static string emulatorProcessName;
+        private static string emulatorWindowName;
+        private static int emulatorX;
+        private static int emulatorY;
+        private static int emulatorWidth;
+        private static int emulatorHeight;
+
+        private static bool UseWin32;
+
+        private static Win32FrameBuffer _win32FrameBuffer;
 
         private enum ConsoleKeyPressEnum
         {
@@ -74,6 +85,9 @@ namespace BotEngine
             botDeviceConfig = new BOTDeviceConfig();
             botDeviceConfigNew = new BOTDeviceConfig();
             threadCTS = null;
+
+            UseWin32 = false;
+            _win32FrameBuffer = null;
 
             services = new ServiceCollection();
 
@@ -147,6 +161,27 @@ namespace BotEngine
                 {
                     JsonHelper jsonHelper = new JsonHelper();
                     JsonHelper.ConfigFileType fileType;
+
+                    #region Setup Win32
+
+                    if (!string.IsNullOrEmpty(o.ProcessName) && !string.IsNullOrEmpty(o.WindowName))
+                    {
+                        try
+                        {
+                            _win32FrameBuffer = new Win32FrameBuffer(o.ProcessName, o.WindowName);
+
+                            _win32FrameBuffer.ImageSize = new System.Drawing.Rectangle(o.TopLeftX, o.TopLeftY, o.Width, o.Height);
+                            UseWin32 = _win32FrameBuffer.IsValid();
+                        }
+                        catch (Exception ex)
+                        {
+                            UseWin32 = false;
+                            _win32FrameBuffer = null;
+                            _logger.LogError("Unable to initialise Win32 Graphics Capture, falling back to ADB. Exception was:\r\n{0}", ex.Message);
+                        }
+                    }
+
+                    #endregion
 
                     #region Validate Files
                     _logger.LogDebug("Ensure that files exist");

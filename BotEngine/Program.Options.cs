@@ -27,6 +27,21 @@ namespace BotEngine
 
             public string LogLevel { get; set; }
 
+            /// <summary>
+            /// Used to hold the name of the process that the emulator is running in
+            /// </summary>
+            public string ProcessName { get; set; }
+
+            /// <summary>
+            /// Used to hold the name of the main window to identify which instance of the ProcessName to attach to
+            /// </summary>
+            public string WindowName { get; set; }
+
+            public int TopLeftX { get; set; }
+            public int TopLeftY { get; set; }
+            public int Height { get; set; }
+            public int Width { get; set; }
+
         }
     }
 }

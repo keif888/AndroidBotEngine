@@ -525,6 +525,7 @@ namespace BotEngine
             }
             else
             {
+                //ToDo: Add device matching here to handle cases where only the transport_id is incorrect.
                 deviceId = o.DeviceString;
             }
 

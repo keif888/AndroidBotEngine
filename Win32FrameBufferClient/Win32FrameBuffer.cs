@@ -17,6 +17,11 @@ namespace Win32FrameBufferClient
         private readonly IntPtr _mainWindowHandle;
         private Rectangle _imageSize;
 
+        // ToDo: Add capability to create a video of all the images that are captured.
+        // Would need a variable that it is being done, and a destructor on the class, that closes out the video rendering.
+        // Would need methods to start the capture, stop the capture.
+
+
         /// <summary>
         /// Initialise the class by finding the main window handle that we will be grabbing content from
         /// </summary>

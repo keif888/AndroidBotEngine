@@ -21,7 +21,26 @@ namespace ActionRecorderClient
         private long _rtStart = 0;
         // ToDo: Implement VFR (Variable Frame Rate).
         // But this is difficult, as you need to add the previous bitmap with the time between when it arrived and when the new bitmap arrived.
-        // private DateTime _recordingStart = DateTime.MinValue;
+
+        /// <summary>
+        /// Stores the previous frame to support variable frame rate.
+        /// </summary>
+        private Bitmap? _previousFrame = null;
+        /// <summary>
+        /// Stores when the previous frame arrived.
+        /// </summary>
+        private DateTime _previousFrameDateTime = DateTime.MinValue;
+
+        private bool _isVariableFrameRate = false;
+        /// <summary>
+        /// Enables VariableFrameRate IF recording has not started.
+        /// </summary>
+        public bool VariableFrameRate
+        {
+            get { return _isVariableFrameRate; }
+            set { if (_writer == null) { _isVariableFrameRate = value; } }
+        }
+
 
         /// <summary>
         /// Stores the video width to use for this recording.
@@ -73,6 +92,14 @@ namespace ActionRecorderClient
             private set { _isMFStarted = value; }
         }
 
+
+        /// <summary>
+        /// Returns true when recording has already started.
+        /// </summary>
+        public bool IsRecordingStarted
+        {
+            get { return (_writer != null); }
+        }
 
 
         /// <summary>
@@ -174,14 +201,18 @@ namespace ActionRecorderClient
             {
                 throw new Exception("MediaFoundation is not started.");
             }
-            if (string.IsNullOrEmpty(VideoFileName))
+            if (string.IsNullOrEmpty(_videoFileName))
             {
                 throw new Exception("VideoFileName not populated.");
             }
+            if (_writer != null)
+            {
+                throw new Exception("Recording has already started.");
+            }
             try
             {
-                File.WriteAllText(VideoFileName, String.Empty);
-                File.Delete(VideoFileName);
+                File.WriteAllText(_videoFileName, String.Empty);
+                File.Delete(_videoFileName);
             }
             catch (Exception ex)
             {
@@ -192,7 +223,7 @@ namespace ActionRecorderClient
             // Create the _writer
             try
             {
-                hr = MFExtern.MFCreateSinkWriterFromURL(@"D:\Test\CaptureWindow.mp4", null, null, out _writer);
+                hr = MFExtern.MFCreateSinkWriterFromURL(_videoFileName, null, null, out _writer);
                 if (hr != HResult.S_OK)
                 {
                     throw new Exception("MFCreateSinkWriterFromURL failed, result = " + hr.ToString());
@@ -236,7 +267,7 @@ namespace ActionRecorderClient
             }
             if (hr == HResult.S_OK && pMediaTypeOut != null)
             {
-                hr = MFExtern.MFSetAttributeRatio(pMediaTypeOut, MFAttributesClsid.MF_MT_FRAME_RATE, VideoFPS, 1);
+                hr = MFExtern.MFSetAttributeRatio(pMediaTypeOut, MFAttributesClsid.MF_MT_FRAME_RATE, _videoFPS, 1);
             }
             if (hr == HResult.S_OK && pMediaTypeOut != null)
             {
@@ -269,7 +300,7 @@ namespace ActionRecorderClient
             }
             if (hr == HResult.S_OK && pMediaTypeIn != null)
             {
-                hr = MFExtern.MFSetAttributeRatio(pMediaTypeIn, MFAttributesClsid.MF_MT_FRAME_RATE, VideoFPS, 1);
+                hr = MFExtern.MFSetAttributeRatio(pMediaTypeIn, MFAttributesClsid.MF_MT_FRAME_RATE, _videoFPS, 1);
             }
             if (hr == HResult.S_OK && pMediaTypeIn != null)
             {
@@ -352,6 +383,21 @@ namespace ActionRecorderClient
                 graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
                 graphics.DrawString(stamp, new Font("Tahoma", 8), Brushes.White, rectf);
             }
+            long VFD = _videoFrameDuration;
+
+            if (_isVariableFrameRate && _previousFrame == null)
+            {
+                _previousFrame = bitmap;
+                _previousFrameDateTime = DateTime.Now;
+                return;
+            }
+            else if (_isVariableFrameRate && _previousFrame != null)
+            {
+                Bitmap tempBitmap = _previousFrame;
+                _previousFrame = bitmap;
+                bitmap = tempBitmap;
+                VFD = ((long)(DateTime.Now - _previousFrameDateTime).TotalNanoseconds) / 100;
+            }
 
             // Convert to byte array
             byte[] imgArray = BmpToByte(bitmap);
@@ -433,7 +479,7 @@ namespace ActionRecorderClient
             }
             if (hr == HResult.S_OK && pSample != null)
             {
-                hr = pSample.SetSampleDuration(_videoFrameDuration);
+                hr = pSample.SetSampleDuration(VFD);
             }
 
             // Send the sample to the Sink Writer.
@@ -451,8 +497,22 @@ namespace ActionRecorderClient
                 Marshal.ReleaseComObject(pBuffer);
             }
 
-            _rtStart += _videoFrameDuration;
+            _rtStart += VFD;
         }
+
+        /// <summary>
+        /// Adds the provided sourceImage onto the already started recording.
+        /// But without a stamp...
+        /// </summary>
+        /// <param name="source">The Image to add into the recording</param>
+        /// <exception cref="Exception">MediaFoundation is not started.</exception>
+        /// <exception cref="Exception">InitiateMFWriterAndSink hasn't been done.</exception>
+        /// <exception cref="Exception">Either memory allocation or MFCopyImage borked.</exception>
+        public void AddImageAsFrame(Image source)
+        {
+            AddImageAsFrame(source, string.Empty);
+        }
+
 
         /// <summary>
         /// If a recording is in progress this will stop it, and write the video file out.
@@ -461,6 +521,10 @@ namespace ActionRecorderClient
         {
             if (IsMFStarted && _writer != null)
             {
+                if (_isVariableFrameRate && _previousFrame != null)
+                {
+                    AddImageAsFrame(_previousFrame);
+                }
                 HResult hr = _writer.Finalize_();
                 Marshal.ReleaseComObject(_writer);
                 _writer = null;

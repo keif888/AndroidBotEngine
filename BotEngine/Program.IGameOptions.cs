@@ -28,10 +28,10 @@ namespace BotEngine
             [Option('l', "LogLevel", Required = false, HelpText = "The level of output from the logger (None, Critical, Error, Warning, Information, Debug, Trace).", Default = "Warning")]
             public string LogLevel { get; set; }
 
-            [Option('P', "ProcessName", Required = true, HelpText = "The name of the process that the emulator is running in (without the .exe).")]
+            [Option('P', "ProcessName", Required = false, HelpText = "The name of the process that the emulator is running in (without the .exe).")]
             public string ProcessName { get; set; }
 
-            [Option('n', "WindowName", Required = true, HelpText = "The name of the Main Window that the emulator is running.  Check the MultiPlayer for your emulator.")]
+            [Option('n', "WindowName", Required = false, HelpText = "The name of the Main Window that the emulator is running.  Check the MultiPlayer for your emulator.")]
             public string WindowName { get; set; }
 
             [Option('x', "TopLeftX", Required = false, HelpText = "The top left X offset to read from the emulator window", Default = 1)]

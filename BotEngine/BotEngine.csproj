@@ -5,11 +5,11 @@
     <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <StartupObject>BotEngine.Program</StartupObject>
     <Nullable>annotations</Nullable>
-    <Version>0.3.3-beta-13</Version>
+    <Version>0.3.3-beta-14</Version>
     <Authors>Keif888</Authors>
     <Description>Android BotEngine</Description>
-    <AssemblyVersion>0.3.3.109</AssemblyVersion>
-    <FileVersion>0.3.3.109</FileVersion>
+    <AssemblyVersion>0.3.3.110</AssemblyVersion>
+    <FileVersion>0.3.3.110</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

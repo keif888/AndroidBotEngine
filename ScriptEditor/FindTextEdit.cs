@@ -1131,7 +1131,7 @@ namespace ScriptEditor
             if (server == null)
             {
                 server = new AdbServer();
-                StartServerResult result = server.StartServer(AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", restartServerIfNewer: true);
+                StartServerResult result = server.StartServer(AppDomain.CurrentDomain.BaseDirectory + @"ADB\adb.exe", restartServerIfNewer: true);
                 if (result != StartServerResult.AlreadyRunning)
                 {
                     Thread.Sleep(1500);

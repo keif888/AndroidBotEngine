@@ -178,7 +178,7 @@ namespace ScriptEditor
             string actionName = workerArgument.actionName;
             Win32FrameBufferClient.Win32FrameBuffer win32FrameBuffer = null;
 
-            BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig, false, win32FrameBuffer);
+            BotEngineClient.BotEngine bot = new BotEngineClient.BotEngine(ServiceProvider, AppDomain.CurrentDomain.BaseDirectory + @"ADB\adb.exe", deviceId, botGameConfig.FindStrings, botGameConfig.SystemActions, botGameConfig.Actions, botListConfig, false, win32FrameBuffer);
             BotEngine.CommandResults cr;
             threadCTS = new CancellationTokenSource();
             Thread botThread;

@@ -11,10 +11,11 @@ using System.Text;
 using System.Windows.Forms;
 using System.Text.Json;
 using BotEngineClient;
-using SharpAdbClient;
+using AdvancedSharpAdbClient;
 using static BotEngineClient.BotEngine;
 using System.Text.Json.Nodes;
 using System.Threading;
+using AdvancedSharpAdbClient.Models;
 #endregion
 
 namespace ScriptEditor
@@ -1836,7 +1837,8 @@ namespace ScriptEditor
             if (server == null)
             {
                 server = new AdbServer();
-                StartServerResult result = server.StartServer(AppDomain.CurrentDomain.BaseDirectory + @"\ADB\adb.exe", restartServerIfNewer: true);
+                string adbPath = AppDomain.CurrentDomain.BaseDirectory + @"ADB\adb.exe";
+                StartServerResult result = server.StartServer(adbPath, restartServerIfNewer: true);
                 if (result != StartServerResult.AlreadyRunning)
                 {
                     Thread.Sleep(1500);
@@ -1850,7 +1852,7 @@ namespace ScriptEditor
             }
 
             AdbClient client = new AdbClient();
-            List<DeviceData> devices = client.GetDevices();
+            IEnumerable<DeviceData> devices = client.GetDevices();
 
             if (devicesList == null)
             {

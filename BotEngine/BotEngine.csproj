@@ -5,11 +5,11 @@
     <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <StartupObject>BotEngine.Program</StartupObject>
     <Nullable>annotations</Nullable>
-    <Version>0.3.3-beta-09</Version>
+    <Version>0.3.3-beta-13</Version>
     <Authors>Keif888</Authors>
     <Description>Android BotEngine</Description>
-    <AssemblyVersion>0.3.3.105</AssemblyVersion>
-    <FileVersion>0.3.3.105</FileVersion>
+    <AssemblyVersion>0.3.3.109</AssemblyVersion>
+    <FileVersion>0.3.3.109</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -37,9 +37,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.8.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
+    <PackageReference Include="AdvancedSharpAdbClient" Version="3.6.16" />
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>

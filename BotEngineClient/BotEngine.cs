@@ -406,7 +406,7 @@ namespace BotEngineClient
                 do
                 {
                     Thread.Sleep(1500);
-                    AdbClientExtensions.ExecuteRemoteCommand(adbClient, string.Format("dumpsys window windows", gameString), adbDevice, adbReceiver);
+                    AdbClientExtensions.ExecuteRemoteCommand(adbClient, string.Format("dumpsys window displays", gameString), adbDevice, adbReceiver);
                     string cmdResult = adbReceiver.ToString();
                     string currentFocus = cmdResult[cmdResult.IndexOf("mCurrentFocus")..];
                     currentFocus = currentFocus.Substring(0, currentFocus.IndexOf("\n"));
